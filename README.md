@@ -57,7 +57,7 @@ Bạn muốn tham gia vào sự hỗn loạn này? Tuyệt vời! Chúng tôi lu
 **Lưu ý quan trọng:** Chúng tôi có quyền từ chối bất kỳ đóng góp nào mà chúng tôi không thích. Đó là quyền lực của chúng tôi, và chúng tôi sẽ sử dụng nó một cách... tùy hứng.
 
 ## Giấy Phép (Hay Còn Gọi Là "Giấy Phép Để Làm Bất Cứ Điều Gì Bạn Muốn, Nhưng Đừng Đổ Lỗi Cho Chúng Tôi") 📜
-Dự án này được cấp phép theo giấy phép [Giấy Phép Của Bạn, ví dụ: MIT License]. Về cơ bản, bạn có thể làm bất cứ điều gì bạn muốn với nó, nhưng nếu có gì đó sai sót, đừng đổ lỗi cho chúng tôi. Chúng tôi đã cảnh báo bạn rồi đấy!
+Dự án này được cấp phép theo giấy phép [MIT License]. Về cơ bản, bạn có thể làm bất cứ điều gì bạn muốn với nó, nhưng nếu có gì đó sai sót, đừng đổ lỗi cho chúng tôi. Chúng tôi đã cảnh báo bạn rồi đấy!
 
 ## Liên Hệ (Hay Còn Gọi Là "Gọi Cứu Trợ, Hoặc Chỉ Để Chào Hỏi") 📞
 Nếu bạn có bất kỳ câu hỏi, báo cáo lỗi (chắc chắn sẽ có), hoặc chỉ muốn nói "Xin chào!", hãy liên hệ với chúng tôi tại [trongtruyen04@gmail.com] hoặc [https://github.com/truien].
