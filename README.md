@@ -32,7 +32,7 @@ Chúng tôi tự hào (và hơi xấu hổ) giới thiệu một sản phẩm...
 4. **Bước 4: Chạy!** (Ngón tay chéo nhé!)
     ```bash
         npm start # Hoặc yarn start, hoặc python main.py, hoặc... bạn là phù thủy, bạn tự biết mà.
-    (Nếu nó không chạy, hãy chắc chắn rằng bạn đã cắm điện vào máy tính. Đừng hỏi tại sao chúng tôi biết điều này.)
+>(Nếu nó không chạy, hãy chắc chắn rằng bạn đã cắm điện vào máy tính. Đừng hỏi tại sao chúng tôi biết điều này.)
 
 ## Sử Dụng (Hay Còn Gọi Là "Cách Thức Điều Khiển Con Quái Vật") 👹
 Sau khi bạn đã vượt qua được "nghi lễ triệu hồi" (cài đặt), bây giờ là lúc để... sử dụng nó! Chúc may mắn!
