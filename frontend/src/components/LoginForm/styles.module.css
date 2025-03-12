@@ -1,0 +1,29 @@
+.login_right{
+    background: url('https://static.topcv.vn/v4/image/auth/auth_bg_desktop.png');
+    padding: 100px 30px !important;
+}
+.header_title{
+    color: #00b14f;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 28px;
+    text-align: left;
+}
+.header_caption{
+    color: #7f878f;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: 20px;
+    margin-bottom: 0;
+    text-align: left;
+}
+.form-group{
+    max-width: 600px !important;
+    padding: 20px;
+}
+.img-fluid{
+    width: 150px;
+}

@@ -2,16 +2,20 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using BACKEND.Services;
+using BACKEND.Models;
+using Microsoft.EntityFrameworkCore;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<TopcvBeContext>(options =>
+    options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
+        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))));
 
-// ✅ Lấy thông tin JWT từ appsettings.json
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var secret = jwtSettings["Secret"] ?? throw new InvalidOperationException("JWT Secret is missing in configuration.");
 var key = Encoding.UTF8.GetBytes(secret);
 
-// ✅ Cấu hình Authentication
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -45,7 +49,7 @@ builder.Services.AddAuthentication(options =>
 
 // ✅ Thêm Authorization
 builder.Services.AddAuthorization();
-builder.Services.AddScoped<AuthService>();
+// builder.Services.AddScoped<AuthService>();
 
 // ✅ Cấu hình CORS
 builder.Services.AddCors(options =>

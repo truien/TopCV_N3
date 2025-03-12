@@ -38,8 +38,6 @@ public partial class TopcvBeContext : DbContext
 
     public virtual DbSet<Notification> Notifications { get; set; }
 
-    public virtual DbSet<OauthAccount> OauthAccounts { get; set; }
-
     public virtual DbSet<Package> Packages { get; set; }
 
     public virtual DbSet<ProFeature> ProFeatures { get; set; }
@@ -54,10 +52,8 @@ public partial class TopcvBeContext : DbContext
 
     public virtual DbSet<UserRole> UserRoles { get; set; }
 
-    public virtual DbSet<UserToken> UserTokens { get; set; }
-
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseMySql("server=localhost;database=topcv_be;user=root;password=admin", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.40-mysql"));
+        => optionsBuilder.UseMySql("server=localhost;port=3306;database=topcv_be;user=root;password=admin", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.40-mysql"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -367,28 +363,6 @@ public partial class TopcvBeContext : DbContext
                 .HasConstraintName("notifications_ibfk_1");
         });
 
-        modelBuilder.Entity<OauthAccount>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PRIMARY");
-
-            entity.ToTable("oauth_accounts");
-
-            entity.HasIndex(e => e.ProviderId, "provider_id").IsUnique();
-
-            entity.HasIndex(e => e.UserId, "user_id");
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Provider)
-                .HasColumnType("enum('google','facebook')")
-                .HasColumnName("provider");
-            entity.Property(e => e.ProviderId).HasColumnName("provider_id");
-            entity.Property(e => e.UserId).HasColumnName("user_id");
-
-            entity.HasOne(d => d.User).WithMany(p => p.OauthAccounts)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("oauth_accounts_ibfk_1");
-        });
-
         modelBuilder.Entity<Package>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
@@ -506,12 +480,9 @@ public partial class TopcvBeContext : DbContext
             entity.Property(e => e.Password)
                 .HasMaxLength(255)
                 .HasColumnName("password");
-            entity.Property(e => e.Role)
-                .HasColumnType("enum('candidate','recruiter','admin')")
-                .HasColumnName("role");
             entity.Property(e => e.RoleId).HasColumnName("role_id");
 
-            entity.HasOne(d => d.RoleNavigation).WithMany(p => p.Users)
+            entity.HasOne(d => d.Role).WithMany(p => p.Users)
                 .HasForeignKey(d => d.RoleId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_users_role");
@@ -555,28 +526,6 @@ public partial class TopcvBeContext : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
                 .HasColumnName("name");
-        });
-
-        modelBuilder.Entity<UserToken>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PRIMARY");
-
-            entity.ToTable("user_tokens");
-
-            entity.HasIndex(e => e.UserId, "user_id");
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.ExpiresAt)
-                .HasColumnType("timestamp")
-                .HasColumnName("expires_at");
-            entity.Property(e => e.RefreshToken)
-                .HasColumnType("text")
-                .HasColumnName("refresh_token");
-            entity.Property(e => e.UserId).HasColumnName("user_id");
-
-            entity.HasOne(d => d.User).WithMany(p => p.UserTokens)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("user_tokens_ibfk_1");
         });
 
         OnModelCreatingPartial(modelBuilder);

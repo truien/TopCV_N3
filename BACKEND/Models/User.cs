@@ -17,8 +17,6 @@ public partial class User
 
     public string? FacebookId { get; set; }
 
-    public string Role { get; set; } = null!;
-
     public DateTime? CreatedAt { get; set; }
 
     public int RoleId { get; set; }
@@ -35,15 +33,11 @@ public partial class User
 
     public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 
-    public virtual ICollection<OauthAccount> OauthAccounts { get; set; } = new List<OauthAccount>();
-
     public virtual ICollection<ProSubscription> ProSubscriptions { get; set; } = new List<ProSubscription>();
 
-    public virtual UserRole RoleNavigation { get; set; } = null!;
+    public virtual UserRole Role { get; set; } = null!;
 
     public virtual ICollection<UserFollow> UserFollowEmployers { get; set; } = new List<UserFollow>();
 
     public virtual ICollection<UserFollow> UserFollowUsers { get; set; } = new List<UserFollow>();
-
-    public virtual ICollection<UserToken> UserTokens { get; set; } = new List<UserToken>();
 }
