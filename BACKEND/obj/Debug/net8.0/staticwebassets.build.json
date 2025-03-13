@@ -1,11 +1,19 @@
 {
   "Version": 1,
-  "Hash": "rua3chM07FLLtJWvx9y1MaMOmaotvdwwFZSutZ14IEg=",
+  "Hash": "zTsPmbm7k6DHJ5NJ8g4KprY4CK5bbTCvL00UiNQ97eM=",
   "Source": "BACKEND",
   "BasePath": "_content/BACKEND",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "BACKEND\\wwwroot",
+      "Source": "BACKEND",
+      "ContentRoot": "C:\\Users\\ADMIN\\TopCV_N3\\BACKEND\\wwwroot\\",
+      "BasePath": "_content/BACKEND",
+      "Pattern": "**"
+    }
+  ],
   "Assets": []
 }

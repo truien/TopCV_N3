@@ -8,6 +8,7 @@ public class UserResponse
 {
     public int Id { get; set; }
     public string? Username { get; set; }
+    public string? Avatar { get; set; }
     public string? Role { get; set; }
     public string? Token { get; set; }
 }
@@ -18,9 +19,10 @@ public class RegisterRequest
     public string Password { get; set; } = string.Empty;
     public int RoleId { get; set; }
 }
+
 public class ChangePasswordRequest
 {
-    public string Username { get; set; } = string.Empty;
-    public string NewPassword { get; set; } = string.Empty;
+    public string? UserName { get; set; }
+    public string? OldPassword { get; set; }
+    public string? NewPassword { get; set; }
 }
-

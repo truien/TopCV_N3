@@ -5,6 +5,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using BCrypt.Net;
+using Microsoft.AspNetCore.Authorization;
 using BACKEND.Models;
 
 [Route("api/auth")]
@@ -23,7 +24,8 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var user = await _context.Users.FirstOrDefaultAsync(u => u.Name == request.Username);
+        var baseUrl = $"{Request.Scheme}://{Request.Host}/";
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
         if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
         {
             return Unauthorized(new { message = "Invalid username or password" });
@@ -36,9 +38,10 @@ public class AuthController : ControllerBase
         return Ok(new UserResponse
         {
             Id = user.Id,
-            Username = user.Name,
+            Username = user.Username,
             Role = role,
-            Token = token
+            Token = token,
+            Avatar = string.IsNullOrEmpty(user.Avatar) ? "" : baseUrl + "avatar/" + user.Avatar,
         });
     }
 
@@ -55,7 +58,7 @@ public class AuthController : ControllerBase
 
         var newUser = new User
         {
-            Name = request.Name,
+            Username = request.Name,
             Email = request.Email,
             Password = hashedPassword,
             RoleId = request.RoleId,
@@ -80,7 +83,6 @@ public class AuthController : ControllerBase
             var candidate = new CandidateProfile
             {
                 UserId = newUser.Id,
-                CvTitle = "Chưa có CV"
             };
             _context.CandidateProfiles.Add(candidate);
         }
@@ -95,7 +97,7 @@ public class AuthController : ControllerBase
         return Ok(new UserResponse
         {
             Id = newUser.Id,
-            Username = newUser.Name,
+            Username = newUser.Username,
             Role = role,
             Token = token
         });
@@ -118,7 +120,7 @@ public class AuthController : ControllerBase
 
         var claims = new[]
         {
-        new Claim(JwtRegisteredClaimNames.Sub, user.Name),
+        new Claim(JwtRegisteredClaimNames.Sub, user.Username),
         new Claim("id", user.Id.ToString()),
         new Claim("role", role)
     };
@@ -131,9 +133,63 @@ public class AuthController : ControllerBase
             expires: DateTime.UtcNow.AddMinutes(expireTime),
             signingCredentials: creds
         );
-        Console.WriteLine($"DEBUG: Claims = {string.Join(", ", claims.Select(c => $"{c.Type}: {c.Value}"))}");
 
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
+    [HttpPut("change-password")]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == request.UserName);
+
+        if (user == null)
+        {
+            return NotFound(new { message = "Người dùng không tồn tại!" });
+        }
+
+        if (!BCrypt.Net.BCrypt.Verify(request.OldPassword, user.Password))
+        {
+            return BadRequest(new { message = "Mật khẩu cũ không chính xác!" });
+        }
+        user.Password = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Đổi mật khẩu thành công!" });
+    }
+    [HttpGet("users")]
+    public async Task<IActionResult> GetAllUsers()
+    {
+        var baseUrl = $"{Request.Scheme}://{Request.Host}/";
+
+        var users = await _context.Users
+            .Select(u => new
+            {
+                Id = u.Id,
+                Username = u.Username,
+                Email = u.Email,
+                Role = _context.UserRoles.Where(r => r.Id == u.RoleId).Select(r => r.Name).FirstOrDefault(),
+                Avatar = string.IsNullOrEmpty(u.Avatar) ? "" : baseUrl + "uploads/avatars/" + u.Avatar,
+                CreatedAt = u.CreatedAt
+            })
+            .ToListAsync();
+
+        return Ok(users);
+    }
+    [Authorize(Roles = "admin")]
+    [HttpDelete("delete/{id}")]
+    public async Task<IActionResult> DeleteUser(int id)
+    {
+        var user = await _context.Users.FindAsync(id);
+        if (user == null)
+        {
+            return NotFound(new { message = "Người dùng không tồn tại!" });
+        }
+
+        _context.Users.Remove(user);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Xóa người dùng thành công!" });
+    }
+
+
 }

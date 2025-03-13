@@ -53,7 +53,7 @@ public partial class TopcvBeContext : DbContext
     public virtual DbSet<UserRole> UserRoles { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseMySql("server=localhost;port=3306;database=topcv_be;user=root;password=admin", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.40-mysql"));
+        => optionsBuilder.UseMySql("server=localhost;database=topcv_be;user=root;password=admin", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.40-mysql"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -129,9 +129,6 @@ public partial class TopcvBeContext : DbContext
             entity.Property(e => e.CvFilePath)
                 .HasMaxLength(255)
                 .HasColumnName("cv_file_path");
-            entity.Property(e => e.CvTitle)
-                .HasMaxLength(255)
-                .HasColumnName("cv_title");
             entity.Property(e => e.DateOfBirth).HasColumnName("date_of_birth");
             entity.Property(e => e.Education)
                 .HasColumnType("text")
@@ -139,18 +136,15 @@ public partial class TopcvBeContext : DbContext
             entity.Property(e => e.Experience)
                 .HasColumnType("text")
                 .HasColumnName("experience");
-            entity.Property(e => e.Gender)
-                .HasColumnType("enum('male','female','other')")
-                .HasColumnName("gender");
+            entity.Property(e => e.Fullname)
+                .HasMaxLength(100)
+                .HasColumnName("fullname");
             entity.Property(e => e.Phone)
                 .HasMaxLength(15)
                 .HasColumnName("phone");
             entity.Property(e => e.Skills)
                 .HasColumnType("text")
                 .HasColumnName("skills");
-            entity.Property(e => e.Summary)
-                .HasColumnType("text")
-                .HasColumnName("summary");
             entity.Property(e => e.UserId).HasColumnName("user_id");
 
             entity.HasOne(d => d.User).WithMany(p => p.CandidateProfiles)
@@ -467,6 +461,9 @@ public partial class TopcvBeContext : DbContext
             entity.HasIndex(e => e.GoogleId, "google_id").IsUnique();
 
             entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Avatar)
+                .HasColumnType("text")
+                .HasColumnName("avatar");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("timestamp")
@@ -474,13 +471,13 @@ public partial class TopcvBeContext : DbContext
             entity.Property(e => e.Email).HasColumnName("email");
             entity.Property(e => e.FacebookId).HasColumnName("facebook_id");
             entity.Property(e => e.GoogleId).HasColumnName("google_id");
-            entity.Property(e => e.Name)
-                .HasMaxLength(255)
-                .HasColumnName("name");
             entity.Property(e => e.Password)
                 .HasMaxLength(255)
                 .HasColumnName("password");
             entity.Property(e => e.RoleId).HasColumnName("role_id");
+            entity.Property(e => e.Username)
+                .HasMaxLength(255)
+                .HasColumnName("username");
 
             entity.HasOne(d => d.Role).WithMany(p => p.Users)
                 .HasForeignKey(d => d.RoleId)

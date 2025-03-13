@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import styles from './styles.module.css';
 import { toast } from "react-toastify";
-import { Link } from 'react-router-dom';
+import { Link,useNavigate } from 'react-router-dom';
 
 function SignInForm() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const navigate = useNavigate();
     const handleLogin = async (event) => {
         event.preventDefault();
         if (!email || !password) {
@@ -25,6 +26,12 @@ function SignInForm() {
                 toast.error(error.message || "Đăng nhập thất bại.", { position: "top-right" });
                 return;
             }
+            const data = await response.json();
+            localStorage.setItem("token", data.token);
+            if (data.role === "admin") {
+                navigate("/admin");
+            }
+
 
             toast.success("Đăng nhập thành công!", { position: "top-right" });
         } catch (error) {
