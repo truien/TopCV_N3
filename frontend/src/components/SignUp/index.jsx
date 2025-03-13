@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 
 function Sign() {
@@ -13,7 +14,7 @@ function Sign() {
     });
 
     const [errors, setErrors] = useState({});
-
+    const navigate = useNavigate();
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
         setFormData({
@@ -74,6 +75,7 @@ function Sign() {
                 }
             );
             console.log(response.data);
+            navigate('/login');
         } catch (error) {
             console.error(error);
         }

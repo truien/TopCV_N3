@@ -151,3 +151,9 @@ C:\Users\ADMIN\TopCV_N3\BACKEND\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.
 C:\Users\ADMIN\TopCV_N3\BACKEND\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Security.Cryptography.ProtectedData.dll
 C:\Users\ADMIN\TopCV_N3\BACKEND\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
 C:\Users\ADMIN\TopCV_N3\BACKEND\bin\Debug\net8.0\BACKEND.staticwebassets.runtime.json
+C:\Users\ADMIN\TopCV_N3\BACKEND\bin\Debug\net8.0\Google.Apis.dll
+C:\Users\ADMIN\TopCV_N3\BACKEND\bin\Debug\net8.0\Google.Apis.Auth.dll
+C:\Users\ADMIN\TopCV_N3\BACKEND\bin\Debug\net8.0\Google.Apis.Core.dll
+C:\Users\ADMIN\TopCV_N3\BACKEND\bin\Debug\net8.0\Newtonsoft.Json.dll
+C:\Users\ADMIN\TopCV_N3\BACKEND\bin\Debug\net8.0\System.Management.dll
+C:\Users\ADMIN\TopCV_N3\BACKEND\bin\Debug\net8.0\runtimes\win\lib\net7.0\System.Management.dll

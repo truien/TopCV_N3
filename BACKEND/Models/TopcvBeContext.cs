@@ -16,8 +16,6 @@ public partial class TopcvBeContext : DbContext
     {
     }
 
-    public virtual DbSet<AdminUser> AdminUsers { get; set; }
-
     public virtual DbSet<Application> Applications { get; set; }
 
     public virtual DbSet<CandidateProfile> CandidateProfiles { get; set; }
@@ -25,6 +23,8 @@ public partial class TopcvBeContext : DbContext
     public virtual DbSet<CompanyProfile> CompanyProfiles { get; set; }
 
     public virtual DbSet<EmploymentType> EmploymentTypes { get; set; }
+
+    public virtual DbSet<Interview> Interviews { get; set; }
 
     public virtual DbSet<JobField> JobFields { get; set; }
 
@@ -36,7 +36,9 @@ public partial class TopcvBeContext : DbContext
 
     public virtual DbSet<JobPostPromotion> JobPostPromotions { get; set; }
 
-    public virtual DbSet<Notification> Notifications { get; set; }
+    public virtual DbSet<JobPostReport> JobPostReports { get; set; }
+
+    public virtual DbSet<JobPostReview> JobPostReviews { get; set; }
 
     public virtual DbSet<Package> Packages { get; set; }
 
@@ -52,7 +54,10 @@ public partial class TopcvBeContext : DbContext
 
     public virtual DbSet<UserRole> UserRoles { get; set; }
 
+    public virtual DbSet<Warning> Warnings { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseMySql("server=localhost;database=topcv_be;user=root;password=admin", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.40-mysql"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -60,21 +65,6 @@ public partial class TopcvBeContext : DbContext
         modelBuilder
             .UseCollation("utf8mb4_0900_ai_ci")
             .HasCharSet("utf8mb4");
-
-        modelBuilder.Entity<AdminUser>(entity =>
-        {
-            entity.HasKey(e => e.UserId).HasName("PRIMARY");
-
-            entity.ToTable("admin_users");
-
-            entity.Property(e => e.UserId)
-                .ValueGeneratedNever()
-                .HasColumnName("user_id");
-
-            entity.HasOne(d => d.User).WithOne(p => p.AdminUser)
-                .HasForeignKey<AdminUser>(d => d.UserId)
-                .HasConstraintName("admin_users_ibfk_1");
-        });
 
         modelBuilder.Entity<Application>(entity =>
         {
@@ -95,10 +85,6 @@ public partial class TopcvBeContext : DbContext
                 .HasColumnType("text")
                 .HasColumnName("cover_letter");
             entity.Property(e => e.JobId).HasColumnName("job_id");
-            entity.Property(e => e.Status)
-                .HasDefaultValueSql("'pending'")
-                .HasColumnType("enum('pending','accepted','rejected')")
-                .HasColumnName("status");
             entity.Property(e => e.UserId).HasColumnName("user_id");
 
             entity.HasOne(d => d.Job).WithMany(p => p.Applications)
@@ -130,21 +116,12 @@ public partial class TopcvBeContext : DbContext
                 .HasMaxLength(255)
                 .HasColumnName("cv_file_path");
             entity.Property(e => e.DateOfBirth).HasColumnName("date_of_birth");
-            entity.Property(e => e.Education)
-                .HasColumnType("text")
-                .HasColumnName("education");
-            entity.Property(e => e.Experience)
-                .HasColumnType("text")
-                .HasColumnName("experience");
             entity.Property(e => e.Fullname)
                 .HasMaxLength(100)
                 .HasColumnName("fullname");
             entity.Property(e => e.Phone)
                 .HasMaxLength(15)
                 .HasColumnName("phone");
-            entity.Property(e => e.Skills)
-                .HasColumnType("text")
-                .HasColumnName("skills");
             entity.Property(e => e.UserId).HasColumnName("user_id");
 
             entity.HasOne(d => d.User).WithMany(p => p.CandidateProfiles)
@@ -190,6 +167,47 @@ public partial class TopcvBeContext : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(100)
                 .HasColumnName("name");
+        });
+
+        modelBuilder.Entity<Interview>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("interviews");
+
+            entity.HasIndex(e => e.ApplicantId, "applicant_id");
+
+            entity.HasIndex(e => e.EmployerId, "employer_id");
+
+            entity.HasIndex(e => e.JobId, "job_id");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.ApplicantId).HasColumnName("applicant_id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("created_at");
+            entity.Property(e => e.EmployerId).HasColumnName("employer_id");
+            entity.Property(e => e.JobId).HasColumnName("job_id");
+            entity.Property(e => e.Message)
+                .HasColumnType("text")
+                .HasColumnName("message");
+            entity.Property(e => e.Status)
+                .HasDefaultValueSql("'pending'")
+                .HasColumnType("enum('pending','accepted','declined')")
+                .HasColumnName("status");
+
+            entity.HasOne(d => d.Applicant).WithMany(p => p.InterviewApplicants)
+                .HasForeignKey(d => d.ApplicantId)
+                .HasConstraintName("interviews_ibfk_2");
+
+            entity.HasOne(d => d.Employer).WithMany(p => p.InterviewEmployers)
+                .HasForeignKey(d => d.EmployerId)
+                .HasConstraintName("interviews_ibfk_3");
+
+            entity.HasOne(d => d.Job).WithMany(p => p.Interviews)
+                .HasForeignKey(d => d.JobId)
+                .HasConstraintName("interviews_ibfk_1");
         });
 
         modelBuilder.Entity<JobField>(entity =>
@@ -331,30 +349,69 @@ public partial class TopcvBeContext : DbContext
                 .HasConstraintName("job_post_promotions_ibfk_2");
         });
 
-        modelBuilder.Entity<Notification>(entity =>
+        modelBuilder.Entity<JobPostReport>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("notifications");
+            entity.ToTable("job_post_reports");
 
-            entity.HasIndex(e => e.UserId, "user_id");
+            entity.HasIndex(e => e.JobPostId, "job_post_id");
+
+            entity.HasIndex(e => e.ReportedBy, "reported_by");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("timestamp")
                 .HasColumnName("created_at");
-            entity.Property(e => e.IsRead)
-                .HasDefaultValueSql("'0'")
-                .HasColumnName("is_read");
-            entity.Property(e => e.Message)
+            entity.Property(e => e.JobPostId).HasColumnName("job_post_id");
+            entity.Property(e => e.Reason)
                 .HasColumnType("text")
-                .HasColumnName("message");
+                .HasColumnName("reason");
+            entity.Property(e => e.ReportedBy).HasColumnName("reported_by");
+            entity.Property(e => e.Status)
+                .HasDefaultValueSql("'pending'")
+                .HasColumnType("enum('pending','reviewed','resolved')")
+                .HasColumnName("status");
+
+            entity.HasOne(d => d.JobPost).WithMany(p => p.JobPostReports)
+                .HasForeignKey(d => d.JobPostId)
+                .HasConstraintName("job_post_reports_ibfk_1");
+
+            entity.HasOne(d => d.ReportedByNavigation).WithMany(p => p.JobPostReports)
+                .HasForeignKey(d => d.ReportedBy)
+                .HasConstraintName("job_post_reports_ibfk_2");
+        });
+
+        modelBuilder.Entity<JobPostReview>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("job_post_reviews");
+
+            entity.HasIndex(e => e.JobPostId, "job_post_id");
+
+            entity.HasIndex(e => e.UserId, "user_id");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Comment)
+                .HasColumnType("text")
+                .HasColumnName("comment");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("created_at");
+            entity.Property(e => e.JobPostId).HasColumnName("job_post_id");
+            entity.Property(e => e.Rating).HasColumnName("rating");
             entity.Property(e => e.UserId).HasColumnName("user_id");
 
-            entity.HasOne(d => d.User).WithMany(p => p.Notifications)
+            entity.HasOne(d => d.JobPost).WithMany(p => p.JobPostReviews)
+                .HasForeignKey(d => d.JobPostId)
+                .HasConstraintName("job_post_reviews_ibfk_1");
+
+            entity.HasOne(d => d.User).WithMany(p => p.JobPostReviews)
                 .HasForeignKey(d => d.UserId)
-                .HasConstraintName("notifications_ibfk_1");
+                .HasConstraintName("job_post_reviews_ibfk_2");
         });
 
         modelBuilder.Entity<Package>(entity =>
@@ -523,6 +580,36 @@ public partial class TopcvBeContext : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
                 .HasColumnName("name");
+        });
+
+        modelBuilder.Entity<Warning>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("warnings");
+
+            entity.HasIndex(e => e.EmployerId, "employer_id");
+
+            entity.HasIndex(e => e.JobPostId, "job_post_id");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("created_at");
+            entity.Property(e => e.EmployerId).HasColumnName("employer_id");
+            entity.Property(e => e.JobPostId).HasColumnName("job_post_id");
+            entity.Property(e => e.WarningMessage)
+                .HasColumnType("text")
+                .HasColumnName("warning_message");
+
+            entity.HasOne(d => d.Employer).WithMany(p => p.Warnings)
+                .HasForeignKey(d => d.EmployerId)
+                .HasConstraintName("warnings_ibfk_1");
+
+            entity.HasOne(d => d.JobPost).WithMany(p => p.Warnings)
+                .HasForeignKey(d => d.JobPostId)
+                .HasConstraintName("warnings_ibfk_2");
         });
 
         OnModelCreatingPartial(modelBuilder);

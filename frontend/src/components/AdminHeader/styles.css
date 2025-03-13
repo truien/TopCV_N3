@@ -4,13 +4,13 @@
     background-color: #ffffff; 
     border-right: 1px solid #ddd; 
     min-height: 100vh;
-    padding-top: 60px;
+    margin-top: 60px;
     position: fixed;
     top: 0;
     left: 0;
     transition: width 0.3s;
     overflow-x: hidden;
-    z-index: -1;
+    z-index: 100;
 }
 
 .sidebar.collapsed {

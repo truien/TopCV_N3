@@ -13,8 +13,6 @@ public partial class Application
 
     public string? CoverLetter { get; set; }
 
-    public string? Status { get; set; }
-
     public DateTime? AppliedAt { get; set; }
 
     public virtual JobPost Job { get; set; } = null!;

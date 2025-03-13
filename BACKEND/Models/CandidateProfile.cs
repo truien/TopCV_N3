@@ -17,12 +17,6 @@ public partial class CandidateProfile
 
     public DateOnly? DateOfBirth { get; set; }
 
-    public string? Experience { get; set; }
-
-    public string? Education { get; set; }
-
-    public string? Skills { get; set; }
-
     public string? CvFilePath { get; set; }
 
     public DateTime? CreatedAt { get; set; }

@@ -29,9 +29,17 @@ public partial class JobPost
 
     public virtual User Employer { get; set; } = null!;
 
+    public virtual ICollection<Interview> Interviews { get; set; } = new List<Interview>();
+
     public virtual ICollection<JobPostEmploymentType> JobPostEmploymentTypes { get; set; } = new List<JobPostEmploymentType>();
 
     public virtual ICollection<JobPostField> JobPostFields { get; set; } = new List<JobPostField>();
 
     public virtual ICollection<JobPostPromotion> JobPostPromotions { get; set; } = new List<JobPostPromotion>();
+
+    public virtual ICollection<JobPostReport> JobPostReports { get; set; } = new List<JobPostReport>();
+
+    public virtual ICollection<JobPostReview> JobPostReviews { get; set; } = new List<JobPostReview>();
+
+    public virtual ICollection<Warning> Warnings { get; set; } = new List<Warning>();
 }

@@ -7,6 +7,9 @@ using System.Text;
 using BCrypt.Net;
 using Microsoft.AspNetCore.Authorization;
 using BACKEND.Models;
+using Google.Apis.Auth;
+using Microsoft.Extensions.Caching.Memory;
+
 
 [Route("api/auth")]
 [ApiController]
@@ -14,13 +17,16 @@ public class AuthController : ControllerBase
 {
     private readonly TopcvBeContext _context;
     private readonly IConfiguration _config;
+    private readonly IMemoryCache _memoryCache;
+    private readonly EmailService _emailService;
 
-    public AuthController(TopcvBeContext context, IConfiguration config)
+    public AuthController(TopcvBeContext context, IConfiguration config, IMemoryCache memoryCache, EmailService emailService)
     {
         _context = context;
         _config = config;
+        _memoryCache = memoryCache;
+        _emailService = emailService;
     }
-
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
@@ -28,7 +34,7 @@ public class AuthController : ControllerBase
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
         if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.Password))
         {
-            return Unauthorized(new { message = "Invalid username or password" });
+            return BadRequest(new { message = "Sai tên đăng nhập hoặc mật khẩu." });
         }
 
         string role = await _context.UserRoles.Where(r => r.Id == user.RoleId).Select(r => r.Name).FirstOrDefaultAsync() ?? "user";
@@ -44,7 +50,6 @@ public class AuthController : ControllerBase
             Avatar = string.IsNullOrEmpty(user.Avatar) ? "" : baseUrl + "avatar/" + user.Avatar,
         });
     }
-
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
@@ -156,6 +161,7 @@ public class AuthController : ControllerBase
 
         return Ok(new { message = "Đổi mật khẩu thành công!" });
     }
+    [Authorize(Roles = "admin")]
     [HttpGet("users")]
     public async Task<IActionResult> GetAllUsers()
     {
@@ -188,8 +194,106 @@ public class AuthController : ControllerBase
         _context.Users.Remove(user);
         await _context.SaveChangesAsync();
 
-        return Ok(new { message = "Xóa người dùng thành công!" });
+        return NoContent();
     }
 
+    [HttpPost("google-login")]
+    public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequest request)
+    {
+        var settings = new GoogleJsonWebSignature.ValidationSettings
+        {
+            Audience = new List<string?> { _config["GoogleAuth:ClientId"] }
+        };
+
+        GoogleJsonWebSignature.Payload payload;
+        try
+        {
+            payload = await GoogleJsonWebSignature.ValidateAsync(request.Token, settings);
+        }
+        catch (Exception)
+        {
+            return BadRequest(new { message = "Token không hợp lệ!" });
+        }
+
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == payload.Email);
+
+        if (user == null)
+        {
+            user = new User
+            {
+                GoogleId = payload.Subject,
+                Username = payload.Name,
+                Email = payload.Email,
+                Avatar = payload.Picture,
+                RoleId = 3, // Mặc định ứng viên
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+        }
+
+        string role = await _context.UserRoles.Where(r => r.Id == user.RoleId)
+                                            .Select(r => r.Name)
+                                            .FirstOrDefaultAsync() ?? "user";
+
+        string token = GenerateJwtToken(user, role);
+
+        return Ok(new UserResponse
+        {
+            Id = user.Id,
+            Username = user.Username,
+            Email = user.Email,
+            Avatar = user.Avatar,
+            Role = role,
+            Token = token
+        });
+    }
+    // 📌 1. Gửi OTP qua email
+    [HttpPost("forgot-password")]
+    public IActionResult ForgotPassword([FromBody] ForgotPasswordRequest request)
+    {
+        if (string.IsNullOrEmpty(request.Email))
+            return BadRequest(new { message = "Email không được để trống" });
+
+        var user = _context.Users.FirstOrDefault(u => u.Email == request.Email);
+        if (user == null)
+            return BadRequest(new { message = "Email không tồn tại trong hệ thống." });
+
+        string otp = new Random().Next(100000, 999999).ToString();
+        _memoryCache.Set(request.Email, otp, TimeSpan.FromMinutes(5));
+
+        _emailService.SendEmail(request.Email, "Mã OTP đặt lại mật khẩu", $"Mã OTP của bạn là: {otp}. Mã này có hiệu lực trong 5 phút.");
+
+        return Ok(new { message = "OTP đã được gửi đến email của bạn." });
+    }
+
+    // 📌 2. Xác minh OTP và đặt lại mật khẩu
+    [HttpPost("reset-password")]
+    public IActionResult ResetPassword([FromBody] ResetPasswordRequest request)
+    {
+        if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.NewPassword) || string.IsNullOrEmpty(request.OTP))
+            return BadRequest(new { message = "Email, OTP và mật khẩu mới không được để trống." });
+
+        if (!_memoryCache.TryGetValue(request.Email, out string? storedOtp) || storedOtp != request.OTP)
+        {
+            return BadRequest(new { message = "OTP không hợp lệ hoặc đã hết hạn." });
+        }
+
+        var user = _context.Users.FirstOrDefault(u => u.Email == request.Email);
+        if (user == null)
+            return BadRequest(new { message = "Email không tồn tại." });
+
+        user.Password = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+        _context.SaveChanges();
+        _memoryCache.Remove(request.Email);
+
+        return Ok(new { message = "Mật khẩu đã được đặt lại thành công." });
+    }
 
 }
+
+
+
+
+
