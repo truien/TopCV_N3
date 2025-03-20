@@ -62,7 +62,7 @@ const AdminHeaderSidebar = () => {
                         onClick={() => handleLinkClick('/admin/job-post-pakage')}
                     >
                         <FaBriefcase className="icon" />
-                        <span className="link-text fw-bolder">Quản lý gói cho bài viết</span>
+                        <span className="link-text fw-bolder">Quản lý gói bài viết</span>
                     </Link>
                     <Link
                         to="/admin/company-pakage"
@@ -70,7 +70,7 @@ const AdminHeaderSidebar = () => {
                         onClick={() => handleLinkClick('/admin/company-pakage')}
                     >
                         <FaBriefcase className="icon" />
-                        <span className="link-text fw-bolder">Quản lý gói cho công ty</span>
+                        <span className="link-text fw-bolder">Quản lý gói công ty</span>
                     </Link>
                     <Link
                         to="/admin/managecatery"

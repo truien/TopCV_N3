@@ -7,10 +7,13 @@ import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 function SignInForm() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showRoleSelection, setShowRoleSelection] = useState(false);
+    const [googleUser, setGoogleUser] = useState(null);
+    const [selectedRole, setSelectedRole] = useState("");
     const navigate = useNavigate();
-
     const handleLogin = async (event) => {
         event.preventDefault();
+
         if (!email || !password) {
             toast.warning("Vui lòng nhập tên đăng nhập và mật khẩu.", { position: "top-right" });
             return;
@@ -23,24 +26,24 @@ function SignInForm() {
                 body: JSON.stringify({ UserName: email, Password: password }),
             });
 
-            if (!response.ok) {
-                const error = await response.json();
-                toast.error(error.message || "Đăng nhập thất bại.", { position: "top-right" });
-                return;
-            }
             const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Đăng nhập thất bại.");
+            }
+
             localStorage.setItem("token", data.token);
+            toast.success("Đăng nhập thành công!", { position: "top-right" });
+
             if (data.role === "admin") {
                 navigate("/admin");
             }
-            toast.success("Đăng nhập thành công!", { position: "top-right" });
         } catch (error) {
-            toast.error("Tài khoản hoặc mật khẩu không đúng.", { position: "top-right" });
-            console.error(error);
+            toast.error(error.message, { position: "top-right" });
+            console.error("Login Error:", error);
         }
     };
 
-    // Xử lý đăng nhập bằng Google
     const handleGoogleLogin = async (credentialResponse) => {
         try {
             const res = await fetch(`${import.meta.env.VITE_API_URL}/api/Auth/google-login`, {
@@ -49,24 +52,61 @@ function SignInForm() {
                 body: JSON.stringify({ token: credentialResponse.credential }),
             });
 
-            if (!res.ok) {
-                const error = await res.json();
-                toast.error(error.message || "Đăng nhập Google thất bại.", { position: "top-right" });
-                return;
-            }
-
             const data = await res.json();
-            localStorage.setItem("token", data.token);
-            if (data.role === "admin") {
-                navigate("/admin");
+
+            if (!res.ok) {
+                throw new Error(data.message || "Đăng nhập Google thất bại.");
             }
 
-            toast.success("Đăng nhập Google thành công!", { position: "top-right" });
+            if (data.requireRoleSelection) {
+                setGoogleUser(data); // Lưu thông tin người dùng để đăng ký
+                setShowRoleSelection(true); // Hiện form chọn vai trò
+            } else {
+                localStorage.setItem("token", data.token);
+                toast.success("Đăng nhập Google thành công!", { position: "top-right" });
+
+                if (data.role === "admin") {
+                    navigate("/admin");
+                }
+            }
         } catch (error) {
-            toast.error("Lỗi đăng nhập Google.", { position: "top-right" });
-            console.error(error);
+            toast.error(error.message, { position: "top-right" });
+            console.error("Google Login Error:", error);
         }
     };
+
+    const handleRegisterWithGoogle = async () => {
+        if (!selectedRole) {
+            toast.warning("Vui lòng chọn vai trò.", { position: "top-right" });
+            return;
+        }
+
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/Auth/register-with-google`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    email: googleUser.email,
+                    name: googleUser.name,
+                    avatar: googleUser.avatar,
+                    roleId: selectedRole
+                }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.message || "Đăng ký Google thất bại.");
+            }
+
+            localStorage.setItem("token", data.token);
+            toast.success("Đăng ký thành công!", { position: "top-right" });
+        } catch (error) {
+            toast.error(error.message, { position: "top-right" });
+            console.error("Google Register Error:", error);
+        }
+    };
+
 
     return (
         <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
@@ -82,7 +122,7 @@ function SignInForm() {
                                 <div className='mb-3'>
                                     <label htmlFor='UserName' className='form-label'>UserName</label>
                                     <div className='input-group'>
-                                        <span className='input-group-text'><i className='bi bi-person-circle  text-success'></i></span>
+                                        <span className='input-group-text'><i className='bi bi-person-circle text-success'></i></span>
                                         <input className='form-control' id='email' placeholder='Email'
                                             value={email} onChange={(e) => setEmail(e.target.value)} />
                                     </div>
@@ -102,19 +142,12 @@ function SignInForm() {
                                     <Link to="/forgot-password">Quên mật khẩu</Link>
                                 </button>
 
-
                                 <p className='text-center'>Hoặc đăng nhập bằng</p>
                                 <div className='d-flex justify-content-center gap-2 mb-3'>
                                     <GoogleLogin
                                         onSuccess={handleGoogleLogin}
-                                        onError={() => console.error("Google Login Failed")}
+                                        onError={() => toast.error("Google Login Failed", { position: "top-right" })}
                                     />
-                                    <button type='button' className='btn btn-primary d-flex align-items-center'>
-                                        <i className='bi bi-facebook'></i> Facebook
-                                    </button>
-                                    <button type='button' className='btn btn-info text-white d-flex align-items-center'>
-                                        <i className='bi bi-linkedin'></i> LinkedIn
-                                    </button>
                                 </div>
 
                                 <div className='form-check mb-3'>
@@ -139,6 +172,31 @@ function SignInForm() {
                     </div>
                 </div>
             </div>
+            {showRoleSelection && (
+                <div className="modal d-block">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">Chọn vai trò</h5>
+                                <button type="button" className="btn-close" onClick={() => setShowRoleSelection(false)}></button>
+                            </div>
+                            <div className="modal-body">
+                                <p>Chào {googleUser.name}, hãy chọn vai trò của bạn:</p>
+                                <select className="form-select" onChange={(e) => setSelectedRole(e.target.value)}>
+                                    <option value="">-- Chọn vai trò --</option>
+                                    <option value="1">Nhà tuyển dụng</option>
+                                    <option value="3">Người tìm việc</option>
+                                </select>
+                            </div>
+                            <div className="modal-footer">
+                                <button className="btn btn-primary" onClick={handleRegisterWithGoogle}>Xác nhận</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+
         </GoogleOAuthProvider>
     );
 }

@@ -163,24 +163,38 @@ public class AuthController : ControllerBase
     }
     [Authorize(Roles = "admin")]
     [HttpGet("users")]
-    public async Task<IActionResult> GetAllUsers()
+    public async Task<IActionResult> GetAllUsers([FromQuery] int page = 1, [FromQuery] int pageSize = 5)
     {
         var baseUrl = $"{Request.Scheme}://{Request.Host}/";
 
+        var totalUsers = await _context.Users.CountAsync();
+
         var users = await _context.Users
+            .OrderBy(u => u.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .Select(u => new
             {
                 Id = u.Id,
                 Username = u.Username,
                 Email = u.Email,
                 Role = _context.UserRoles.Where(r => r.Id == u.RoleId).Select(r => r.Name).FirstOrDefault(),
-                Avatar = string.IsNullOrEmpty(u.Avatar) ? "" : baseUrl + "uploads/avatars/" + u.Avatar,
-                CreatedAt = u.CreatedAt
+                Avatar = string.IsNullOrEmpty(u.Avatar)
+                    ? null
+                    : (u.Avatar.StartsWith("https") ? u.Avatar : baseUrl + "uploads/avatars/" + u.Avatar)
             })
             .ToListAsync();
 
-        return Ok(users);
+        return Ok(new
+        {
+            TotalUsers = totalUsers,
+            Page = page,
+            PageSize = pageSize,
+            TotalPages = (int)Math.Ceiling(totalUsers / (double)pageSize),
+            Users = users
+        });
     }
+
     [Authorize(Roles = "admin")]
     [HttpDelete("delete/{id}")]
     public async Task<IActionResult> DeleteUser(int id)
@@ -219,25 +233,21 @@ public class AuthController : ControllerBase
 
         if (user == null)
         {
-            user = new User
+            return Ok(new
             {
-                GoogleId = payload.Subject,
-                Username = payload.Name,
-                Email = payload.Email,
-                Avatar = payload.Picture,
-                RoleId = 3, // Mặc định ứng viên
-                CreatedAt = DateTime.UtcNow
-            };
-
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+                requireRoleSelection = true,
+                email = payload.Email,
+                name = payload.Name,
+                avatar = payload.Picture
+            });
         }
 
-        string role = await _context.UserRoles.Where(r => r.Id == user.RoleId)
-                                            .Select(r => r.Name)
-                                            .FirstOrDefaultAsync() ?? "user";
+        var role = await _context.UserRoles
+                                  .Where(r => r.Id == user.RoleId)
+                                  .Select(r => r.Name)
+                                  .FirstOrDefaultAsync() ?? "user";
 
-        string token = GenerateJwtToken(user, role);
+        var token = GenerateJwtToken(user, role);
 
         return Ok(new UserResponse
         {
@@ -249,7 +259,48 @@ public class AuthController : ControllerBase
             Token = token
         });
     }
-    // 📌 1. Gửi OTP qua email
+
+    [HttpPost("register-with-google")]
+    public async Task<IActionResult> RegisterWithGoogle([FromBody] RegisterGoogleRequest request)
+    {
+        var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+        if (existingUser != null)
+        {
+            return BadRequest(new { message = "Người dùng đã tồn tại!" });
+        }
+
+        var role = await _context.UserRoles.FirstOrDefaultAsync(r => r.Id == request.RoleId);
+        if (role == null)
+        {
+            return BadRequest(new { message = "Vai trò không hợp lệ." });
+        }
+
+        var newUser = new User
+        {
+            Username = request.Name ?? "Người dùng mới",
+            Email = request.Email ?? "",
+            Avatar = request.Avatar,
+            RoleId = request.RoleId
+        };
+
+        _context.Users.Add(newUser);
+        await _context.SaveChangesAsync();
+
+        var token = GenerateJwtToken(newUser, role.Name);
+
+        return Ok(new UserResponse
+        {
+            Id = newUser.Id,
+            Username = newUser.Username,
+            Email = newUser.Email,
+            Avatar = newUser.Avatar,
+            Role = role.Name,
+            Token = token
+        });
+    }
+
+
+
     [HttpPost("forgot-password")]
     public IActionResult ForgotPassword([FromBody] ForgotPasswordRequest request)
     {
@@ -268,7 +319,7 @@ public class AuthController : ControllerBase
         return Ok(new { message = "OTP đã được gửi đến email của bạn." });
     }
 
-    // 📌 2. Xác minh OTP và đặt lại mật khẩu
+
     [HttpPost("reset-password")]
     public IActionResult ResetPassword([FromBody] ResetPasswordRequest request)
     {

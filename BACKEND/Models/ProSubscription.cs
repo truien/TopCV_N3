@@ -9,13 +9,15 @@ public partial class ProSubscription
 
     public int UserId { get; set; }
 
+    public int PackageId { get; set; }
+
     public DateTime StartDate { get; set; }
 
     public DateTime EndDate { get; set; }
 
     public DateTime? CreatedAt { get; set; }
 
-    public virtual ICollection<ProSubscriptionFeature> ProSubscriptionFeatures { get; set; } = new List<ProSubscriptionFeature>();
+    public virtual ProPackage Package { get; set; } = null!;
 
     public virtual User User { get; set; } = null!;
 }

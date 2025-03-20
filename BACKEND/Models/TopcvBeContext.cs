@@ -42,11 +42,9 @@ public partial class TopcvBeContext : DbContext
 
     public virtual DbSet<Package> Packages { get; set; }
 
-    public virtual DbSet<ProFeature> ProFeatures { get; set; }
+    public virtual DbSet<ProPackage> ProPackages { get; set; }
 
     public virtual DbSet<ProSubscription> ProSubscriptions { get; set; }
-
-    public virtual DbSet<ProSubscriptionFeature> ProSubscriptionFeatures { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
 
@@ -57,7 +55,6 @@ public partial class TopcvBeContext : DbContext
     public virtual DbSet<Warning> Warnings { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseMySql("server=localhost;database=topcv_be;user=root;password=admin", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.40-mysql"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -258,6 +255,9 @@ public partial class TopcvBeContext : DbContext
             entity.Property(e => e.Title)
                 .HasMaxLength(100)
                 .HasColumnName("title");
+            entity.Property(e => e.ViewCount)
+                .HasDefaultValueSql("'0'")
+                .HasColumnName("view_count");
 
             entity.HasOne(d => d.Employer).WithMany(p => p.JobPosts)
                 .HasForeignKey(d => d.EmployerId)
@@ -437,19 +437,27 @@ public partial class TopcvBeContext : DbContext
                 .HasColumnName("price");
         });
 
-        modelBuilder.Entity<ProFeature>(entity =>
+        modelBuilder.Entity<ProPackage>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("pro_features");
+            entity.ToTable("pro_packages");
 
             entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("datetime")
+                .HasColumnName("created_at");
             entity.Property(e => e.Description)
                 .HasColumnType("text")
                 .HasColumnName("description");
+            entity.Property(e => e.DurationDays).HasColumnName("duration_days");
             entity.Property(e => e.Name)
                 .HasMaxLength(255)
                 .HasColumnName("name");
+            entity.Property(e => e.Price)
+                .HasPrecision(10, 2)
+                .HasColumnName("price");
         });
 
         modelBuilder.Entity<ProSubscription>(entity =>
@@ -458,49 +466,31 @@ public partial class TopcvBeContext : DbContext
 
             entity.ToTable("pro_subscriptions");
 
+            entity.HasIndex(e => e.PackageId, "package_id");
+
             entity.HasIndex(e => e.UserId, "user_id");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp")
+                .HasColumnType("datetime")
                 .HasColumnName("created_at");
             entity.Property(e => e.EndDate)
-                .HasColumnType("timestamp")
+                .HasColumnType("datetime")
                 .HasColumnName("end_date");
+            entity.Property(e => e.PackageId).HasColumnName("package_id");
             entity.Property(e => e.StartDate)
-                .HasColumnType("timestamp")
+                .HasColumnType("datetime")
                 .HasColumnName("start_date");
             entity.Property(e => e.UserId).HasColumnName("user_id");
+
+            entity.HasOne(d => d.Package).WithMany(p => p.ProSubscriptions)
+                .HasForeignKey(d => d.PackageId)
+                .HasConstraintName("pro_subscriptions_ibfk_2");
 
             entity.HasOne(d => d.User).WithMany(p => p.ProSubscriptions)
                 .HasForeignKey(d => d.UserId)
                 .HasConstraintName("pro_subscriptions_ibfk_1");
-        });
-
-        modelBuilder.Entity<ProSubscriptionFeature>(entity =>
-        {
-            entity.HasKey(e => new { e.ProSubscriptionId, e.ProFeatureId })
-                .HasName("PRIMARY")
-                .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0 });
-
-            entity.ToTable("pro_subscription_features");
-
-            entity.HasIndex(e => e.ProFeatureId, "pro_feature_id");
-
-            entity.Property(e => e.ProSubscriptionId).HasColumnName("pro_subscription_id");
-            entity.Property(e => e.ProFeatureId).HasColumnName("pro_feature_id");
-            entity.Property(e => e.CreatedAt)
-                .HasColumnType("datetime")
-                .HasColumnName("created at");
-
-            entity.HasOne(d => d.ProFeature).WithMany(p => p.ProSubscriptionFeatures)
-                .HasForeignKey(d => d.ProFeatureId)
-                .HasConstraintName("pro_subscription_features_ibfk_2");
-
-            entity.HasOne(d => d.ProSubscription).WithMany(p => p.ProSubscriptionFeatures)
-                .HasForeignKey(d => d.ProSubscriptionId)
-                .HasConstraintName("pro_subscription_features_ibfk_1");
         });
 
         modelBuilder.Entity<User>(entity =>

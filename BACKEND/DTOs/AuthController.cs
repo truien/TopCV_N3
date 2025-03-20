@@ -42,3 +42,13 @@ public class ResetPasswordRequest
     public string? OTP { get; set; }
     public string? NewPassword { get; set; }
 }
+
+public class RegisterGoogleRequest
+{
+    public string? Email { get; set; }
+    public string? Name { get; set; }
+    public string? Avatar { get; set; }
+    public int RoleId { get; set; }
+}
+
+
