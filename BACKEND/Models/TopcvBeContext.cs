@@ -261,6 +261,10 @@ public partial class TopcvBeContext : DbContext
             entity.Property(e => e.JobOpeningCount)
                 .HasDefaultValueSql("'1'")
                 .HasColumnName("job_opening_count");
+            entity.Property(e => e.ApplyDeadline)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("apply_deadline");
 
             entity.HasOne(d => d.Employer).WithMany(p => p.JobPosts)
                 .HasForeignKey(d => d.EmployerId)

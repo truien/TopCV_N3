@@ -73,6 +73,59 @@ namespace BACKEND.Controllers
                 CurrentPage = page
             });
         }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetJobPostDetails(int id)
+        {
+            var baseUrl = $"{Request.Scheme}://{Request.Host}/";
+
+            var job = await _context.JobPosts
+                .Include(j => j.Employer)
+                    .ThenInclude(e => e.CompanyProfiles)
+                .Include(j => j.Employer)
+                    .ThenInclude(e => e.Role)
+                .FirstOrDefaultAsync(j => j.Id == id && j.Status == "open");
+
+            if (job == null)
+            {
+                return NotFound(new { message = "Bài đăng không tồn tại" });
+            }
+
+            // Lấy field
+            var fields = await _context.JobPostFields
+                .Where(x => x.JobPostId == id)
+                .Select(x => x.Field!.Name)
+                .ToListAsync();
+
+            // Lấy employment type
+            var employmentTypes = await _context.JobPostEmploymentTypes
+                .Where(x => x.JobPostId == id)
+                .Select(x => x.EmploymentType!.Name)
+                .ToListAsync();
+
+            var result = new
+            {
+                job.Id,
+                job.Title,
+                JobDescription = job.Description,
+                job.Requirements,
+                job.SalaryRange,
+                job.Location,
+                job.PostDate,
+                job.Interest,
+                job.ApplyDeadline,
+                job.JobOpeningCount,
+                Employer = new
+                {
+                    CompanyName = job.Employer.CompanyProfiles.FirstOrDefault()?.CompanyName,
+                    Avatar = string.IsNullOrEmpty(job.Employer.Avatar) ? null : baseUrl + job.Employer.Avatar
+                },
+                Fields = fields,
+                Employment = employmentTypes
+            };
+
+            return Ok(result);
+        }
+
 
 
     }

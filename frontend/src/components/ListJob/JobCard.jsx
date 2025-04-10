@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import Tippy from '@tippyjs/react';
-import JobDetailTooltip from '../../JobDetailTooltip/JobDetailTooltip.jsx';
-import logo from '@images/topcv-logo-10-year.png';
-import styles from './Jobs.module.css'; // import module CSS
+import JobDetailTooltip from '../JobDetailTooltip/JobDetailTooltip.jsx';
+import logo from '../../assets/images/topcv-logo-10-year.png';
+import styles from './Jobs.module.css'; 
 
 const JobCard = ({ job, fetchJobDetail, JobDetailCache, index }) => {
     // eslint-disable-next-line no-unused-vars

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import JobCard from './JobCard';
 import { toast } from 'react-toastify';
-import styles from './Jobs.module.css'; 
+import styles from './Jobs.module.css';
 
 const ListJobs = () => {
     const [jobs, setJobs] = useState([]);
@@ -21,7 +21,7 @@ const ListJobs = () => {
     useEffect(() => {
         const fetchJobs = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_API_URL}api/JobPosts/promoted`, {
+                const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/JobPosts/promoted`, {
                     params: {
                         page: currentPage,
                         pageSize: jobsPerPage,
@@ -29,7 +29,7 @@ const ListJobs = () => {
                     },
                 });
                 setJobs(response.data.jobs);
-                setTotalJobs(response.data.total);
+                setTotalJobs(response.data.totalJobs);
             } catch (err) {
                 toast.error('Đã có lỗi xảy ra, vui lòng thử lại sau');
                 console.log('Lỗi', err);
@@ -42,7 +42,7 @@ const ListJobs = () => {
     const prefetchJobDetail = async (id) => {
         if (!JobDetailCache[id]) {
             try {
-                const response = await axios.get(`http://localhost:5224/api/JobPosts/get-jobpost/${id}`);
+                const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/JobPosts/${id}`);
                 JobDetailCache[id] = response.data;
             } catch (error) {
                 console.error('Lỗi tải bài viết:', error);
@@ -57,11 +57,10 @@ const ListJobs = () => {
                 {filters.map((filter) => (
                     <button
                         key={filter}
-                        className={`btn ${
-                            filter === selectedFilter
+                        className={`btn ${filter === selectedFilter
                                 ? `btn-success ${styles.btnFilterActive}`
                                 : `btn-outline-secondary ${styles.btnFilter}`
-                        }`}
+                            }`}
                         onClick={() => handleFilterChange(filter)}
                     >
                         {filter}

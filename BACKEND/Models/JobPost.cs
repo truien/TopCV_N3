@@ -28,6 +28,8 @@ public partial class JobPost
     public int? ViewCount { get; set; }
 
     public int JobOpeningCount { get; set; }
+    public DateTime? ApplyDeadline { get; set; }
+
 
 
     public virtual ICollection<Application> Applications { get; set; } = new List<Application>();
