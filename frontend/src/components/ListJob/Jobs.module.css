@@ -1,0 +1,49 @@
+/* Jobs.module.css */
+:root {
+    --success-color: #28a745;
+    --secondary-color: #6c757d;
+    --hover-color: #e2e6ea;
+    --disabled-color: #ccc;
+    --text-dark: #333;
+    --text-medium: #555;
+    --text-light: #888;
+}
+
+/* Các style dùng cho button filter */
+.btnFilter {
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+}
+
+.btnFilterActive {
+    background-color: #00b14f;
+    color: white;
+}
+
+/* Style cho JobCard */
+.jobCard {
+    border: none;
+    border-radius: 8px;
+}
+
+.jobTitle {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--text-dark);
+}
+
+.companyName {
+    font-size: 14px;
+    color: var(--text-medium);
+}
+
+.jobSalary,
+.jobLocation {
+    font-size: 13px;
+    color: var(--text-light);
+}
+
+/* Nếu cần tùy chỉnh style cho mũi tên của Tippy, sử dụng :global để áp dụng ngoài phạm vi module */
+:global(.tippy-box[data-placement^="left"] > .tippy-arrow) {
+    left: 500px;
+}

@@ -258,6 +258,9 @@ public partial class TopcvBeContext : DbContext
             entity.Property(e => e.ViewCount)
                 .HasDefaultValueSql("'0'")
                 .HasColumnName("view_count");
+            entity.Property(e => e.JobOpeningCount)
+                .HasDefaultValueSql("'1'")
+                .HasColumnName("job_opening_count");
 
             entity.HasOne(d => d.Employer).WithMany(p => p.JobPosts)
                 .HasForeignKey(d => d.EmployerId)

@@ -27,6 +27,9 @@ public partial class JobPost
 
     public int? ViewCount { get; set; }
 
+    public int JobOpeningCount { get; set; }
+
+
     public virtual ICollection<Application> Applications { get; set; } = new List<Application>();
 
     public virtual User Employer { get; set; } = null!;
