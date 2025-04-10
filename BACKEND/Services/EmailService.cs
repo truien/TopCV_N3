@@ -22,7 +22,6 @@ public class EmailService
         {
             client.EnableSsl = true;
             client.Credentials = new NetworkCredential(smtpUser, smtpPass);
-
             var mailMessage = new MailMessage
             {
                 From = new MailAddress(smtpUser??""),
@@ -30,7 +29,6 @@ public class EmailService
                 Body = body,
                 IsBodyHtml = false
             };
-
             mailMessage.To.Add(toEmail);
             client.Send(mailMessage);
         }

@@ -1,0 +1,131 @@
+.quickview-job-tooltip {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    min-width: 500px;
+    max-width: 500px;
+    height: 600px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.box-header {
+    display: flex;
+    align-items: center;
+    position: sticky;
+    top: 0; 
+    background-color: #fff;
+    z-index: 10; 
+    padding: 10px 0;
+}
+
+.company-logo {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 15px;
+}
+
+.company-logo__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.job-title-block {
+    flex: 1;
+}
+
+.title {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0;
+    color: black;
+}
+
+.company-name {
+    font-size: 18px;
+    color: #7c848d;
+    text-decoration: none;
+}
+
+.company-name:hover {
+    text-decoration: underline;
+}
+
+.salary {
+    font-size: 14px;
+    color: #28a745;
+    font-weight: bold;
+}
+
+.d-flex {
+    display: flex;
+    align-items: center;
+}
+
+.location,
+.deadline {
+    font-size: 12px;
+    color: #6c757d;
+    margin-right: 5px;
+}
+
+.location__icon,
+.deadline__icon {
+    margin-right: 5px;
+}
+
+.content-tab {
+    font-size: 14px;
+    color: #333;
+    line-height: 1.6;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.job-detail-tooltip__h5 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.box-footer {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    margin-top: auto;
+    width: 100%;
+}
+
+.btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    text-align: center;
+}
+
+.btn-apply-now {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-apply-now:hover {
+    background-color: #0056b3;
+}
+
+.btn-view-detail {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-view-detail:hover {
+    background-color: #218838;
+}

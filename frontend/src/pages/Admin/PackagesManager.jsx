@@ -48,7 +48,7 @@ function PackagesManager() {
     const fetchPackages = async () => {
         setLoading(true);
         try {
-            const res = await axios.get(URL, {
+            const res = await axios.get(import.meta.env.VITE_API_URL + "/api/PackagesPost", {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setPackages(res.data);
@@ -61,7 +61,7 @@ function PackagesManager() {
 
     const fetchStatistics = async () => {
         try {
-            const res = await axios.get(`${URL}/post-package-statistics`, {
+            const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/PackagesPost/post-package-statistics`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setStatistics(res.data);
@@ -71,7 +71,7 @@ function PackagesManager() {
     };
     const fetchPostsUsingPackages = async () => {
         try {
-            const res = await axios.get(`${URL}/posts-using-packages`, {
+            const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/PackagesPost/posts-using-packages`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setPostsUsingPackages(res.data);
@@ -82,7 +82,7 @@ function PackagesManager() {
 
     const fetchCompanyPostPackages = async () => {
         try {
-            const res = await axios.get(`${URL}/company-post-packages`, {
+            const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/PackagesPost/company-post-packages`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setCompanyPostPackages(res.data);

@@ -1,0 +1,94 @@
+.logo {
+    width: 327px;
+}
+
+.logoflex {
+    height: auto;
+}
+
+.icon {
+    width: 32px;
+    height: 32px;
+}
+
+.item {
+    text-decoration: none;
+    color: #4d5965;
+    font-size: 14px;
+}
+
+.bg_topcv {
+    align-items: center;
+    background: linear-gradient(90deg, #213142 0.62%, #0a9c4b 99.38%);
+    border-radius: 8px;
+    display: flex;
+    gap: 13px;
+    min-height: 72px;
+    padding: 16px;
+}
+
+.bg_happytime {
+    align-items: center;
+    background: linear-gradient(90deg, #fd7222, #edab28);
+    border-radius: 8px;
+    display: flex;
+    gap: 13px;
+    min-height: 72px;
+    padding: 16px;
+}
+
+.bg_testcenter {
+    align-items: center;
+    background: linear-gradient(90deg, #2a3a4d, #0e60d8);
+    border-radius: 8px;
+    display: flex;
+    gap: 13px;
+    min-height: 72px;
+    padding: 16px;
+}
+
+.bg_shiring {
+    align-items: center;
+    background: linear-gradient(90deg, #009941 0.18%, #0bca5d);
+    border-radius: 8px;
+    display: flex;
+    gap: 13px;
+    min-height: 72px;
+    padding: 16px;
+}
+
+.img-app {
+    width: 50px;
+}
+
+.text_app {
+    color: #fff;
+    font-size: 12px;
+}
+
+@media (max-width: 768px) {
+    .logo {
+        width: 200px;
+    }
+
+    .item {
+        font-size: 12px;
+    }
+
+    .img-app {
+        width: 40px;
+    }
+
+    .bg_topcv,
+    .bg_happytime,
+    .bg_testcenter,
+    .bg_shiring {
+        gap: 8px;
+        padding: 8px;
+        min-height: 60px;
+    }
+
+    .text_app {
+        font-size: 10px;
+    }
+}

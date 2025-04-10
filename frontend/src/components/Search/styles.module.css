@@ -1,0 +1,25 @@
+.inputCustom:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.btnCustomerGren {
+    background: #009643 !important;
+    align-items: center !important;
+}
+
+.textCustom {
+    color: #009643 !important;
+    font-size: 24px !important;
+    font-weight: 700 !important;
+    line-height: 28px !important;
+}
+
+.textSpanCustom {
+    color: #fff;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    letter-spacing: .12px !important;
+    line-height: 16px !important;
+    text-align: center !important;
+}

@@ -1,0 +1,75 @@
+.navbar {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.navbarBrandImg {
+    height: 72px;
+}
+
+.customText {
+    color: #212f3f !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.235px !important;
+    line-height: 20px !important;
+}
+
+.btnOutlineCustom {
+    color: #00b14f !important;
+    border-color: #00b14f !important;
+}
+
+.btnOutlineCustom:hover {
+    background-color: #00b14f !important;
+    color: white !important;
+}
+
+.btnPrimaryCustom {
+    background-color: #00b14f !important;
+    color: white !important;
+}
+
+.btnPrimaryCustom:hover {
+    background-color: #009445 !important;
+    color: white !important;
+}
+
+.navLinkCustom {
+    color: black !important;
+    transition: color 0.3s ease !important;
+}
+
+.navLinkCustom:hover {
+    color: #00b14f !important;
+}
+
+.dropdownMenu {
+    display: none;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    right: 0;
+    z-index: 1000;
+}
+
+.positionRelative:hover .dropdownMenu {
+    display: block;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 0.5rem;
+    }
+
+    .navbarBrandImg {
+        height: 50px;
+    }
+
+    .customText {
+        font-size: 14px !important;
+    }
+}
