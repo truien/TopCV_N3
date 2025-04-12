@@ -3,6 +3,7 @@ import axios from 'axios';
 import JobCard from './JobCard';
 import { toast } from 'react-toastify';
 import styles from './Jobs.module.css';
+import Topai from '../../assets/images/label-toppy-ai.webp'
 
 const ListJobs = () => {
     const [jobs, setJobs] = useState([]);
@@ -52,14 +53,26 @@ const ListJobs = () => {
 
     return (
         <div className='container mt-4'>
-            <h2 className='mb-4'>Việc làm tốt nhất</h2>
-            <div className='mb-3 d-flex flex-wrap gap-2'>
+            <div className='row'>
+                <div className='col-3'><h2 className={styles['titleComponent'] + ' mb-4'}>Việc làm tốt nhất</h2></div>
+                <div className='col-3' style={{
+                    marginLeft: '-70px'
+                }}><img src={Topai} style={{
+                    width: '110px',
+                    height: '26px',
+                    borderLeft: '1px solid',
+                    paddingLeft: '10px'
+                }}></img></div>
+
+            </div>
+
+            <div className='m mb-3 d-flex flex-wrap gap-2'>
                 {filters.map((filter) => (
                     <button
                         key={filter}
                         className={`btn ${filter === selectedFilter
-                                ? `btn-success ${styles.btnFilterActive}`
-                                : `btn-outline-secondary ${styles.btnFilter}`
+                            ? `btn-success ${styles.btnFilterActive}`
+                            : `btn-outline-secondary ${styles.btnFilter}`
                             }`}
                         onClick={() => handleFilterChange(filter)}
                     >

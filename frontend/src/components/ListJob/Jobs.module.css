@@ -9,41 +9,109 @@
     --text-light: #888;
 }
 
-/* Các style dùng cho button filter */
+.titleComponent {
+    color: #00b14f !important;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 0;
+    margin-right: auto;
+    margin-top: 0;
+}
+
 .btnFilter {
+    background: #e9eaec !important;
     border-radius: 20px;
-    padding: 0.5rem 1rem;
+    color: #212f3f !important;
+    font-size: 14px !important;
+    font-weight: 500;
+    height: 40px;
+    line-height: 20px;
+    padding: 9px 12px !important;
+    border: 1px solid #e9eaec;
+}
+
+.btnFilter:hover {
+    border: 1px solid #00b14f;
 }
 
 .btnFilterActive {
-    background-color: #00b14f;
-    color: white;
+    border: 1px solid #00b14f !important;
 }
 
-/* Style cho JobCard */
+.btnFilterActive {
+    background: #00b14f !important;
+    color: #fff !important;
+    border-radius: 20px;
+    font-size: 14px !important;
+    font-weight: 500;
+    height: 40px;
+    line-height: 20px;
+    padding: 9px 12px !important;
+    border: 1px solid #00b14f;
+}
+
+.card {
+    border: 1px solid #ffffff !important;
+}
+
+.card:hover {
+    border: 1px solid #00b14f !important;
+}
+
 .jobCard {
-    border: none;
+    border: 0px solid #fff;
     border-radius: 8px;
+    padding: 5px !important;
 }
 
 .jobTitle {
-    font-size: 16px;
+    font-size: 17px;
     font-weight: bold;
     color: var(--text-dark);
+    text-decoration: none;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+}
+
+.jobTitle:hover {
+    color: #00b14f !important;
+    text-decoration: underline !important;
+
 }
 
 .companyName {
-    font-size: 14px;
-    color: var(--text-medium);
+    color: #6f7882;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 16px;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
 }
 
 .jobSalary,
 .jobLocation {
-    font-size: 13px;
-    color: var(--text-light);
+    align-items: center;
+    background: #edeff0;
+    border-radius: 34px;
+    color: #263a4d;
+    display: inline-flex;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 16px;
+    padding: 4px 10px;
 }
 
-/* Nếu cần tùy chỉnh style cho mũi tên của Tippy, sử dụng :global để áp dụng ngoài phạm vi module */
+
 :global(.tippy-box[data-placement^="left"] > .tippy-arrow) {
     left: 500px;
 }

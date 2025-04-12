@@ -62,9 +62,9 @@ const JobDetailTooltip = ({ jobDetail }) => {
                 </div>
             </div>
 
-            <div className={styles['box-footer']}>
-                <button className={`${styles['btn']} ${styles['btn-apply-now']}`}>Ứng tuyển ngay</button>
-                <button className={`${styles['btn']} ${styles['btn-view-detail']}`}>Xem chi tiết</button>
+            <div className={`${styles['box-footer']} row`}>
+                <button className={`${styles['btn']} ${styles['btn-apply-now']} col-3 me-4 ms-2`}>Ứng tuyển</button>
+                <button className={`${styles['btn']} ${styles['btn-view-detail']} col-8`}>Xem chi tiết</button>
             </div>
         </div>
     );

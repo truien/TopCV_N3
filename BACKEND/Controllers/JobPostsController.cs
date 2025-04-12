@@ -33,14 +33,16 @@ namespace BACKEND.Controllers
                         select new
                         {
                             Id = job.Id,
-                            Avatar = string.IsNullOrEmpty(user.Avatar) ? null : baseUrl + user.Avatar,
+                            Avatar = string.IsNullOrEmpty(user.Avatar)
+                                    ? null
+                                    : (user.Avatar.StartsWith("http") ? user.Avatar : baseUrl + "avatar/" + user.Avatar),
+
                             Company = company.CompanyName,
                             JobTitle = job.Title,
                             Salary = job.SalaryRange,
                             Location = job.Location
                         };
 
-            // Lọc theo location
             if (!string.IsNullOrEmpty(location))
             {
                 if (location == "Miền Bắc")
@@ -57,7 +59,6 @@ namespace BACKEND.Controllers
                 }
             }
 
-            // Phân trang
             var jobs = await query
                 .Skip(skip)
                 .Take(pageSize)

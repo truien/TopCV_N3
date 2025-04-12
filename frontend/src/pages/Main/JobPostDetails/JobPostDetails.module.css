@@ -1,0 +1,98 @@
+.bg_customer {
+    background-color: #f3f5f7 !important;
+}
+.bg_company {
+    background: linear-gradient(90deg, #212f3f, #00b14f);
+}
+.logo {
+    height: 150px;
+    width: 150px;
+}
+.top {
+    top: 42% !important;
+}
+.ps_6 {
+    padding-left: 6rem !important;
+}
+.activite {
+    color: #00b14f !important;
+    border: #00b14f solid 1px !important;
+}
+.jobCard {
+    border-radius: 8px;
+    padding: 16px;
+    background-color: #fff !important;
+}
+
+.jobCard_card_title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 16px;
+}
+
+.jobCard_icon {
+    font-size: 1.2rem;
+    color: #28a745;
+}
+
+.jobCard_btn {
+    font-weight: bold;
+}
+.boder_custum {
+    border: 1px solid rgba(0, 0, 0, 0.175) !important;
+    border-radius: 8px !important;
+    background-color: #fff !important;
+}
+.jobDetailsContainer {
+    padding: 20px;
+}
+
+.jobDetailsContainer_btn {
+    font-weight: bold;
+    border-radius: 5px;
+}
+.title {
+    border-left: 6px solid #00b14f;
+    padding-left: 10px;
+    color: #00b14f;
+    font-size: 20px;
+}
+.Title {
+    color: #212f3f !important;
+    font-size: 20px !important;
+    font-style: normal !important;
+    font-weight: 700 !important;
+    line-height: 28px !important;
+}
+.box-report-job {
+    background: #fff;
+    border: 1px solid #00b14f;
+    border-radius: 8px;
+    counter-reset: common-signal-title-counter;
+    padding: 16px 20px;
+}
+.common-signal__title {
+    color: #00b14f;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 600;
+    grid-template-columns: 1fr 12fr;
+    letter-spacing: 0.175px;
+    line-height: 22px;
+    margin: 0;
+}
+.slider__caption {
+    font-size: 14px;
+    font-style: normal;
+    line-height: 22px;
+    color: #212f3f;
+    font-weight: 400;
+    letter-spacing: .14px;
+}
+.content-seo-box {
+    background: #fff;
+    border-bottom: 1px solid #e9eaec;
+    font-weight: 400;
+    padding: 40px 0 30px;
+    font-size: 14px;
+}

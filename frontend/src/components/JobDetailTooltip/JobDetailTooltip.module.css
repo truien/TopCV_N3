@@ -97,14 +97,12 @@
 
 .box-footer {
     margin-top: 20px;
-    display: flex;
-    justify-content: space-between;
     margin-top: auto;
     width: 100%;
 }
 
 .btn {
-    padding: 10px 15px;
+    padding: 5px 10px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -113,19 +111,21 @@
 }
 
 .btn-apply-now {
-    background-color: #007bff;
-    color: white;
+    background-color: #fff;
+    color: #00b14f;
+    border: 1px solid #00b14f;
 }
 
 .btn-apply-now:hover {
-    background-color: #0056b3;
+    background-color: #00b14f;
+    color: #fff;
 }
 
 .btn-view-detail {
-    background-color: #28a745;
+    background-color: #00b14f;
     color: white;
 }
 
 .btn-view-detail:hover {
-    background-color: #218838;
+    opacity: 0.9;
 }
