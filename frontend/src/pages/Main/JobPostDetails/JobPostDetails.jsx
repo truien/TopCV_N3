@@ -4,13 +4,15 @@ import Footer from '../../../components/Footer/Footer'
 import coverPhoto from '../../../assets/images/company_cover.jpg';
 import styles from './JobPostDetails.module.css';
 import RelatedJobs from '../../../components/RelatedJobs/RelatedJobs';
-import { TbBuildings } from 'react-icons/tb';
+import logo from '../../../assets/images/avatar-default.jpg'
+
 // import { toast } from 'react-toastify';
 import {
     FaMapMarkerAlt,
     FaMoneyBillWave,
     FaBriefcase,
     FaRegCalendarAlt,
+    FaRegPaperPlane, FaRegHeart, FaUserFriends
 } from 'react-icons/fa';
 import { FaCircleQuestion } from 'react-icons/fa6';
 import DOMPurify from 'dompurify';
@@ -67,13 +69,17 @@ function JobPostDetails() {
     }, []);
 
     useEffect(() => {
-        if (jobPost && jobPost.userEmployer) {
+        if (jobPost && jobPost.employerId) {
             const fetchCompanyJobs = async () => {
                 try {
                     const response = await axios.get(
-                        `http://localhost:5224/api/Employer/get-jobpost/${jobPost.userEmployer}`
+                        `${import.meta.env.VITE_API_URL}/api/JobPosts/get-jobpost-by-id/${jobPost.employerId}`
                     );
-                    setCompanyJobs(response.data);
+                    if (response.data) {
+                        setCompanyJobs(response.data);
+                    } else {
+                        console.warn('Dữ liệu công việc của công ty không có');
+                    }
                 } catch (error) {
                     console.error(
                         'Lỗi khi tải dữ liệu bài đăng liên quan:',
@@ -85,18 +91,18 @@ function JobPostDetails() {
         }
     }, [jobPost]);
 
+
     useEffect(() => {
-        if (jobPost) {
+        if (jobPost && jobPost.fields && jobPost.employment) {
             const fetchCompanyJobs = async () => {
                 try {
                     const response = await axios.get(
-                        'http://localhost:5224/api/JobPosts/related',
+                        `${import.meta.env.VITE_API_URL}/api/JobPosts/related`,
                         {
                             params: {
                                 Fields: jobPost.fields[0],
                                 location: jobPost.location,
                                 employment: jobPost.employment[0],
-                                companyname: jobPost.employer.companyName,
                                 excludeId: jobPost.id,
                                 limitted: 10,
                             },
@@ -111,11 +117,12 @@ function JobPostDetails() {
         }
     }, [jobPost]);
 
+
     const prefetchJobDetail = async (id) => {
         if (!JobDetailCache[id]) {
             try {
                 const response = await axios.get(
-                    `http://localhost:5224/api/JobPosts/get-jobpost/${id}`
+                    `${import.meta.env.VITE_API_URL}/api/JobPosts/${id}`
                 );
                 JobDetailCache[id] = response.data;
             } catch (error) {
@@ -221,13 +228,13 @@ function JobPostDetails() {
                         <div
                             className={
                                 styles['top'] +
-                                ' logo position-absolute start-0 ms-5 '
+                                ' position-absolute start-0 ms-5 '
                             }
                         >
                             <img
-                                src={jobPost.employer.avatar}
+                                src={jobPost.employer.avatar || logo}
                                 alt='Logo'
-                                className={styles['logo'] + ' rounded-circle'}
+                                className={styles['logo']}
                             />
                         </div>
                         <div className='d-flex p-5 ms-5 justify-content-between '>
@@ -241,17 +248,20 @@ function JobPostDetails() {
                                     {jobPost.employer.companyName}
                                 </span>
                                 <div className='d-flex align-content-center'>
-                                    <TbBuildings
+                                    <FaUserFriends
                                         style={{
                                             fontSize: '20px',
                                         }}
                                         className='me-2'
                                     />
-                                    20-24 nhân viên
+                                    {jobPost.employer.follower} follower
                                 </div>
                             </div>
-                            <div className='folow'>
-                                <div className='btn btn-outline-light'>
+                            <div className='folow btn'>
+                                <div className={
+                                    styles['btnfollow'] +
+                                    ' p-2'
+                                }>
                                     + Theo dõi công ty
                                 </div>
                             </div>
@@ -308,17 +318,16 @@ function JobPostDetails() {
 
                             {/* Nút hành động */}
                             <div className='d-flex justify-content-start'>
-                                <button
+                                <button className={styles['btnapply'] + ' btn me-3'}
                                     onClick={() => {
                                         handleApplyJob(jobPost.id);
                                     }}
-                                    className='btn btn-success me-3'
                                 >
-                                    <FaRegCalendarAlt className='me-2' />
+                                    <FaRegPaperPlane className='me-2' />
                                     Ứng tuyển ngay
                                 </button>
-                                <button className='btn btn-outline-success'>
-                                    <FaRegCalendarAlt className='me-2' />
+                                <button className={styles['btnsave'] + ' btn'}>
+                                    <FaRegHeart className='me-2' />
                                     Lưu tin
                                 </button>
                             </div>
@@ -328,31 +337,28 @@ function JobPostDetails() {
                         <div>
                             <div
                                 onClick={() => scrollToSection(detailsRef)}
-                                className={`btn fw-bold me-3 ${
-                                    activeSection === 'details'
-                                        ? styles['activite']
-                                        : ''
-                                }`}
+                                className={`btn fw-bold me-3 ${activeSection === 'details'
+                                    ? styles['activite']
+                                    : ''
+                                    }`}
                             >
                                 Chi tiết công việc
                             </div>
                             <div
                                 onClick={() => scrollToSection(companyJobsRef)}
-                                className={`btn fw-bold me-3 ${
-                                    activeSection === 'companyJobs'
-                                        ? styles['activite']
-                                        : ''
-                                }`}
+                                className={`btn fw-bold me-3 ${activeSection === 'companyJobs'
+                                    ? styles['activite']
+                                    : ''
+                                    }`}
                             >
                                 Việc làm khác của công ty
                             </div>
                             <div
                                 onClick={() => scrollToSection(relatedJobsRef)}
-                                className={`btn fw-bold ${
-                                    activeSection === 'relatedJobs'
-                                        ? styles['activite']
-                                        : ''
-                                }`}
+                                className={`btn fw-bold ${activeSection === 'relatedJobs'
+                                    ? styles['activite']
+                                    : ''
+                                    }`}
                             >
                                 Việc làm liên quan
                             </div>
@@ -481,7 +487,7 @@ function JobPostDetails() {
                                             }}
                                             className={
                                                 styles[
-                                                    'jobDetailsContainer_btn'
+                                                'jobDetailsContainer_btn'
                                                 ] + ' btn btn-success me-3'
                                             }
                                         >
@@ -490,7 +496,7 @@ function JobPostDetails() {
                                         <button
                                             className={
                                                 styles[
-                                                    'jobDetailsContainer_btn'
+                                                'jobDetailsContainer_btn'
                                                 ] + ' btn btn-outline-success'
                                             }
                                         >
@@ -641,7 +647,7 @@ function JobPostDetails() {
                                                     <p
                                                         className={
                                                             styles[
-                                                                'slider__caption'
+                                                            'slider__caption'
                                                             ]
                                                         }
                                                     >
@@ -661,7 +667,7 @@ function JobPostDetails() {
                                                     <p
                                                         className={
                                                             styles[
-                                                                'slider__caption'
+                                                            'slider__caption'
                                                             ]
                                                         }
                                                     >
@@ -682,7 +688,7 @@ function JobPostDetails() {
                                                     <p
                                                         className={
                                                             styles[
-                                                                'slider__caption'
+                                                            'slider__caption'
                                                             ]
                                                         }
                                                     >
@@ -702,7 +708,7 @@ function JobPostDetails() {
                                                     <p
                                                         className={
                                                             styles[
-                                                                'slider__caption'
+                                                            'slider__caption'
                                                             ]
                                                         }
                                                     >
@@ -722,7 +728,7 @@ function JobPostDetails() {
                                                     <p
                                                         className={
                                                             styles[
-                                                                'slider__caption'
+                                                            'slider__caption'
                                                             ]
                                                         }
                                                     >
@@ -742,7 +748,7 @@ function JobPostDetails() {
                                                     <p
                                                         className={
                                                             styles[
-                                                                'slider__caption'
+                                                            'slider__caption'
                                                             ]
                                                         }
                                                     >

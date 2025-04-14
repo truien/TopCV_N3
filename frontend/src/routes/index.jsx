@@ -9,6 +9,7 @@ import PackagesManager from "../pages/Admin/PackagesManager.jsx";
 import NotFoundPage from "../components/NotFoundPage/NotFoundPage.jsx";
 import MainLayout from "../layouts/MainLayoutts.jsx";
 import HomePage from "../pages/Main/Home/Home.jsx";
+import JobPostDetails from "../pages/Main/JobPostDetails/JobPostDetails.jsx";
 function AppRoutes() {
     return (
         <Router>
@@ -21,6 +22,7 @@ function AppRoutes() {
                     <Route path='job-post-pakage' element={<PackagesManager />} />
                 </Route>
                 <Route path="/login" element={<LoginPage />} />
+                <Route path='/jobposts/:id' element={<JobPostDetails />} />
                 <Route path="/sign" element={<SignPage />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />

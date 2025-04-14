@@ -4,6 +4,7 @@ import { CiHeart } from 'react-icons/ci';
 import { TbCoinFilled } from 'react-icons/tb';
 import Tippy from '@tippyjs/react';
 import JobDetailTooltip from '../JobDetailTooltip/JobDetailTooltip';
+import logo from '../../assets/images/avatar-default.jpg'
 function RelatedJobs({ job, fetchJobDetail, JobDetailCache }) {
     // eslint-disable-next-line no-unused-vars
     const [visible, setVisible] = useState(false);
@@ -62,7 +63,7 @@ function RelatedJobs({ job, fetchJobDetail, JobDetailCache }) {
                     {/* Logo */}
                     <div className={styles.logo}>
                         <img
-                            src={job.avatar}
+                            src={job.avatar|| logo}
                             alt='Logo'
                             style={{
                                 width: '100px',
