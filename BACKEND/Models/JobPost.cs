@@ -27,10 +27,9 @@ public partial class JobPost
 
     public int? ViewCount { get; set; }
 
-    public int JobOpeningCount { get; set; }
+    public int? JobOpeningCount { get; set; }
+
     public DateTime? ApplyDeadline { get; set; }
-
-
 
     public virtual ICollection<Application> Applications { get; set; } = new List<Application>();
 
@@ -47,6 +46,8 @@ public partial class JobPost
     public virtual ICollection<JobPostReport> JobPostReports { get; set; } = new List<JobPostReport>();
 
     public virtual ICollection<JobPostReview> JobPostReviews { get; set; } = new List<JobPostReview>();
+
+    public virtual ICollection<SavedJob> SavedJobs { get; set; } = new List<SavedJob>();
 
     public virtual ICollection<Warning> Warnings { get; set; } = new List<Warning>();
 }

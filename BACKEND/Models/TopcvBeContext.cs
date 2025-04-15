@@ -46,6 +46,8 @@ public partial class TopcvBeContext : DbContext
 
     public virtual DbSet<ProSubscription> ProSubscriptions { get; set; }
 
+    public virtual DbSet<SavedJob> SavedJobs { get; set; }
+
     public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<UserFollow> UserFollows { get; set; }
@@ -228,6 +230,9 @@ public partial class TopcvBeContext : DbContext
             entity.HasIndex(e => e.EmployerId, "employer_id");
 
             entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.ApplyDeadline)
+                .HasColumnType("datetime")
+                .HasColumnName("apply_deadline");
             entity.Property(e => e.Description)
                 .HasColumnType("text")
                 .HasColumnName("description");
@@ -235,6 +240,9 @@ public partial class TopcvBeContext : DbContext
             entity.Property(e => e.Interest)
                 .HasColumnType("text")
                 .HasColumnName("interest");
+            entity.Property(e => e.JobOpeningCount)
+                .HasDefaultValueSql("'1'")
+                .HasColumnName("job_opening_count");
             entity.Property(e => e.Location)
                 .HasMaxLength(100)
                 .HasColumnName("location");
@@ -258,13 +266,6 @@ public partial class TopcvBeContext : DbContext
             entity.Property(e => e.ViewCount)
                 .HasDefaultValueSql("'0'")
                 .HasColumnName("view_count");
-            entity.Property(e => e.JobOpeningCount)
-                .HasDefaultValueSql("'1'")
-                .HasColumnName("job_opening_count");
-            entity.Property(e => e.ApplyDeadline)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp")
-                .HasColumnName("apply_deadline");
 
             entity.HasOne(d => d.Employer).WithMany(p => p.JobPosts)
                 .HasForeignKey(d => d.EmployerId)
@@ -498,6 +499,35 @@ public partial class TopcvBeContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.ProSubscriptions)
                 .HasForeignKey(d => d.UserId)
                 .HasConstraintName("pro_subscriptions_ibfk_1");
+        });
+
+        modelBuilder.Entity<SavedJob>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("saved_jobs");
+
+            entity.HasIndex(e => e.JobPostId, "job_post_id");
+
+            entity.HasIndex(e => new { e.UserId, e.JobPostId }, "unique_user_job").IsUnique();
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("created_at");
+            entity.Property(e => e.JobPostId).HasColumnName("job_post_id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+
+            entity.HasOne(d => d.JobPost).WithMany(p => p.SavedJobs)
+                .HasForeignKey(d => d.JobPostId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("saved_jobs_ibfk_2");
+
+            entity.HasOne(d => d.User).WithMany(p => p.SavedJobs)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("saved_jobs_ibfk_1");
         });
 
         modelBuilder.Entity<User>(entity =>

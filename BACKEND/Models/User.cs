@@ -13,7 +13,7 @@ public partial class User
 
     public string? Password { get; set; }
 
-    public string? Avatar { get; set; } 
+    public string? Avatar { get; set; }
 
     public string? GoogleId { get; set; }
 
@@ -42,6 +42,8 @@ public partial class User
     public virtual ICollection<ProSubscription> ProSubscriptions { get; set; } = new List<ProSubscription>();
 
     public virtual UserRole Role { get; set; } = null!;
+
+    public virtual ICollection<SavedJob> SavedJobs { get; set; } = new List<SavedJob>();
 
     public virtual ICollection<UserFollow> UserFollowEmployers { get; set; } = new List<UserFollow>();
 
