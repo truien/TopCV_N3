@@ -138,12 +138,24 @@
     border: 1px solid #00b14f;
 }
 
-.btnfollow{
+.btnfollow {
     color: #00b14f !important;
     border: none;
     background-color: #fff;
     border-radius: 8px !important;
 }
-.btnfollow:hover{
+
+.btnfollow:hover {
     background-color: #e5f7ed !important;
+}
+
+.fadeIn {
+    opacity: 0;
+    animation: fadeInImage 0.6s ease-in-out forwards;
+}
+
+@keyframes fadeInImage {
+    to {
+        opacity: 1;
+    }
 }

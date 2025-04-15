@@ -37,6 +37,10 @@ function SignInForm() {
 
             if (data.role === "admin") {
                 navigate("/admin");
+            } else if (data.role === "employer") {
+                navigate("/employer");
+            } else {
+                navigate("/");
             }
         } catch (error) {
             toast.error(error.message, { position: "top-right" });

@@ -5,8 +5,8 @@ import coverPhoto from '../../../assets/images/company_cover.jpg';
 import styles from './JobPostDetails.module.css';
 import RelatedJobs from '../../../components/RelatedJobs/RelatedJobs';
 import logo from '../../../assets/images/avatar-default.jpg'
+import { toast } from 'react-toastify';
 
-// import { toast } from 'react-toastify';
 import {
     FaMapMarkerAlt,
     FaMoneyBillWave,
@@ -204,6 +204,58 @@ function JobPostDetails() {
         );
     }
 
+    const handleFollowEmployer = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                toast.warning('Vui lòng đăng nhập để theo dõi!');
+                return;
+            }
+            await axios.post(
+                `${import.meta.env.VITE_API_URL}/api/Follow/follow-employer/${jobPost.employerId}`,
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            toast.success('Theo dõi công ty thành công!');
+        } catch (error) {
+            if (error.response?.status === 400) {
+                toast.info('Bạn đã theo dõi công ty này rồi.');
+            } else {
+                toast.error('Lỗi khi theo dõi công ty.');
+            }
+        }
+    };
+
+    const handleSaveJob = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                toast.warning('Vui lòng đăng nhập để lưu tin!');
+                return;
+            }
+            await axios.post(
+                `${import.meta.env.VITE_API_URL}/api/SaveJob/save-job/${jobPost.id}`,
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            toast.success('Đã lưu tin tuyển dụng!');
+        } catch (error) {
+            if (error.response?.status === 400) {
+                toast.info('Bạn đã lưu tin này rồi.');
+            } else {
+                toast.error('Lỗi khi lưu tin.');
+            }
+        }
+    };
+
     const scrollToSection = (ref) => {
         ref.current.scrollIntoView({ behavior: 'smooth' });
     };
@@ -234,7 +286,9 @@ function JobPostDetails() {
                             <img
                                 src={jobPost.employer.avatar || logo}
                                 alt='Logo'
-                                className={styles['logo']}
+                                className={`${styles['logo']}`}
+                                height={150}
+                                width={150}
                             />
                         </div>
                         <div className='d-flex p-5 ms-5 justify-content-between '>
@@ -258,12 +312,12 @@ function JobPostDetails() {
                                 </div>
                             </div>
                             <div className='folow btn'>
-                                <div className={
-                                    styles['btnfollow'] +
-                                    ' p-2'
-                                }>
+                                <button
+                                    className={styles['btnfollow'] + ' p-2'}
+                                    onClick={handleFollowEmployer}
+                                >
                                     + Theo dõi công ty
-                                </div>
+                                </button>
                             </div>
                         </div>
                     </section>
@@ -326,7 +380,10 @@ function JobPostDetails() {
                                     <FaRegPaperPlane className='me-2' />
                                     Ứng tuyển ngay
                                 </button>
-                                <button className={styles['btnsave'] + ' btn'}>
+                                <button
+                                    className={styles['btnsave'] + ' btn'}
+                                    onClick={handleSaveJob}
+                                >
                                     <FaRegHeart className='me-2' />
                                     Lưu tin
                                 </button>

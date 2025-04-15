@@ -12,6 +12,7 @@ public partial class JobPostReport
     public int ReportedBy { get; set; }
 
     public string Reason { get; set; } = null!;
+    public string Description { get; set; } = null!;
 
     public string? Status { get; set; }
 

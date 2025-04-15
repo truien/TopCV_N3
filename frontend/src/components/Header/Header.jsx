@@ -1,25 +1,50 @@
+// ✅ Header.jsx — dùng API để lấy avatar và tên người dùng
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../assets/images/topcv-logo-10-year.png';
 import avatarDefault from '../../assets/images/avatar-default.jpg';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
 import styles from './Header.module.css';
 
 const Header = () => {
     const navigate = useNavigate();
-    const username = sessionStorage.getItem('username');
-    const avatar = sessionStorage.getItem('avatar');
-    const userType = sessionStorage.getItem('userType');
-    const displayAvatar = avatar || avatarDefault;
+    const [userInfo, setUserInfo] = useState(null);
     const [showDropdown, setShowDropdown] = useState(false);
+    const token = localStorage.getItem('token');
+    const dropdownRef = useRef(null);
+    useEffect(() => {
+        const fetchUser = async () => {
+            if (!token) return;
+            try {
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/User/profile`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setUserInfo(res.data);
+            } catch (err) {
+                console.error('Lỗi lấy thông tin user:', err);
+            }
+        };
+        fetchUser();
+    }, [token]);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setShowDropdown(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     const handleLogin = () => navigate('/login');
     const handleRegister = () => navigate('/sign');
     const handleLogout = () => {
-        sessionStorage.removeItem('token');
-        sessionStorage.removeItem('userType');
-        sessionStorage.removeItem('avatar');
-        sessionStorage.removeItem('username');
-        sessionStorage.removeItem('activeLink');
+        localStorage.removeItem('token')
+        setUserInfo(null);
         navigate('/');
     };
 
@@ -69,51 +94,37 @@ const Header = () => {
                                 Tài nguyên
                             </Link>
                         </li>
-                        {userType === 'Admin' && (
+                        {userInfo?.role === 'admin' && (
                             <li className="nav-item">
                                 <Link to="/admin" className={`nav-link ${styles.navLinkCustom} ${styles.customText}`}>
                                     Quản lý
                                 </Link>
                             </li>
                         )}
-                        {/* Chỉ hiển thị ở mobile */}
-                        {!userType && (
-                            <>
-                                <li className="nav-item d-lg-none">
-                                    <Link to="/login" className={`nav-link ${styles.navLinkCustom} ${styles.customText}`}>
-                                        Đăng nhập
-                                    </Link>
-                                </li>
-                                <li className="nav-item d-lg-none">
-                                    <Link to="/sign" className={`nav-link ${styles.navLinkCustom} ${styles.customText}`}>
-                                        Đăng ký
-                                    </Link>
-                                </li>
-                            </>
-                        )}
                     </ul>
-                    <div className="d-none d-lg-flex me-3">
-                        {userType ? (
-                            <div
-                                className={`position-relative ${styles.positionRelative}`}
-                                onMouseEnter={toggleDropdown}
-                                onMouseLeave={toggleDropdown}
-                            >
-                                <img
-                                    src={displayAvatar}
-                                    alt="Avatar"
-                                    style={{ width: '50px', height: '50px', borderRadius: '50%' }}
-                                    className="avatar"
-                                />
+
+                    <div className="d-none d-lg-flex align-items-center gap-3 position-relative">
+                        {userInfo ? (
+                            <div className={`dropdown ${styles.userDropdown}`} ref={dropdownRef}>
+                                <button
+                                    className="btn btn-light dropdown-toggle d-flex align-items-center gap-2"
+                                    type="button"
+                                    onClick={toggleDropdown}
+                                >
+                                    <span>{userInfo.fullName || userInfo.username}</span>
+                                    <img
+                                        src={userInfo.avatar || avatarDefault}
+                                        alt="Avatar"
+                                        className={styles.avatar}
+                                    />
+                                </button>
                                 {showDropdown && (
-                                    <div className={styles.dropdownMenu}>
-                                        {username !== 'admin' && (
-                                            <Link to="/account-settings" className="dropdown-item">
-                                                Cài đặt tài khoản
-                                            </Link>
-                                        )}
+                                    <div className={`dropdown-menu show ${styles.dropdownMenu}`}>
+                                        <Link to="/account-settings" className="dropdown-item">
+                                            ⚙️ Cài đặt tài khoản
+                                        </Link>
                                         <button onClick={handleLogout} className="dropdown-item">
-                                            Đăng xuất
+                                            🚪 Đăng xuất
                                         </button>
                                     </div>
                                 )}

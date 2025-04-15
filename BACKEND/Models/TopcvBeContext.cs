@@ -376,6 +376,9 @@ public partial class TopcvBeContext : DbContext
             entity.Property(e => e.Reason)
                 .HasColumnType("text")
                 .HasColumnName("reason");
+            entity.Property(e => e.Description)
+                .HasColumnType("text")
+                .HasColumnName("description");
             entity.Property(e => e.ReportedBy).HasColumnName("reported_by");
             entity.Property(e => e.Status)
                 .HasDefaultValueSql("'pending'")
