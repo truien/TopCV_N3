@@ -11,7 +11,7 @@ public partial class Application
 
     public int JobId { get; set; }
 
-    public string? CoverLetter { get; set; }
+    public string? CvFile { get; set; }
 
     public DateTime? AppliedAt { get; set; }
 

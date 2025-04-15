@@ -6,6 +6,8 @@ import styles from './JobPostDetails.module.css';
 import RelatedJobs from '../../../components/RelatedJobs/RelatedJobs';
 import logo from '../../../assets/images/avatar-default.jpg'
 import { toast } from 'react-toastify';
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
 
 import {
     FaMapMarkerAlt,
@@ -29,8 +31,11 @@ function JobPostDetails() {
     const companyJobsRef = useRef(null);
     const relatedJobsRef = useRef(null);
     const JobDetailCache = {};
-    // eslint-disable-next-line no-unused-vars
+    const [showReportModal, setShowReportModal] = useState(false);
+    const [reportReason, setReportReason] = useState('');
+    const [reportDescription, setReportDescription] = useState('');
     const navigate = useNavigate();
+
 
     useEffect(() => {
         const fetchJobPostDetails = async () => {
@@ -131,6 +136,40 @@ function JobPostDetails() {
         }
     };
 
+    const handleSubmitReport = async () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            toast.warning('Vui lòng đăng nhập để báo cáo!');
+            return;
+        }
+
+        if (!reportReason) {
+            toast.warning('Vui lòng chọn lý do báo cáo.');
+            return;
+        }
+
+        try {
+            await axios.post(
+                `${import.meta.env.VITE_API_URL}/api/Report/job`,
+                {
+                    jobPostId: jobPost.id,
+                    reason: reportReason,
+                    description: reportDescription
+                },
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+            toast.success('Báo cáo đã được gửi!');
+            setShowReportModal(false);
+            setReportReason('');
+            setReportDescription('');
+        } catch (error) {
+            toast.error('Lỗi khi gửi báo cáo.');
+            console.error(error);
+        }
+    };
+
     // eslint-disable-next-line no-unused-vars
     const handleApplyJob = async (selectedJobPostId) => {
         // const Username = sessionStorage.getItem('username');
@@ -209,6 +248,7 @@ function JobPostDetails() {
             const token = localStorage.getItem('token');
             if (!token) {
                 toast.warning('Vui lòng đăng nhập để theo dõi!');
+                navigate("/")
                 return;
             }
             await axios.post(
@@ -235,6 +275,7 @@ function JobPostDetails() {
             const token = localStorage.getItem('token');
             if (!token) {
                 toast.warning('Vui lòng đăng nhập để lưu tin!');
+                navigate("/")
                 return;
             }
             await axios.post(
@@ -556,6 +597,7 @@ function JobPostDetails() {
                                                 'jobDetailsContainer_btn'
                                                 ] + ' btn btn-outline-success'
                                             }
+                                            onClick={handleSaveJob}
                                         >
                                             Lưu tin
                                         </button>
@@ -920,8 +962,10 @@ function JobPostDetails() {
                                             </li>
                                         </ul>
                                     </div>
-                                    <div className='btn btn-outline-success d-flex justify-content-center'>
-                                        Báo cáo tin tuyển dụng{' '}
+                                    <div className='d-flex justify-content-center'>
+                                        <Button variant="outline-danger" onClick={() => setShowReportModal(true)}>
+                                            Báo cáo tin tuyển dụng
+                                        </Button>
                                     </div>
                                 </section>
                             </div>
@@ -1072,6 +1116,46 @@ function JobPostDetails() {
                 </div>
             </div>
             <Footer />
+
+            <Modal show={showReportModal} onHide={() => setShowReportModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Báo cáo bài tuyển dụng</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <div className="mb-3">
+                        <label>Lý do</label>
+                        <select
+                            className="form-select"
+                            value={reportReason}
+                            onChange={(e) => setReportReason(e.target.value)}
+                        >
+                            <option value=''>-- Chọn lý do --</option>
+                            <option value='Sai thông tin'>Sai thông tin</option>
+                            <option value='Giả mạo'>Giả mạo</option>
+                            <option value='Spam'>Spam</option>
+                            <option value='Khác'>Khác</option>
+                        </select>
+                    </div>
+                    <div className="mb-3">
+                        <label>Mô tả chi tiết (nếu có)</label>
+                        <textarea
+                            className="form-control"
+                            rows={4}
+                            value={reportDescription}
+                            onChange={(e) => setReportDescription(e.target.value)}
+                            placeholder='Bạn hãy mô tả lý do báo cáo...'
+                        ></textarea>
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowReportModal(false)}>
+                        Hủy
+                    </Button>
+                    <Button variant="danger" onClick={handleSubmitReport}>
+                        Gửi báo cáo
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </>
     );
 }

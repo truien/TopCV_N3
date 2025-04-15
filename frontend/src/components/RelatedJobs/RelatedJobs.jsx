@@ -5,9 +5,13 @@ import { TbCoinFilled } from 'react-icons/tb';
 import Tippy from '@tippyjs/react';
 import JobDetailTooltip from '../JobDetailTooltip/JobDetailTooltip';
 import logo from '../../assets/images/avatar-default.jpg'
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 function RelatedJobs({ job, fetchJobDetail, JobDetailCache }) {
     // eslint-disable-next-line no-unused-vars
     const [visible, setVisible] = useState(false);
+    const navigate = useNavigate();
     if (!job) {
         return null;
     }
@@ -36,7 +40,32 @@ function RelatedJobs({ job, fetchJobDetail, JobDetailCache }) {
         (-new Date(job.postDate).getTime() + new Date().getTime()) /
         (1000 * 60 * 60 * 24)
     );
-
+    const handleSaveJob = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                toast.warning('Vui lòng đăng nhập để lưu tin!');
+                navigate("/")
+                return;
+            }
+            await axios.post(
+                `${import.meta.env.VITE_API_URL}/api/SaveJob/save-job/${job.id}`,
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            toast.success('Đã lưu tin tuyển dụng!');
+        } catch (error) {
+            if (error.response?.status === 400) {
+                toast.info('Bạn đã lưu tin này rồi.');
+            } else {
+                toast.error('Lỗi khi lưu tin.');
+            }
+        }
+    };
 
     return (
         <>
@@ -63,7 +92,7 @@ function RelatedJobs({ job, fetchJobDetail, JobDetailCache }) {
                     {/* Logo */}
                     <div className={styles.logo}>
                         <img
-                            src={job.avatar|| logo}
+                            src={job.avatar || logo}
                             alt='Logo'
                             style={{
                                 width: '100px',
@@ -124,7 +153,7 @@ function RelatedJobs({ job, fetchJobDetail, JobDetailCache }) {
                             >
                                 Ứng tuyển
                             </button>
-                            <button className='btn btn-outline-success btn-sm'>
+                            <button className='btn btn-outline-success btn-sm' onClick={handleSaveJob}>
                                 <CiHeart />
                             </button>
                         </div>

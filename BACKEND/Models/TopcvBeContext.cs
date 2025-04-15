@@ -80,9 +80,9 @@ public partial class TopcvBeContext : DbContext
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("timestamp")
                 .HasColumnName("applied_at");
-            entity.Property(e => e.CoverLetter)
+            entity.Property(e => e.CvFile)
                 .HasColumnType("text")
-                .HasColumnName("cover_letter");
+                .HasColumnName("cv_file");
             entity.Property(e => e.JobId).HasColumnName("job_id");
             entity.Property(e => e.UserId).HasColumnName("user_id");
 
