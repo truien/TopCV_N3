@@ -32,7 +32,7 @@ function SignInForm() {
                 throw new Error(data.message || "Đăng nhập thất bại.");
             }
 
-            localStorage.setItem("token", data.token);
+            sessionStorage.setItem("token", data.token);
             toast.success("Đăng nhập thành công!", { position: "top-right" });
 
             if (data.role === "admin") {
@@ -66,11 +66,17 @@ function SignInForm() {
                 setGoogleUser(data); // Lưu thông tin người dùng để đăng ký
                 setShowRoleSelection(true); // Hiện form chọn vai trò
             } else {
-                localStorage.setItem("token", data.token);
+                sessionStorage.setItem("token", data.token);
                 toast.success("Đăng nhập Google thành công!", { position: "top-right" });
 
                 if (data.role === "admin") {
                     navigate("/admin");
+                }
+                if (data.role === "candidate") {
+                    navigate("/")
+                }
+                else {
+                    navigate("/employer")
                 }
             }
         } catch (error) {
@@ -103,7 +109,7 @@ function SignInForm() {
                 throw new Error(data.message || "Đăng ký Google thất bại.");
             }
 
-            localStorage.setItem("token", data.token);
+            sessionStorage.setItem("token", data.token);
             toast.success("Đăng ký thành công!", { position: "top-right" });
         } catch (error) {
             toast.error(error.message, { position: "top-right" });

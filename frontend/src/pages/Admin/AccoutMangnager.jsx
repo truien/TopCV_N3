@@ -5,7 +5,7 @@ import { MdDelete, MdOutlineClose } from "react-icons/md";
 import { toast } from "react-toastify";
 
 function AccountManager() {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);

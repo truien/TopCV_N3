@@ -10,7 +10,7 @@ const Header = () => {
     const navigate = useNavigate();
     const [userInfo, setUserInfo] = useState(null);
     const [showDropdown, setShowDropdown] = useState(false);
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     const dropdownRef = useRef(null);
     useEffect(() => {
         const fetchUser = async () => {
@@ -43,8 +43,10 @@ const Header = () => {
     const handleLogin = () => navigate('/login');
     const handleRegister = () => navigate('/sign');
     const handleLogout = () => {
-        localStorage.removeItem('token')
+        sessionStorage.removeItem('token')
+        sessionStorage.removeItem('activeLink')
         setUserInfo(null);
+
         navigate('/');
     };
 

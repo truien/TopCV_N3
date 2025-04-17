@@ -42,7 +42,7 @@ function RelatedJobs({ job, fetchJobDetail, JobDetailCache }) {
     );
     const handleSaveJob = async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = sessionStorage.getItem('token');
             if (!token) {
                 toast.warning('Vui lòng đăng nhập để lưu tin!');
                 navigate("/")

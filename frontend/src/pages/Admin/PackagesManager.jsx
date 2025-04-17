@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 import { Card, Table, Button, Spinner, Badge, Modal, Collapse } from "react-bootstrap";
 
 function PackagesManager() {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     const [packages, setPackages] = useState([]);
     const [loading, setLoading] = useState(true);
     const [statistics, setStatistics] = useState(null);

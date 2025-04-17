@@ -293,6 +293,58 @@ namespace BACKEND.Controllers
             return Ok(result);
         }
 #pragma warning restore CS8602
+        [Authorize(Roles = "employer")]
+        [HttpPost("create")]
+        public async Task<IActionResult> CreateJobPost([FromBody] CreateJobPostDto dto)
+        {
+            var userIdClaim = HttpContext.User.FindFirst("id");
+            if (userIdClaim == null) return Unauthorized();
+
+            int employerId = int.Parse(userIdClaim.Value);
+
+            var jobPost = new JobPost
+            {
+                Title = dto.Title,
+                Description = dto.Description,
+                Requirements = dto.Requirements,
+                Interest = dto.Interest,
+                SalaryRange = dto.SalaryRange,
+                Location = dto.Location,
+                ApplyDeadline = dto.ApplyDeadline,
+                PostDate = DateTime.UtcNow,
+                Status = "open",
+                JobOpeningCount = dto.JobOpeningCount,
+                ViewCount = 0,
+                EmployerId = employerId
+            };
+
+            _context.JobPosts.Add(jobPost);
+            await _context.SaveChangesAsync();
+
+            // Gán ngành nghề
+            foreach (var fieldId in dto.JobFieldIds)
+            {
+                _context.JobPostFields.Add(new JobPostField
+                {
+                    JobPostId = jobPost.Id,
+                    FieldId = fieldId
+                });
+            }
+
+            // Gán hình thức làm việc
+            foreach (var typeId in dto.EmploymentTypeIds)
+            {
+                _context.JobPostEmploymentTypes.Add(new JobPostEmploymentType
+                {
+                    JobPostId = jobPost.Id,
+                    EmploymentTypeId = typeId
+                });
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Tạo bài viết thành công!", jobId = jobPost.Id });
+        }
 
 
 

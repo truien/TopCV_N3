@@ -18,7 +18,8 @@ var secret = jwtSettings["Secret"] ?? throw new InvalidOperationException("JWT S
 var key = Encoding.UTF8.GetBytes(secret);
 
 builder.Services.AddHttpContextAccessor();
-
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

@@ -1,0 +1,52 @@
+/* EmployerLayout.module.css */
+
+.header {
+    z-index: 1050;
+    height: 60px;
+}
+
+.headerIcons button {
+    margin-left: 0.5rem;
+}
+
+.sidebar {
+    z-index: 1040;
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+}
+
+.sidebarCollapsed {
+    width: 80px;
+    overflow: hidden;
+    transition: width 0.3s ease;
+}
+
+.navLink {
+    padding: 10px 16px;
+    color: #333;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.navLink:hover {
+    background-color: #e9ecef;
+    color: #007bff;
+}
+
+.navLinkActive {
+    background-color: #dbeafe;
+    color: #0d6efd;
+    font-weight: 600;
+}
+
+.icon {
+    font-size: 1.1rem;
+}
+
+.linkText {
+    font-size: 0.95rem;
+    white-space: nowrap;
+    transition: opacity 0.2s ease;
+}

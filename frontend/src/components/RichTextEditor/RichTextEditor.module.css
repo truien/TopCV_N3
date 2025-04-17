@@ -1,0 +1,34 @@
+.editorWrapper {
+    border: 2px solid #dcdcdc;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: white;
+    max-height: 500px;
+    transition: border 0.2s;
+}
+
+.editorWrapper:hover {
+    border-color: #999;
+}
+
+.quill {
+    min-height: 300px;
+    max-height: 500px;
+    font-size: 1rem;
+    overflow-y: auto;
+}
+
+.quill .ql-editor {
+    padding: 1rem;
+    line-height: 1.6;
+}
+
+.quill .ql-toolbar {
+    border: none;
+    border-bottom: 1px solid #e0e0e0;
+    background-color: #f9f9f9;
+}
+
+.quill .ql-container {
+    border: none;
+}

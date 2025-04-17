@@ -137,7 +137,7 @@ function JobPostDetails() {
     };
 
     const handleSubmitReport = async () => {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         if (!token) {
             toast.warning('Vui lòng đăng nhập để báo cáo!');
             return;
@@ -245,7 +245,7 @@ function JobPostDetails() {
 
     const handleFollowEmployer = async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = sessionStorage.getItem('token');
             if (!token) {
                 toast.warning('Vui lòng đăng nhập để theo dõi!');
                 navigate("/")
@@ -272,7 +272,7 @@ function JobPostDetails() {
 
     const handleSaveJob = async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = sessionStorage.getItem('token');
             if (!token) {
                 toast.warning('Vui lòng đăng nhập để lưu tin!');
                 navigate("/")
