@@ -80,12 +80,16 @@ public class ApplicationsController : ControllerBase
     {
         var app = await _context.Applications.FindAsync(id);
         if (app == null) return NotFound("Không tìm thấy hồ sơ.");
-
         app.Status = (int)request.Status;
+        if (request.Status == ApplicationStatus.Rejected && !string.IsNullOrEmpty(request.RejectReason))
+        {
+            app.RejectReason = request.RejectReason;
+        }
         await _context.SaveChangesAsync();
 
         return Ok(new { message = "Cập nhật trạng thái thành công!" });
     }
+
 
     [Authorize(Roles = "employer")]
     [HttpGet("{id}")]
@@ -143,7 +147,8 @@ public class ApplicationsController : ControllerBase
                 a.AppliedAt,
                 JobTitle = a.Job.Title,
                 CvUrl = string.IsNullOrEmpty(a.CvFile) ? null : $"{Request.Scheme}://{Request.Host}/cv/{a.CvFile}",
-                Status = a.Status.ToString()
+                Status = a.Status.ToString(),
+                a.RejectReason
             })
             .ToListAsync();
 #pragma warning restore CS8602
@@ -157,4 +162,5 @@ public class ApplicationsController : ControllerBase
 public class UpdateStatusRequest
 {
     public ApplicationStatus Status { get; set; }
+    public string? RejectReason { get; set; }
 }

@@ -4,6 +4,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import RichTextEditor from '../../../components/RichTextEditor/RichTextEditor';
 import styles from './ApplicantManagement.module.css';
+import DOMPurify from 'dompurify';
 
 const ApplicantManagement = () => {
     const [applications, setApplications] = useState([]);
@@ -40,8 +41,8 @@ const ApplicantManagement = () => {
     const handleScheduleInterview = async () => {
         try {
             await axios.post(`${import.meta.env.VITE_API_URL}/api/interview/schedule`, {
-                jobId: selectedApp.jobId, 
-                candidateUserId: selectedApp.userId, 
+                jobId: selectedApp.jobId,
+                candidateUserId: selectedApp.userId,
                 message: interviewMessage,
             }, {
                 headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` }
@@ -64,7 +65,7 @@ const ApplicantManagement = () => {
     const handleReject = async () => {
         try {
             await axios.put(`${import.meta.env.VITE_API_URL}/api/applications/${selectedApp.id}/status`, {
-                status: "Rejected",
+                status: 2,
                 rejectReason: rejectReason
             }, {
                 headers: {
@@ -105,7 +106,13 @@ const ApplicantManagement = () => {
                             <td className={`${styles.table_td}`}>{app.jobTitle}</td>
                             <td className={`${styles.table_td}`}>{app.cvUrl ? <a href={app.cvUrl} target="_blank">Xem CV</a> : 'Không có'}</td>
                             <td className={`${styles.table_td}`}>{app.status}</td>
-                            <td className={`${styles.table_td}`}>{app.status === 'Rejected' ? app.rejectReason || 'Không có' : '-'}</td>
+                            {
+                                app.status === "2" ? <td dangerouslySetInnerHTML={{
+                                    __html: DOMPurify.sanitize(
+                                        app.rejectReason
+                                    ),
+                                }}></td> : <td>-</td>
+                            }
                             <td className={`${styles.table_td}`}>
                                 {app.status === '0' && (
                                     <div className='d-flex flex-column' >
