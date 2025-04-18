@@ -1,0 +1,50 @@
+.wrapper {
+    background-color: #f9fdfb;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    min-height: 80vh;
+}
+
+.title {
+    font-weight: bold;
+    color: #00b14f;
+    font-size: 24px;
+}
+
+.tableHeader {
+    background-color: #e6fff3;
+    color: #00b14f;
+    text-align: center;
+    font-weight: 600;
+    padding: 12px;
+    font-size: 15px;
+}
+
+.cell {
+    text-align: center;
+    vertical-align: middle;
+    font-size: 14.5px;
+    padding: 10px;
+}
+
+.selectBox {
+    border-radius: 6px;
+    border: 1px solid #c9e4d6;
+}
+
+.badgeStatus {
+    text-transform: capitalize;
+    font-size: 13px;
+    padding: 6px 10px;
+}
+
+.exportBtn {
+    border-color: #00b14f;
+    color: #00b14f;
+}
+
+.exportBtn:hover {
+    background-color: #00b14f;
+    color: white;
+}

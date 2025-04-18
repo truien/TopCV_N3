@@ -9,7 +9,7 @@ public partial class Interview
 
     public int JobId { get; set; }
 
-    public int ApplicantId { get; set; }
+    public int? CandidateUserId { get; set; }
 
     public int EmployerId { get; set; }
 
@@ -19,7 +19,7 @@ public partial class Interview
 
     public string Message { get; set; } = null!;
 
-    public virtual User Applicant { get; set; } = null!;
+    public virtual User? CandidateUser { get; set; }
 
     public virtual User Employer { get; set; } = null!;
 

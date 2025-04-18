@@ -12,6 +12,8 @@ import HomePage from "../pages/Main/Home/Home.jsx";
 import JobPostDetails from "../pages/Main/JobPostDetails/JobPostDetails.jsx";
 import EmployerLayouts from "../layouts/EmployLayouts.jsx";
 import CreateJobPost from "../pages/Employer/CreateJobPost/CreateJobPost.jsx";
+import ApplicantManagement from "../pages/Employer/ApplicantManagement/ApplicantManagement.jsx"
+import InterviewManagement from "../pages/Employer/InterviewManagement/InterviewManagement.jsx"
 function AppRoutes() {
     return (
         <Router>
@@ -25,6 +27,8 @@ function AppRoutes() {
                 </Route>
                 <Route path='/employer' element={<EmployerLayouts />}>
                     <Route path="createjobpost" element={<CreateJobPost />} />
+                    <Route path="applicantmanagement" element={<ApplicantManagement />} />
+                    <Route path="interviews" element={<InterviewManagement />} />
                 </Route>
                 <Route path="/login" element={<LoginPage />} />
                 <Route path='/jobposts/:id' element={<JobPostDetails />} />

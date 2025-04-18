@@ -29,7 +29,7 @@ public partial class User
 
     public virtual ICollection<CompanyProfile> CompanyProfiles { get; set; } = new List<CompanyProfile>();
 
-    public virtual ICollection<Interview> InterviewApplicants { get; set; } = new List<Interview>();
+    public virtual ICollection<Interview> InterviewCandidateUsers { get; set; } = new List<Interview>();
 
     public virtual ICollection<Interview> InterviewEmployers { get; set; } = new List<Interview>();
 

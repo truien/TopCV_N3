@@ -62,4 +62,29 @@ public class UserController : ControllerBase
             Role = user.Role?.Name ?? "user"
         });
     }
+    [Authorize(Roles = "candidate")]
+    [HttpGet("cv")]
+    public async Task<IActionResult> GetCvInfo()
+    {
+        var userIdClaim = _httpContextAccessor.HttpContext?.User?.Claims?.FirstOrDefault(c => c.Type == "id");
+        if (userIdClaim == null) return Unauthorized();
+
+        int userId = int.Parse(userIdClaim.Value);
+
+        var cv = await _context.CandidateProfiles
+            .Where(cp => cp.UserId == userId)
+            .Select(cp => new
+            {
+                cp.CvFilePath
+            })
+            .FirstOrDefaultAsync();
+
+        return Ok(new
+        {
+            HasCv = !string.IsNullOrEmpty(cv?.CvFilePath),
+            CvFile = cv?.CvFilePath
+        });
+    }
+
+
 }

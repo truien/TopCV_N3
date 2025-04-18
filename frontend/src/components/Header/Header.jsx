@@ -123,10 +123,10 @@ const Header = () => {
                                 {showDropdown && (
                                     <div className={`dropdown-menu show ${styles.dropdownMenu}`}>
                                         <Link to="/account-settings" className="dropdown-item">
-                                            ⚙️ Cài đặt tài khoản
+                                            Cài đặt tài khoản
                                         </Link>
                                         <button onClick={handleLogout} className="dropdown-item">
-                                            🚪 Đăng xuất
+                                            Đăng xuất
                                         </button>
                                     </div>
                                 )}

@@ -1,11 +1,7 @@
 import EmployerLayout from "../components/Employer/EmployLayout";
-import { Outlet } from 'react-router-dom';
-function EmployerLayouts() {
-    return (<>
-        <EmployerLayout />
 
-        <Outlet />
-    </>);
+function EmployerLayouts() {
+    return <EmployerLayout />;
 }
 
 export default EmployerLayouts;

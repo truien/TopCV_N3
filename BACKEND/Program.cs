@@ -19,7 +19,6 @@ var key = Encoding.UTF8.GetBytes(secret);
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -41,7 +40,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Bố Truyền nè", Version = "pro max" });
 
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -65,6 +64,7 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+
 // Cấu hình CORS
 builder.Services.AddCors(options =>
 {
@@ -75,23 +75,36 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader();
     });
 });
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenAnyIP(5046);
+    serverOptions.ListenAnyIP(7026, listenOptions =>
+    {
+        listenOptions.UseHttps(); // Bắt buộc có cert hợp lệ nếu là prod
+    });
+});
 
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 var app = builder.Build();
+
 app.UseStaticFiles();
 app.UseCors("AllowAllOrigins");
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Trọng Truyền Vip Pro");
+    });
 }
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 app.Run();

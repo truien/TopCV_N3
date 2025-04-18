@@ -50,3 +50,10 @@
     white-space: nowrap;
     transition: opacity 0.2s ease;
 }
+
+.mainContent {
+    min-height: 100vh;
+    background-color: #f9f9f9 !important;
+    padding-top: 6rem !important;
+    transition: all 0.3s ease-in-out !important;
+}

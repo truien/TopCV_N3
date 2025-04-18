@@ -15,6 +15,10 @@ public partial class Application
 
     public DateTime? AppliedAt { get; set; }
 
+    public int Status { get; set; }
+
+    public string? RejectReason { get; set; }
+
     public virtual JobPost Job { get; set; } = null!;
 
     public virtual User User { get; set; } = null!;

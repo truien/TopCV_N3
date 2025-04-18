@@ -63,6 +63,8 @@
 .jobDetailsContainer_btn {
     font-weight: bold;
     border-radius: 5px;
+    background-color: #00b14f !important;
+    color: #fff;
 }
 
 .title {

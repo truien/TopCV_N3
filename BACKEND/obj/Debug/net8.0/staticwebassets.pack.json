@@ -1,0 +1,29 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Users\\ADMIN\\TopCV_N3\\BACKEND\\wwwroot\\cv\\14_9_638805228848281108.pdf",
+      "PackagePath": "staticwebassets\\cv\\14_9_638805228848281108.pdf"
+    },
+    {
+      "Id": "C:\\Users\\ADMIN\\TopCV_N3\\BACKEND\\wwwroot\\cv\\17_6_638805228323831157.pdf",
+      "PackagePath": "staticwebassets\\cv\\17_6_638805228323831157.pdf"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.BACKEND.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.BACKEND.props",
+      "PackagePath": "build\\BACKEND.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.BACKEND.props",
+      "PackagePath": "buildMultiTargeting\\BACKEND.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.BACKEND.props",
+      "PackagePath": "buildTransitive\\BACKEND.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

@@ -9,6 +9,7 @@ import {
     FaCog,
     FaHome,
 } from 'react-icons/fa';
+import { Outlet } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/images/logo-birthday-10.09ebdc6.png';
 import styles from './EmployerLayout.module.css';
@@ -70,12 +71,20 @@ const EmployerLayout = () => {
                         {!isSidebarCollapsed && <span className={styles.linkText}>Quản lý bài tuyển dụng</span>}
                     </Link>
                     <Link
-                        to='/employer/manageprofiles'
-                        className={`nav-link d-flex align-items-center ${styles.navLink} ${activeLink === '/employer/manageprofiles' ? styles.navLinkActive : ''}`}
-                        onClick={() => handleLinkClick('/employer/manageprofiles')}
+                        to='/employer/applicantmanagement'
+                        className={`nav-link d-flex align-items-center ${styles.navLink} ${activeLink === '/employer/applicantmanagement' ? styles.navLinkActive : ''}`}
+                        onClick={() => handleLinkClick('/employer/applicantmanagement')}
                     >
                         <FaBriefcase className={`me-2 ${styles.icon}`} />
                         {!isSidebarCollapsed && <span className={styles.linkText}>Quản lý hồ sơ ứng viên</span>}
+                    </Link>
+                    <Link
+                        to='/employer/interviews'
+                        className={`nav-link d-flex align-items-center ${styles.navLink} ${activeLink === '/employer/interviews' ? styles.navLinkActive : ''}`}
+                        onClick={() => handleLinkClick('/employer/interviews')}
+                    >
+                        <FaBriefcase className={`me-2 ${styles.icon}`} />
+                        {!isSidebarCollapsed && <span className={styles.linkText}>Quản lý lịch phỏng vấn</span>}
                     </Link>
                     <Link
                         to='/employer/createjobpost'
@@ -96,8 +105,17 @@ const EmployerLayout = () => {
                 </nav>
             </aside>
 
-            <main className='ms-auto px-4 py-5' style={{ marginLeft: isSidebarCollapsed ? '80px' : '260px', width: '100%' }}>
+            <main
+                className={`ms-auto py-5 ${styles.mainContent}`}
+                style={{
+                    marginLeft: isSidebarCollapsed ? '30px' : '260px',
+                    width: isSidebarCollapsed ? 'calc(100% - 30px)' : 'calc(100% - 260px)',
+                    transition: 'all 0.3s ease',
+                }}
+            >
+                <Outlet />
             </main>
+
         </div>
     );
 };

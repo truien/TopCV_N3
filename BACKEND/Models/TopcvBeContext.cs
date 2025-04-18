@@ -57,6 +57,7 @@ public partial class TopcvBeContext : DbContext
     public virtual DbSet<Warning> Warnings { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseMySql("server=localhost;database=topcv_be;user=root;password=admin", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.40-mysql"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -81,9 +82,12 @@ public partial class TopcvBeContext : DbContext
                 .HasColumnType("timestamp")
                 .HasColumnName("applied_at");
             entity.Property(e => e.CvFile)
-                .HasColumnType("text")
+                .HasMaxLength(255)
                 .HasColumnName("cv_file");
             entity.Property(e => e.JobId).HasColumnName("job_id");
+            entity.Property(e => e.RejectReason)
+                .HasColumnType("text")
+                .HasColumnName("reject_reason");
             entity.Property(e => e.UserId).HasColumnName("user_id");
 
             entity.HasOne(d => d.Job).WithMany(p => p.Applications)
@@ -174,14 +178,14 @@ public partial class TopcvBeContext : DbContext
 
             entity.ToTable("interviews");
 
-            entity.HasIndex(e => e.ApplicantId, "applicant_id");
+            entity.HasIndex(e => e.CandidateUserId, "applicant_id");
 
             entity.HasIndex(e => e.EmployerId, "employer_id");
 
             entity.HasIndex(e => e.JobId, "job_id");
 
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.ApplicantId).HasColumnName("applicant_id");
+            entity.Property(e => e.CandidateUserId).HasColumnName("candidate_user_id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("timestamp")
@@ -196,8 +200,9 @@ public partial class TopcvBeContext : DbContext
                 .HasColumnType("enum('pending','accepted','declined')")
                 .HasColumnName("status");
 
-            entity.HasOne(d => d.Applicant).WithMany(p => p.InterviewApplicants)
-                .HasForeignKey(d => d.ApplicantId)
+            entity.HasOne(d => d.CandidateUser).WithMany(p => p.InterviewCandidateUsers)
+                .HasForeignKey(d => d.CandidateUserId)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("interviews_ibfk_2");
 
             entity.HasOne(d => d.Employer).WithMany(p => p.InterviewEmployers)
@@ -372,13 +377,13 @@ public partial class TopcvBeContext : DbContext
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("timestamp")
                 .HasColumnName("created_at");
+            entity.Property(e => e.Description)
+                .HasColumnType("text")
+                .HasColumnName("description");
             entity.Property(e => e.JobPostId).HasColumnName("job_post_id");
             entity.Property(e => e.Reason)
                 .HasColumnType("text")
                 .HasColumnName("reason");
-            entity.Property(e => e.Description)
-                .HasColumnType("text")
-                .HasColumnName("description");
             entity.Property(e => e.ReportedBy).HasColumnName("reported_by");
             entity.Property(e => e.Status)
                 .HasDefaultValueSql("'pending'")

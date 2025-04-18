@@ -34,6 +34,12 @@ function JobPostDetails() {
     const [showReportModal, setShowReportModal] = useState(false);
     const [reportReason, setReportReason] = useState('');
     const [reportDescription, setReportDescription] = useState('');
+    const [showModal, setShowModal] = useState(false);
+    const [hasCV, setHasCV] = useState(false);
+    const [cvFile, setCvFile] = useState(null);
+    const [hasApplied, setHasApplied] = useState(false);
+    const [isFollowing, setIsFollowing] = useState(false);
+
     const navigate = useNavigate();
 
 
@@ -48,8 +54,7 @@ function JobPostDetails() {
                 console.error('Lỗi khi tải dữ liệu bài đăng công việc:', error);
             }
         };
-        setTimeout(() => fetchJobPostDetails(), 1000);
-        // fetchJobPostDetails();
+        fetchJobPostDetails();
     }, [id]);
 
     useEffect(() => {
@@ -82,6 +87,24 @@ function JobPostDetails() {
                     );
                     if (response.data) {
                         setCompanyJobs(response.data);
+                        const checkFollowing = async () => {
+                            const token = sessionStorage.getItem("token");
+                            if (!token) return;
+
+                            try {
+                                const res = await axios.get(
+                                    `${import.meta.env.VITE_API_URL}/api/Follow/is-following/${jobPost.employerId}`,
+                                    {
+                                        headers: { Authorization: `Bearer ${token}` },
+                                    }
+                                );
+                                setIsFollowing(res.data.isFollowing);
+                            } catch (err) {
+                                console.error("Lỗi kiểm tra follow:", err);
+                            }
+                        };
+
+                        checkFollowing();
                     } else {
                         console.warn('Dữ liệu công việc của công ty không có');
                     }
@@ -92,6 +115,7 @@ function JobPostDetails() {
                     );
                 }
             };
+
             fetchCompanyJobs();
         }
     }, [jobPost]);
@@ -121,6 +145,24 @@ function JobPostDetails() {
             fetchCompanyJobs();
         }
     }, [jobPost]);
+
+    useEffect(() => {
+        const checkCV = async () => {
+            const token = sessionStorage.getItem("token");
+            if (!token) return;
+
+            try {
+                const res = await axios.get("/api/user/cv", {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                setHasCV(res.data.hasCV === true);
+            } catch (err) {
+                console.error("Lỗi khi kiểm tra CV:", err);
+            }
+        };
+
+        checkCV();
+    }, []);
 
 
     const prefetchJobDetail = async (id) => {
@@ -170,64 +212,51 @@ function JobPostDetails() {
         }
     };
 
-    // eslint-disable-next-line no-unused-vars
-    const handleApplyJob = async (selectedJobPostId) => {
-        // const Username = sessionStorage.getItem('username');
+    const handleApplyJob = async () => {
+        const token = sessionStorage.getItem('token');
+        if (!token) {
+            toast.warning("Vui lòng đăng nhập!");
+            return;
+        }
 
-        // if (!Username) {
-        //     toast.warning('Vui lòng đăng nhập để ứng tuyển!');
-        //     navigate('/login');
-        //     return;
-        // }
+        const formData = new FormData();
+        formData.append("jobId", jobPost.id);
+        if (!hasCV && cvFile) {
+            formData.append("cvFile", cvFile);
+        }
 
-        // try {
-        //     const cvResponse = await fetch(
-        //         `http://localhost:5224/CVFile/${Username}`
-        //     );
-        //     if (!cvResponse.ok) {
-        //         toast.error('Không thể tải CV. Vui lòng kiểm tra lại.');
-        //         return;
-        //     }
+        try {
+            await axios.post(`${import.meta.env.VITE_API_URL}/api/Applications/apply`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "multipart/form-data",
+                },
+            });
 
-        //     const cvData = await cvResponse.json();
-        //     const userCvFile = cvData.cvFile;
-
-        //     if (!userCvFile) {
-        //         toast.warning(
-        //             'CV của bạn không tồn tại. Vui lòng tải lên CV trước.'
-        //         );
-        //         navigate('/account-settings/settings-infor');
-        //         return;
-        //     }
-        //     const applicationData = {
-        //         jobPostID: selectedJobPostId,
-        //         userJobseeker: Username,
-        //         cvfile: userCvFile,
-        //     };
-
-        //     const response = await fetch(
-        //         'http://localhost:5224/api/Applications',
-        //         {
-        //             method: 'POST',
-        //             headers: {
-        //                 'Content-Type': 'application/json',
-        //             },
-        //             body: JSON.stringify(applicationData),
-        //         }
-        //     );
-
-        //     if (response.ok) {
-        //         toast.success('Ứng tuyển thành công!');
-        //     } else if (response.status === 409) {
-        //         toast.warning('Bạn đã ứng tuyển vào bài tuyển dụng này rồi!');
-        //     } else {
-        //         toast.error('Ứng tuyển thất bại, vui lòng thử lại.');
-        //     }
-        // } catch (error) {
-        //     console.error('Lỗi khi ứng tuyển:', error);
-        //     toast.error('Đã xảy ra lỗi. Vui lòng thử lại.');
-        // }
+            toast.success("Ứng tuyển thành công!");
+            setShowModal(false);
+            setHasApplied(true);
+        } catch (err) {
+            toast.error("Không thể ứng tuyển.");
+            console.error(err);
+        }
     };
+    useEffect(() => {
+        const checkApplied = async () => {
+            try {
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/Applications/has-applied/${id}`, {
+                    headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` }
+                });
+                setHasApplied(res.data.hasApplied);
+            } catch (err) {
+                console.error('Lỗi kiểm tra apply:', err);
+            }
+        };
+
+        if (sessionStorage.getItem('token')) {
+            checkApplied();
+        }
+    }, [id]);
 
     if (!jobPost) {
         return (
@@ -248,27 +277,36 @@ function JobPostDetails() {
             const token = sessionStorage.getItem('token');
             if (!token) {
                 toast.warning('Vui lòng đăng nhập để theo dõi!');
-                navigate("/")
+                navigate("/");
                 return;
             }
-            await axios.post(
-                `${import.meta.env.VITE_API_URL}/api/Follow/follow-employer/${jobPost.employerId}`,
-                {},
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-            toast.success('Theo dõi công ty thành công!');
-        } catch (error) {
-            if (error.response?.status === 400) {
-                toast.info('Bạn đã theo dõi công ty này rồi.');
+
+            if (isFollowing) {
+                await axios.delete(
+                    `${import.meta.env.VITE_API_URL}/api/Follow/unfollow-employer/${jobPost.employerId}`,
+                    {
+                        headers: { Authorization: `Bearer ${token}` },
+                    }
+                );
+                toast.info('Đã bỏ theo dõi công ty.');
+                setIsFollowing(false);
             } else {
-                toast.error('Lỗi khi theo dõi công ty.');
+                await axios.post(
+                    `${import.meta.env.VITE_API_URL}/api/Follow/follow-employer/${jobPost.employerId}`,
+                    {},
+                    {
+                        headers: { Authorization: `Bearer ${token}` },
+                    }
+                );
+                toast.success('Theo dõi công ty thành công!');
+                setIsFollowing(true);
             }
+        } catch (error) {
+            toast.error('Lỗi khi xử lý theo dõi công ty.');
+            console.error(error);
         }
     };
+
 
     const handleSaveJob = async () => {
         try {
@@ -357,7 +395,7 @@ function JobPostDetails() {
                                     className={styles['btnfollow'] + ' p-2'}
                                     onClick={handleFollowEmployer}
                                 >
-                                    + Theo dõi công ty
+                                    {isFollowing ? '✓ Đã theo dõi' : '+ Theo dõi công ty'}
                                 </button>
                             </div>
                         </div>
@@ -413,14 +451,21 @@ function JobPostDetails() {
 
                             {/* Nút hành động */}
                             <div className='d-flex justify-content-start'>
-                                <button className={styles['btnapply'] + ' btn me-3'}
-                                    onClick={() => {
-                                        handleApplyJob(jobPost.id);
-                                    }}
-                                >
-                                    <FaRegPaperPlane className='me-2' />
-                                    Ứng tuyển ngay
-                                </button>
+                                {hasApplied ? (
+                                    <button className={styles['btnapply'] + ' btn me-3'}
+                                    >
+                                        <FaRegPaperPlane className='me-2' />
+                                        Bạn đã ứng tuyển bài viết này
+                                    </button>
+                                ) : (
+                                    <button className={styles['btnapply'] + ' btn me-3'}
+                                        onClick={() => setShowModal(true)}
+                                    >
+                                        <FaRegPaperPlane className='me-2' />
+                                        Ứng tuyển ngay
+                                    </button>
+                                )}
+
                                 <button
                                     className={styles['btnsave'] + ' btn'}
                                     onClick={handleSaveJob}
@@ -579,18 +624,29 @@ function JobPostDetails() {
 
                                     {/* Nút hành động */}
                                     <div className='my-4 d-flex '>
-                                        <button
-                                            onClick={() => {
-                                                handleApplyJob(jobPost.id);
-                                            }}
-                                            className={
-                                                styles[
-                                                'jobDetailsContainer_btn'
-                                                ] + ' btn btn-success me-3'
-                                            }
-                                        >
-                                            Ứng tuyển ngay
-                                        </button>
+                                        {hasApplied ? (
+                                            <button
+                                                className={
+                                                    styles[
+                                                    'jobDetailsContainer_btn'
+                                                    ] + ' btn btn-success me-3'
+                                                }
+                                            >
+                                                Bạn đã ứng tuyển bài viết này
+                                            </button>
+                                        ) : (
+                                            <button
+                                                onClick={() => setShowModal(true)}
+                                                className={
+                                                    styles[
+                                                    'jobDetailsContainer_btn'
+                                                    ] + ' btn btn-success me-3'
+                                                }
+                                            >
+                                                Ứng tuyển ngay
+                                            </button>
+                                        )}
+
                                         <button
                                             className={
                                                 styles[
@@ -1146,6 +1202,51 @@ function JobPostDetails() {
                             placeholder='Bạn hãy mô tả lý do báo cáo...'
                         ></textarea>
                     </div>
+                    {showModal && (
+                        <div className="modal show fade d-block" tabIndex="-1" role="dialog">
+                            <div className="modal-dialog" role="document">
+                                <div className="modal-content">
+                                    <div className="modal-header">
+                                        <h5 className="modal-title">Xác nhận ứng tuyển</h5>
+                                        <button
+                                            type="button"
+                                            className="btn-close"
+                                            onClick={() => setShowModal(false)}
+                                        ></button>
+                                    </div>
+
+                                    <div className="modal-body">
+                                        {hasCV ? (
+                                            <p>Bạn đã có CV trong hệ thống. Xác nhận để ứng tuyển ngay.</p>
+                                        ) : (
+                                            <>
+                                                <label className="form-label">Tải lên CV (PDF/DOC):</label>
+                                                <input
+                                                    type="file"
+                                                    accept=".pdf,.doc,.docx"
+                                                    className="form-control"
+                                                    onChange={(e) => setCvFile(e.target.files[0])}
+                                                />
+                                                <p className="text-danger small mt-2">
+                                                    Bạn chưa có CV. Vui lòng tải lên để tiếp tục.
+                                                </p>
+                                            </>
+                                        )}
+                                    </div>
+
+                                    <div className="modal-footer">
+                                        <button className="btn btn-secondary" onClick={() => setShowModal(false)}>
+                                            Hủy
+                                        </button>
+                                        <button className="btn btn-success" onClick={handleApplyJob}>
+                                            Xác nhận ứng tuyển
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowReportModal(false)}>
@@ -1156,6 +1257,51 @@ function JobPostDetails() {
                     </Button>
                 </Modal.Footer>
             </Modal>
+            {showModal && (
+                <div className="modal show fade d-block" tabIndex="-1" role="dialog">
+                    <div className="modal-dialog" role="document">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">Xác nhận ứng tuyển</h5>
+                                <button
+                                    type="button"
+                                    className="btn-close"
+                                    onClick={() => setShowModal(false)}
+                                ></button>
+                            </div>
+
+                            <div className="modal-body">
+                                {hasCV ? (
+                                    <p>Bạn đã có CV trong hệ thống. Xác nhận để ứng tuyển ngay.</p>
+                                ) : (
+                                    <>
+                                        <label className="form-label">Tải lên CV (PDF/DOC):</label>
+                                        <input
+                                            type="file"
+                                            accept=".pdf,.doc,.docx"
+                                            className="form-control"
+                                            onChange={(e) => setCvFile(e.target.files[0])}
+                                        />
+                                        <p className="text-danger small mt-2">
+                                            Bạn chưa có CV. Vui lòng tải lên để tiếp tục.
+                                        </p>
+                                    </>
+                                )}
+                            </div>
+
+                            <div className="modal-footer">
+                                <button className="btn btn-secondary" onClick={() => setShowModal(false)}>
+                                    Hủy
+                                </button>
+                                <button className="btn btn-success" onClick={handleApplyJob}>
+                                    Xác nhận ứng tuyển
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </>
     );
 }

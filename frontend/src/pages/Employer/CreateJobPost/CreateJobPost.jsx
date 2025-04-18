@@ -79,6 +79,7 @@ function CreateJobPost() {
                 }
             );
             toast.success('Đăng tin thành công');
+            sessionStorage.setItem('activeLink', '/employer');
             navigate('/employer');
         } catch (err) {
             toast.error('Có lỗi xảy ra khi đăng tin');
