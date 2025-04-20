@@ -5,16 +5,46 @@ import logo from '../../assets/images/topcv-logo-10-year.png';
 import styles from './Jobs.module.css';
 import { Link } from 'react-router-dom'
 import { FaRegHeart } from "react-icons/fa6";
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const JobCard = ({ job, fetchJobDetail, JobDetailCache, index }) => {
     // eslint-disable-next-line no-unused-vars
     const [visible, setVisible] = useState(false);
 
+    const navigate = useNavigate();
     const handleTooltipVisibleChange = async (visible) => {
         if (visible && !JobDetailCache[job.id]) {
             await fetchJobDetail(job.id);
         }
         setVisible(visible);
+    };
+    const handleSaveJob = async () => {
+        try {
+            const token = sessionStorage.getItem('token');
+            if (!token) {
+                toast.warning('Vui lòng đăng nhập để lưu tin!');
+                navigate("/")
+                return;
+            }
+            await axios.post(
+                `${import.meta.env.VITE_API_URL}/api/SaveJob/save-job/${job.id}`,
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            toast.success('Đã lưu tin tuyển dụng!');
+        } catch (error) {
+            if (error.response?.status === 400) {
+                toast.info('Bạn đã lưu tin này rồi.');
+            } else {
+                toast.error('Lỗi khi lưu tin.');
+            }
+        }
     };
 
     const placement = (index + 1) % 3 === 1 ? 'right' : 'left';
@@ -57,7 +87,7 @@ const JobCard = ({ job, fetchJobDetail, JobDetailCache, index }) => {
                                 onShow={() => handleTooltipVisibleChange(true)}
                                 onHide={() => handleTooltipVisibleChange(false)}
                             >
-                                <Link className={`${styles.jobTitle} `}>
+                                <Link to={`/jobposts/${job.id}`} className={`${styles.jobTitle} `}>
                                     {job.jobTitle}
                                 </Link>
                             </Tippy>
@@ -84,6 +114,7 @@ const JobCard = ({ job, fetchJobDetail, JobDetailCache, index }) => {
                             }}
                             onMouseEnter={(e) => (e.currentTarget.style.background = '#e9f9f1')}
                             onMouseLeave={(e) => (e.currentTarget.style.background = 'white')}
+                            onClick={handleSaveJob}
                         >
                             <FaRegHeart />
                         </button>
