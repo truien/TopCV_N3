@@ -80,13 +80,14 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
     serverOptions.ListenAnyIP(5046);
     serverOptions.ListenAnyIP(7026, listenOptions =>
     {
-        listenOptions.UseHttps(); // Bắt buộc có cert hợp lệ nếu là prod
+        listenOptions.UseHttps();
     });
 });
 
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Configuration.AddEnvironmentVariables();
 
 var app = builder.Build();
 

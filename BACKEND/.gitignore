@@ -1,0 +1,22 @@
+# Cấu hình bảo mật, environment
+.env
+*.env
+.env.*
+**/.env
+
+
+# Thư mục build
+/bin/
+/obj/
+
+# Files IDE
+.vscode/
+.idea/
+
+# Các files cấu hình bảo mật khác
+appsettings.Development.json
+secrets.json
+
+# Các files hệ thống
+.DS_Store
+Thumbs.db

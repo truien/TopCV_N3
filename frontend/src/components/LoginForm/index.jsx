@@ -3,6 +3,9 @@ import styles from './styles.module.css';
 import { toast } from "react-toastify";
 import { Link, useNavigate } from 'react-router-dom';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+import GradientText from '../GradientText/GradientText';
+import SplitText from '../SplitText/SplitText';
+import TextCursor from '../TextCursor/TextCursor'
 
 function SignInForm() {
     const [email, setEmail] = useState('');
@@ -10,6 +13,7 @@ function SignInForm() {
     const [showRoleSelection, setShowRoleSelection] = useState(false);
     const [googleUser, setGoogleUser] = useState(null);
     const [selectedRole, setSelectedRole] = useState("");
+    const [showSecondLine, setShowSecondLine] = useState(false);
     const navigate = useNavigate();
     const handleLogin = async (event) => {
         event.preventDefault();
@@ -120,14 +124,51 @@ function SignInForm() {
 
     return (
         <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+            <TextCursor
+                text="💖"
+                delay={0.01}
+                spacing={80}
+                followMouseDirection={true}
+                randomFloat={true}
+                exitDuration={0.3}
+                removalInterval={20}
+                maxPoints={10}
+            />
             <div className='d-flex justify-content-center align-items-center' style={{ minHeight: '100vh' }}>
                 <div className='row w-100' style={{ maxWidth: '1550px' }}>
                     <div className={'col-md-7 p-5 border bg-white'}>
                         <div className={styles['form-group']}>
-                            <h4 className={styles['header_title']}>Chào mừng bạn đã quay trở lại</h4>
-                            <p className={styles['header_caption'] + ' mb-3'}>
-                                Cùng xây dựng một hồ sơ nổi bật và nhận được các cơ hội sự nghiệp lý tưởng
-                            </p>
+                            <h4 className={styles['header_title']}>
+                                <SplitText
+                                    text="Chào mừng bạn đã quay trở lại"
+                                    className="text-2xl font-semibold text-center"
+                                    delay={100}
+                                    animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}
+                                    animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
+                                    easing="easeOutCubic"
+                                    threshold={0.2}
+                                    rootMargin="-50px"
+                                    onLetterAnimationComplete={() => setShowSecondLine(true)}
+                                />
+                            </h4>
+
+                            {showSecondLine ? (
+                                <p className={styles['header_caption'] + ' mb-3'}>
+                                    <SplitText
+                                        text="Cùng xây dựng một hồ sơ nổi bật và nhận được các cơ hội sự nghiệp lý tưởng"
+                                        className="text-2xl font-semibold text-center"
+                                        delay={50}
+                                        animationFrom={{ opacity: 0, transform: 'translate3d(0,50px,0)' }}
+                                        animationTo={{ opacity: 1, transform: 'translate3d(0,0,0)' }}
+                                        easing="easeOutCubic"
+                                        threshold={0.2}
+                                        rootMargin="-50px"
+                                    />
+                                </p>
+                            )
+                                : (<p style={{ opacity: '0' }}>
+                                    Cùng xây dựng một hồ sơ nổi bật và nhận được các cơ hội sự nghiệp lý tưởng
+                                </p>)}
                             <form onSubmit={handleLogin}>
                                 <div className='mb-3'>
                                     <label htmlFor='UserName' className='form-label'>UserName</label>
@@ -146,8 +187,22 @@ function SignInForm() {
                                             value={password} onChange={(e) => setPassword(e.target.value)} />
                                     </div>
                                 </div>
+                                <button type='submit' style={{
+                                    width: '100vh',
+                                    border: 'none',
+                                    background: '#fff'
+                                }}>
+                                    <GradientText
+                                        colors={["#00b14f", "#009e46", "#007c3a", "#3cb878", "#b2f5ea"]}
+                                        animationSpeed={4}
+                                        showBorder={true}
+                                        className="custom-class p-2"
+                                    >
+                                        Đăng nhập
+                                    </GradientText>
+                                </button>
 
-                                <button type='submit' className='btn btn-success w-100 mb-3'>Đăng nhập</button>
+                                {/* <button type='submit' className='btn btn-success w-100 mb-3'>Đăng nhập</button> */}
                                 <button type='button' className='btn btn-link text-decoration-none'>
                                     <Link to="/forgot-password">Quên mật khẩu</Link>
                                 </button>

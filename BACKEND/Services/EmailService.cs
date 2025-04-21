@@ -13,10 +13,10 @@ public class EmailService
 
     public void SendEmail(string toEmail, string subject, string body)
     {
-        string? smtpServer = _config["EmailSettings:SmtpServer"];
-        int smtpPort = int.Parse(_config["EmailSettings:SmtpPort"] ?? "0");
-        string? smtpUser = _config["EmailSettings:SmtpUser"];
-        string? smtpPass = _config["EmailSettings:SmtpPass"];
+        string? smtpServer = _config["EmailSettings:SmtpServer"] ?? Environment.GetEnvironmentVariable("SmtpServer");
+        int smtpPort = int.Parse(_config["EmailSettings:SmtpPort"] ?? Environment.GetEnvironmentVariable("SmtpPort") ?? "587");
+        string? smtpUser = _config["EmailSettings:SmtpUser"] ?? Environment.GetEnvironmentVariable("SmtpUser");
+        string? smtpPass = _config["EmailSettings:SmtpPass"] ?? Environment.GetEnvironmentVariable("SmtpPass");
 
         using (var client = new SmtpClient(smtpServer, smtpPort))
         {
