@@ -1,10 +1,12 @@
-// ✅ Giao diện đã sửa: ApplicantManagement.jsx
+
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 import { toast } from 'react-toastify';
 import RichTextEditor from '../../../components/RichTextEditor/RichTextEditor';
 import styles from './ApplicantManagement.module.css';
 import DOMPurify from 'dompurify';
+import { getApplicationsForEmployer, rejectApplication } from '@/api/applicationApi';
+import { scheduleInterview } from '@/api/interviewApi';
+
 
 const ApplicantManagement = () => {
     const [applications, setApplications] = useState([]);
@@ -16,17 +18,14 @@ const ApplicantManagement = () => {
 
     const fetchApplications = async () => {
         try {
-            const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/applications/employer/all`, {
-                headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem('token')}`
-                }
-            });
-            setApplications(res.data);
+            const data = await getApplicationsForEmployer();
+            setApplications(data);
         } catch (err) {
             toast.error("Không thể tải danh sách ứng viên.");
             console.error(err);
         }
     };
+
 
     useEffect(() => {
         fetchApplications();
@@ -40,12 +39,10 @@ const ApplicantManagement = () => {
 
     const handleScheduleInterview = async () => {
         try {
-            await axios.post(`${import.meta.env.VITE_API_URL}/api/interview/schedule`, {
+            await scheduleInterview({
                 jobId: selectedApp.jobId,
                 candidateUserId: selectedApp.userId,
                 message: interviewMessage,
-            }, {
-                headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` }
             });
             toast.success("Đã mời phỏng vấn.");
             setShowInterviewModal(false);
@@ -56,6 +53,7 @@ const ApplicantManagement = () => {
         }
     };
 
+
     const handleOpenReject = (app) => {
         setSelectedApp(app);
         setRejectReason('');
@@ -64,14 +62,7 @@ const ApplicantManagement = () => {
 
     const handleReject = async () => {
         try {
-            await axios.put(`${import.meta.env.VITE_API_URL}/api/applications/${selectedApp.id}/status`, {
-                status: 2,
-                rejectReason: rejectReason
-            }, {
-                headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem('token')}`
-                }
-            });
+            await rejectApplication(selectedApp.id, rejectReason);
             toast.success("Đã từ chối ứng viên.");
             setShowRejectModal(false);
             fetchApplications();
@@ -80,6 +71,7 @@ const ApplicantManagement = () => {
             console.error(err);
         }
     };
+
 
     return (
         <div className={`container ${styles.wrapper}`}>

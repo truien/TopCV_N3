@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BACKEND.Models;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 [Route("api/[controller]")]
 [ApiController]
 public class UserController : ControllerBase
@@ -19,7 +20,7 @@ public class UserController : ControllerBase
     [HttpGet("profile")]
     public async Task<IActionResult> GetProfile()
     {
-        var userIdClaim = _httpContextAccessor.HttpContext?.User?.Claims?.FirstOrDefault(c => c.Type == "id");
+        var userIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier);
 
         if (userIdClaim == null)
             return Unauthorized(new { message = "Không xác định được người dùng." });
@@ -66,10 +67,12 @@ public class UserController : ControllerBase
     [HttpGet("cv")]
     public async Task<IActionResult> GetCvInfo()
     {
-        var userIdClaim = _httpContextAccessor.HttpContext?.User?.Claims?.FirstOrDefault(c => c.Type == "id");
-        if (userIdClaim == null) return Unauthorized();
+        var userIdStr = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userIdStr))
+            return Unauthorized(new { message = "Không xác định được người dùng." });
 
-        int userId = int.Parse(userIdClaim.Value);
+        int userId = int.Parse(userIdStr);
+
 
         var cv = await _context.CandidateProfiles
             .Where(cp => cp.UserId == userId)

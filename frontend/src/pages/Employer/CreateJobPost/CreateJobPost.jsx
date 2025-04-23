@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import styles from './CreateJobPost.module.css';
 import RichTextEditor from '../../../components/RichTextEditor/RichTextEditor';
-import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
+import { createJobPost } from '@/api/jobApi';
+import axiosInstance from '@/api/axiosInstance';
+
 
 function CreateJobPost() {
     const navigate = useNavigate();
@@ -27,14 +29,15 @@ function CreateJobPost() {
     const [errors, setErrors] = useState({});
 
     useEffect(() => {
-        axios.get(`${import.meta.env.VITE_API_URL}/api/jobfields`)
+        axiosInstance.get('/api/jobfields')
             .then(res => setJobFields(res.data))
             .catch(() => toast.error('Lỗi khi tải danh sách ngành nghề'));
 
-        axios.get(`${import.meta.env.VITE_API_URL}/api/employmenttypes`)
+        axiosInstance.get('/api/employmenttypes')
             .then(res => setEmploymentTypes(res.data))
             .catch(() => toast.error('Lỗi khi tải hình thức làm việc'));
     }, []);
+
 
     const handleChange = (e) => {
         setFormData(prev => ({
@@ -63,29 +66,20 @@ function CreateJobPost() {
         e.preventDefault();
         if (!validate()) return;
 
-        const token = sessionStorage.getItem('token');
         try {
-            await axios.post(
-                `${import.meta.env.VITE_API_URL}/api/JobPosts/create`,
-                {
-                    ...formData,
-                    jobFieldIds: selectedFields.map(f => f.value),
-                    employmentTypeIds: selectedEmploymentTypes.map(e => e.value)
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                }
-            );
+            await createJobPost({
+                ...formData,
+                jobFieldIds: selectedFields.map(f => f.value),
+                employmentTypeIds: selectedEmploymentTypes.map(e => e.value)
+            });
             toast.success('Đăng tin thành công');
-            sessionStorage.setItem('activeLink', '/employer');
             navigate('/employer');
         } catch (err) {
             toast.error('Có lỗi xảy ra khi đăng tin');
-            console.log(err);
+            console.error(err);
         }
     };
+
 
     return (
         <div className='container mt-4'>

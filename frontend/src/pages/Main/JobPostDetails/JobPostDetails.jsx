@@ -8,6 +8,25 @@ import logo from '../../../assets/images/avatar-default.jpg'
 import { toast } from 'react-toastify';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
+import {
+    getJobDetail,
+    getCompanyJobs,
+    getRelatedJobs,
+} from '@/api/jobApi';
+import {
+    hassApplied,
+    applyJob
+} from '@/api/applicationApi';
+import { checkHasCV } from '@/api/userApi';
+import { reportJob } from '@/api/reportApi';
+import {
+    followEmployer,
+    unfollowEmployer,
+    isFollowingEmployer
+} from '@/api/followApi';
+import { saveJob } from '@/api/saveJobApi';
+
+
 
 import {
     FaMapMarkerAlt,
@@ -18,8 +37,7 @@ import {
 } from 'react-icons/fa';
 import { FaCircleQuestion } from 'react-icons/fa6';
 import DOMPurify from 'dompurify';
-import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useParams } from 'react-router-dom';
 import easyapply from '../../../assets/images/easy-apply.png';
 function JobPostDetails() {
     const { id } = useParams();
@@ -40,22 +58,19 @@ function JobPostDetails() {
     const [hasApplied, setHasApplied] = useState(false);
     const [isFollowing, setIsFollowing] = useState(false);
 
-    const navigate = useNavigate();
-
 
     useEffect(() => {
-        const fetchJobPostDetails = async () => {
+        const fetchJob = async () => {
             try {
-                const response = await axios.get(
-                    `${import.meta.env.VITE_API_URL}/api/JobPosts/${id}`
-                );
-                setJobPost(response.data);
-            } catch (error) {
-                console.error('Lỗi khi tải dữ liệu bài đăng công việc:', error);
+                const data = await getJobDetail(id);
+                setJobPost(data);
+            } catch (err) {
+                console.error('Lỗi tải job:', err);
             }
         };
-        fetchJobPostDetails();
+        if (id) fetchJob();
     }, [id]);
+
 
     useEffect(() => {
         const handleScroll = () => {
@@ -79,184 +94,104 @@ function JobPostDetails() {
     }, []);
 
     useEffect(() => {
-        if (jobPost && jobPost.employerId) {
-            const fetchCompanyJobs = async () => {
-                try {
-                    const response = await axios.get(
-                        `${import.meta.env.VITE_API_URL}/api/JobPosts/get-jobpost-by-id/${jobPost.employerId}`
-                    );
-                    if (response.data) {
-                        setCompanyJobs(response.data);
-                        const checkFollowing = async () => {
-                            const token = sessionStorage.getItem("token");
-                            if (!token) return;
-
-                            try {
-                                const res = await axios.get(
-                                    `${import.meta.env.VITE_API_URL}/api/Follow/is-following/${jobPost.employerId}`,
-                                    {
-                                        headers: { Authorization: `Bearer ${token}` },
-                                    }
-                                );
-                                setIsFollowing(res.data.isFollowing);
-                            } catch (err) {
-                                console.error("Lỗi kiểm tra follow:", err);
-                            }
-                        };
-
-                        checkFollowing();
-                    } else {
-                        console.warn('Dữ liệu công việc của công ty không có');
-                    }
-                } catch (error) {
-                    console.error(
-                        'Lỗi khi tải dữ liệu bài đăng liên quan:',
-                        error
-                    );
-                }
-            };
-
-            fetchCompanyJobs();
-        }
-    }, [jobPost]);
-
-
-    useEffect(() => {
-        if (jobPost && jobPost.fields && jobPost.employment) {
-            const fetchCompanyJobs = async () => {
-                try {
-                    const response = await axios.get(
-                        `${import.meta.env.VITE_API_URL}/api/JobPosts/related`,
-                        {
-                            params: {
-                                Fields: jobPost.fields[0],
-                                location: jobPost.location,
-                                employment: jobPost.employment[0],
-                                excludeId: jobPost.id,
-                                limitted: 10,
-                            },
-                        }
-                    );
-                    setRelatedJobs(response.data);
-                } catch (error) {
-                    console.error('Lỗi khi gọi API:', error);
-                }
-            };
-            fetchCompanyJobs();
-        }
-    }, [jobPost]);
-
-    useEffect(() => {
-        const checkCV = async () => {
-            const token = sessionStorage.getItem("token");
-            if (!token) return;
-
+        const fetchCompany = async () => {
             try {
-                const res = await axios.get("/api/user/cv", {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                setHasCV(res.data.hasCV === true);
+                const jobs = await getCompanyJobs(jobPost.employerId);
+                setCompanyJobs(jobs);
+
+                const follow = await isFollowingEmployer(jobPost.employerId);
+                setIsFollowing(follow);
             } catch (err) {
-                console.error("Lỗi khi kiểm tra CV:", err);
+                console.error('Lỗi job công ty:', err);
             }
         };
+        if (jobPost?.employerId) fetchCompany();
+    }, [jobPost]);
 
-        checkCV();
-    }, []);
+
+
+    useEffect(() => {
+        const fetchRelated = async () => {
+            try {
+                const res = await getRelatedJobs({
+                    excludeId: jobPost.id,
+                    location: jobPost.location,
+                    employment: jobPost.employment?.[0],
+                    fiels: jobPost.fields?.[0],
+                    limitted: 10,
+                });
+                setRelatedJobs(res);
+            } catch (err) {
+                console.error('Lỗi job liên quan:', err);
+            }
+        };
+        if (jobPost?.fields && jobPost?.employment) fetchRelated();
+    }, [jobPost]);
+
+
+    useEffect(() => {
+        const checkStatus = async () => {
+            try {
+                const res = await hassApplied(id);
+                setHasApplied(res?.hasApplied);
+            } catch {
+                setHasApplied(false);
+            }
+
+            try {
+                const has = await checkHasCV();
+                setHasCV(has);
+            } catch {
+                setHasCV(false);
+            }
+        };
+        checkStatus();
+    }, [id]);
 
 
     const prefetchJobDetail = async (id) => {
         if (!JobDetailCache[id]) {
             try {
-                const response = await axios.get(
-                    `${import.meta.env.VITE_API_URL}/api/JobPosts/${id}`
-                );
-                JobDetailCache[id] = response.data;
+                const data = await getJobDetail(id);
+                JobDetailCache[id] = data;
             } catch (error) {
                 console.error('Lỗi tải bài viết:', error);
             }
         }
     };
 
-    const handleSubmitReport = async () => {
-        const token = sessionStorage.getItem('token');
-        if (!token) {
-            toast.warning('Vui lòng đăng nhập để báo cáo!');
-            return;
-        }
 
-        if (!reportReason) {
-            toast.warning('Vui lòng chọn lý do báo cáo.');
-            return;
-        }
+    const handleSubmitReport = async () => {
+        if (!reportReason) return toast.warning("Chọn lý do báo cáo");
 
         try {
-            await axios.post(
-                `${import.meta.env.VITE_API_URL}/api/Report/job`,
-                {
-                    jobPostId: jobPost.id,
-                    reason: reportReason,
-                    description: reportDescription
-                },
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                }
-            );
-            toast.success('Báo cáo đã được gửi!');
+            await reportJob({
+                jobPostId: jobPost.id,
+                reason: reportReason,
+                description: reportDescription,
+            });
+            toast.success("Gửi báo cáo thành công");
             setShowReportModal(false);
-            setReportReason('');
-            setReportDescription('');
-        } catch (error) {
-            toast.error('Lỗi khi gửi báo cáo.');
-            console.error(error);
+        } catch {
+            toast.error("Lỗi khi gửi báo cáo");
         }
     };
 
     const handleApplyJob = async () => {
-        const token = sessionStorage.getItem('token');
-        if (!token) {
-            toast.warning("Vui lòng đăng nhập!");
-            return;
-        }
-
         const formData = new FormData();
         formData.append("jobId", jobPost.id);
-        if (!hasCV && cvFile) {
-            formData.append("cvFile", cvFile);
-        }
+        if (!hasCV && cvFile) formData.append("cvFile", cvFile);
 
         try {
-            await axios.post(`${import.meta.env.VITE_API_URL}/api/Applications/apply`, formData, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "multipart/form-data",
-                },
-            });
-
+            await applyJob(formData);
             toast.success("Ứng tuyển thành công!");
-            setShowModal(false);
             setHasApplied(true);
-        } catch (err) {
+            setShowModal(false);
+        } catch {
             toast.error("Không thể ứng tuyển.");
-            console.error(err);
         }
     };
-    useEffect(() => {
-        const checkApplied = async () => {
-            try {
-                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/Applications/has-applied/${id}`, {
-                    headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` }
-                });
-                setHasApplied(res.data.hasApplied);
-            } catch (err) {
-                console.error('Lỗi kiểm tra apply:', err);
-            }
-        };
 
-        if (sessionStorage.getItem('token')) {
-            checkApplied();
-        }
-    }, [id]);
 
     if (!jobPost) {
         return (
@@ -274,66 +209,35 @@ function JobPostDetails() {
 
     const handleFollowEmployer = async () => {
         try {
-            const token = sessionStorage.getItem('token');
-            if (!token) {
-                toast.warning('Vui lòng đăng nhập để theo dõi!');
-                navigate("/");
-                return;
-            }
-
             if (isFollowing) {
-                await axios.delete(
-                    `${import.meta.env.VITE_API_URL}/api/Follow/unfollow-employer/${jobPost.employerId}`,
-                    {
-                        headers: { Authorization: `Bearer ${token}` },
-                    }
-                );
-                toast.info('Đã bỏ theo dõi công ty.');
+                await unfollowEmployer(jobPost.employerId);
+                toast.info("Đã bỏ theo dõi.");
                 setIsFollowing(false);
             } else {
-                await axios.post(
-                    `${import.meta.env.VITE_API_URL}/api/Follow/follow-employer/${jobPost.employerId}`,
-                    {},
-                    {
-                        headers: { Authorization: `Bearer ${token}` },
-                    }
-                );
-                toast.success('Theo dõi công ty thành công!');
+                await followEmployer(jobPost.employerId);
+                toast.success("Đã theo dõi công ty.");
                 setIsFollowing(true);
             }
-        } catch (error) {
-            toast.error('Lỗi khi xử lý theo dõi công ty.');
-            console.error(error);
+        } catch {
+            toast.error("Lỗi follow công ty");
         }
     };
+
 
 
     const handleSaveJob = async () => {
         try {
-            const token = sessionStorage.getItem('token');
-            if (!token) {
-                toast.warning('Vui lòng đăng nhập để lưu tin!');
-                navigate("/")
-                return;
-            }
-            await axios.post(
-                `${import.meta.env.VITE_API_URL}/api/SaveJob/save-job/${jobPost.id}`,
-                {},
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-            toast.success('Đã lưu tin tuyển dụng!');
+            await saveJob(jobPost.id);
+            toast.success("Đã lưu tin tuyển dụng!");
         } catch (error) {
             if (error.response?.status === 400) {
-                toast.info('Bạn đã lưu tin này rồi.');
+                toast.info("Bạn đã lưu tin này rồi.");
             } else {
-                toast.error('Lỗi khi lưu tin.');
+                toast.error("Lỗi khi lưu tin.");
             }
         }
     };
+
 
     const scrollToSection = (ref) => {
         ref.current.scrollIntoView({ behavior: 'smooth' });

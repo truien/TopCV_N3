@@ -56,7 +56,7 @@ const SplitText = ({
     );
 
     return (
-        <p
+        <span
             ref={ref}
             className={`split-parent ${className}`}
             style={{ textAlign, overflow: 'hidden', display: 'inline', whiteSpace: 'normal', wordWrap: 'break-word' }}
@@ -84,7 +84,7 @@ const SplitText = ({
                     <span style={{ display: 'inline-block', width: '0.3em' }}>&nbsp;</span>
                 </span>
             ))}
-        </p>
+        </span>
     );
 };
 

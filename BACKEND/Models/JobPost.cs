@@ -31,6 +31,12 @@ public partial class JobPost
 
     public DateTime? ApplyDeadline { get; set; }
 
+    public string? HighlightType { get; set; }
+
+    public int? PriorityLevel { get; set; }
+
+    public bool? IsAutoBoost { get; set; }
+
     public virtual ICollection<Application> Applications { get; set; } = new List<Application>();
 
     public virtual User Employer { get; set; } = null!;

@@ -1,9 +1,9 @@
 // ✅ InterviewManagement.jsx (chuẩn module scoped và đẹp)
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 import { toast } from 'react-toastify';
 import * as XLSX from 'xlsx';
 import styles from './InterviewManagement.module.css';
+import { getAllInterviews, getActiveJobs } from '@/api/interviewApi';
 
 const InterviewManagement = () => {
     const [interviews, setInterviews] = useState([]);
@@ -16,28 +16,27 @@ const InterviewManagement = () => {
         fetchJobs();
     }, []);
 
+
     const fetchInterviews = async () => {
         try {
-            const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/interview/employer/all`, {
-                headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` },
-            });
-            setInterviews(res.data);
+            const data = await getAllInterviews(); // gọi API đã chuẩn
+            setInterviews(data);
         } catch (err) {
             toast.error('Không thể tải danh sách phỏng vấn.');
-            console.error('Lỗi khi tải :', err);
+            console.error('Lỗi khi tải:', err);
         }
     };
 
+
     const fetchJobs = async () => {
         try {
-            const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/interview/employer/active`, {
-                headers: { Authorization: `Bearer ${sessionStorage.getItem('token')}` },
-            });
-            setJobs(res.data);
+            const data = await getActiveJobs();
+            setJobs(data);
         } catch (err) {
             console.error('Lỗi khi tải jobs:', err);
         }
     };
+
 
     const handleExportExcel = () => {
         const exportData = filteredInterviews.map(i => ({

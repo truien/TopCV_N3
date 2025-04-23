@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate, useSearchParams, Link } from "react-router-dom";
-import axios from "axios";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { resetPassword } from '@/api/authApi';
+
 
 const ResetPassword = () => {
     const location = useLocation();
@@ -15,7 +16,6 @@ const ResetPassword = () => {
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const apiUrl = import.meta.env.VITE_API_URL;
 
     useEffect(() => {
         const emailFromState = location.state?.email;
@@ -25,7 +25,7 @@ const ResetPassword = () => {
         } else if (emailFromQuery) {
             setEmail(emailFromQuery);
         } else {
-            navigate("/forgot-password"); // Không có email, chuyển về trang quên mật khẩu
+            navigate("/forgot-password"); 
         }
     }, [location.state, searchParams, navigate]);
 
@@ -40,19 +40,16 @@ const ResetPassword = () => {
         setMessage("");
 
         try {
-            const res = await axios.post(`${apiUrl}/api/auth/reset-password`, {
-                email,
-                otp,
-                newPassword,
-            });
-            setMessage(res.data.message);
-            navigate("/login"); // Chuyển ngay khi thành công
+            const res = await resetPassword({ email, otp, newPassword });
+            setMessage(res.message || "Đặt lại mật khẩu thành công");
+            navigate("/login");
         } catch (error) {
-            setMessage(error.response?.data?.message || "Lỗi xảy ra!");
+            setMessage(error.message || "Lỗi xảy ra!");
         } finally {
             setLoading(false);
         }
     };
+
 
     return (
         <div className="container d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>

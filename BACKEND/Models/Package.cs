@@ -17,5 +17,11 @@ public partial class Package
 
     public DateTime? CreatedAt { get; set; }
 
+    public string? HighlightType { get; set; }
+
+    public int? PriorityLevel { get; set; }
+
+    public bool? AutoBoostDaily { get; set; }
+
     public virtual ICollection<JobPostPromotion> JobPostPromotions { get; set; } = new List<JobPostPromotion>();
 }

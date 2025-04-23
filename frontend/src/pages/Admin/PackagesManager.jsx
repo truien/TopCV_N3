@@ -1,19 +1,27 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable no-unused-vars */
-
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { FaEdit, FaTrash, FaPlus, FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { Card, Table, Button, Spinner, Badge, Modal, Collapse } from "react-bootstrap";
+import {
+    getAllPackages,
+    getPackageStatistics,
+    getPostsUsingPackages,
+    getCompanyPostPackages,
+    createPackage,
+    updatePackage,
+    deletePackage
+} from '@/api/packagesApi';
+
+
+
 
 function PackagesManager() {
-    const token = sessionStorage.getItem("token");
     const [packages, setPackages] = useState([]);
     const [loading, setLoading] = useState(true);
     const [statistics, setStatistics] = useState(null);
     const [modalShow, setModalShow] = useState(false);
     const [editingPackage, setEditingPackage] = useState(null);
+    // eslint-disable-next-line no-unused-vars
     const [newPackage, setNewPackage] = useState({ name: "", description: "", price: "", durationDays: "" });
     const URL = import.meta.env.VITE_API_URL + "/api/Packages";
     const [postsUsingPackages, setPostsUsingPackages] = useState([]);
@@ -48,11 +56,9 @@ function PackagesManager() {
     const fetchPackages = async () => {
         setLoading(true);
         try {
-            const res = await axios.get(import.meta.env.VITE_API_URL + "/api/PackagesPost", {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            setPackages(res.data);
-        } catch (err) {
+            const data = await getAllPackages();
+            setPackages(data);
+        } catch {
             toast.error("Lỗi tải dữ liệu.");
         } finally {
             setLoading(false);
@@ -61,53 +67,46 @@ function PackagesManager() {
 
     const fetchStatistics = async () => {
         try {
-            const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/PackagesPost/post-package-statistics`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            setStatistics(res.data);
-        } catch (err) {
+            const data = await getPackageStatistics();
+            setStatistics(data);
+        } catch {
             toast.error("Lỗi tải thống kê.");
         }
     };
+
     const fetchPostsUsingPackages = async () => {
         try {
-            const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/PackagesPost/posts-using-packages`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            setPostsUsingPackages(res.data);
-        } catch (err) {
+            const data = await getPostsUsingPackages();
+            setPostsUsingPackages(data);
+        } catch {
             toast.error("Lỗi tải dữ liệu bài viết sử dụng gói.");
         }
     };
 
+
     const fetchCompanyPostPackages = async () => {
         try {
-            const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/PackagesPost/company-post-packages`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            setCompanyPostPackages(res.data);
-        } catch (err) {
+            const data = await getCompanyPostPackages();
+            setCompanyPostPackages(data);
+        } catch {
             toast.error("Lỗi tải dữ liệu công ty có bài viết dùng gói.");
         }
     };
 
+
     const handleSave = async () => {
         try {
             if (editingPackage) {
-                await axios.put(`${URL}/${editingPackage.id}`, editingPackage, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
+                await updatePackage(editingPackage.id, editingPackage);
                 toast.success("Cập nhật thành công!");
             } else {
-                const res = await axios.post(URL, newPackage, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                setPackages([...packages, res.data]);
+                const data = await createPackage(newPackage);
+                setPackages([...packages, data]);
                 toast.success("Tạo gói mới thành công!");
             }
             setModalShow(false);
             fetchPackages();
-        } catch (err) {
+        } catch {
             toast.error("Lỗi khi xử lý dữ liệu.");
         }
     };
@@ -115,13 +114,14 @@ function PackagesManager() {
     const handleDelete = async (id) => {
         if (!window.confirm("Bạn có chắc chắn muốn xóa gói này?")) return;
         try {
-            await axios.delete(`${URL}/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+            await deletePackage(id);
             toast.success("Xóa gói thành công!");
             fetchPackages();
-        } catch (err) {
+        } catch {
             toast.error("Lỗi khi xóa gói.");
         }
     };
+
 
     return (
         <div className="container mt-4">

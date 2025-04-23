@@ -7,7 +7,8 @@ import JobDetailTooltip from '../JobDetailTooltip/JobDetailTooltip';
 import logo from '../../assets/images/avatar-default.jpg'
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { saveJob } from '@/api/saveJobApi';
+
 function RelatedJobs({ job, fetchJobDetail, JobDetailCache }) {
     // eslint-disable-next-line no-unused-vars
     const [visible, setVisible] = useState(false);
@@ -42,30 +43,20 @@ function RelatedJobs({ job, fetchJobDetail, JobDetailCache }) {
     );
     const handleSaveJob = async () => {
         try {
-            const token = sessionStorage.getItem('token');
-            if (!token) {
-                toast.warning('Vui lòng đăng nhập để lưu tin!');
-                navigate("/")
-                return;
-            }
-            await axios.post(
-                `${import.meta.env.VITE_API_URL}/api/SaveJob/save-job/${job.id}`,
-                {},
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
+            await saveJob(job.id); // cookie tự gắn, không cần token
             toast.success('Đã lưu tin tuyển dụng!');
         } catch (error) {
             if (error.response?.status === 400) {
                 toast.info('Bạn đã lưu tin này rồi.');
+            } else if (error.response?.status === 401) {
+                toast.warning('Vui lòng đăng nhập để lưu tin!');
+                navigate('/');
             } else {
                 toast.error('Lỗi khi lưu tin.');
             }
         }
     };
+
 
     return (
         <>

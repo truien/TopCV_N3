@@ -5,7 +5,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import GradientText from '../GradientText/GradientText';
 import SplitText from '../SplitText/SplitText';
-import TextCursor from '../TextCursor/TextCursor'
+import { login, googleLogin, registerWithGoogle } from '@/api/authApi';
+
 
 function SignInForm() {
     const [email, setEmail] = useState('');
@@ -15,6 +16,12 @@ function SignInForm() {
     const [selectedRole, setSelectedRole] = useState("");
     const [showSecondLine, setShowSecondLine] = useState(false);
     const navigate = useNavigate();
+    const redirectByRole = (role) => {
+        if (role === "admin") navigate("/admin");
+        else if (role === "employer") navigate("/employer");
+        else navigate("/");
+    };
+
     const handleLogin = async (event) => {
         event.preventDefault();
 
@@ -24,67 +31,37 @@ function SignInForm() {
         }
 
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/Auth/login`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ UserName: email, Password: password }),
-            });
+            const data = await login({ UserName: email, Password: password });
 
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || "Đăng nhập thất bại.");
-            }
-
-            sessionStorage.setItem("token", data.token);
             toast.success("Đăng nhập thành công!", { position: "top-right" });
 
-            if (data.role === "admin") {
-                navigate("/admin");
-            } else if (data.role === "employer") {
-                navigate("/employer");
-            } else {
-                navigate("/");
-            }
+            redirectByRole(data.user.role);
         } catch (error) {
-            toast.error(error.message, { position: "top-right" });
+            toast.error(error.message || "Đăng nhập thất bại.", { position: "top-right" });
             console.error("Login Error:", error);
         }
     };
 
     const handleGoogleLogin = async (credentialResponse) => {
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/Auth/google-login`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ token: credentialResponse.credential }),
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                throw new Error(data.message || "Đăng nhập Google thất bại.");
-            }
+            const data = await googleLogin(credentialResponse.credential);
 
             if (data.requireRoleSelection) {
-                setGoogleUser(data); // Lưu thông tin người dùng để đăng ký
-                setShowRoleSelection(true); // Hiện form chọn vai trò
+                setGoogleUser(data);
+                setShowRoleSelection(true);
             } else {
-                sessionStorage.setItem("token", data.token);
                 toast.success("Đăng nhập Google thành công!", { position: "top-right" });
 
-                if (data.role === "admin") {
+                if (data.user.role === "admin") {
                     navigate("/admin");
-                }
-                if (data.role === "candidate") {
-                    navigate("/")
-                }
-                else {
-                    navigate("/employer")
+                } else if (data.user.role === "candidate") {
+                    navigate("/");
+                } else {
+                    navigate("/employer");
                 }
             }
         } catch (error) {
-            toast.error(error.message, { position: "top-right" });
+            toast.error(error.message || "Đăng nhập Google thất bại.", { position: "top-right" });
             console.error("Google Login Error:", error);
         }
     };
@@ -96,49 +73,31 @@ function SignInForm() {
         }
 
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/Auth/register-with-google`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    email: googleUser.email,
-                    name: googleUser.name,
-                    avatar: googleUser.avatar,
-                    roleId: selectedRole
-                }),
-            });
+            const payload = {
+                email: googleUser.email,
+                name: googleUser.name,
+                avatar: googleUser.avatar,
+                roleId: selectedRole
+            };
 
-            const data = await res.json();
-
-            if (!res.ok) {
-                throw new Error(data.message || "Đăng ký Google thất bại.");
-            }
-
-            sessionStorage.setItem("token", data.token);
+            await registerWithGoogle(payload);
             toast.success("Đăng ký thành công!", { position: "top-right" });
+            navigate('/');
         } catch (error) {
-            toast.error(error.message, { position: "top-right" });
+            toast.error(error.message || "Đăng ký Google thất bại.", { position: "top-right" });
             console.error("Google Register Error:", error);
         }
     };
 
 
+
     return (
         <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-            <TextCursor
-                text="💖"
-                delay={0.01}
-                spacing={80}
-                followMouseDirection={true}
-                randomFloat={true}
-                exitDuration={0.3}
-                removalInterval={20}
-                maxPoints={10}
-            />
             <div className='d-flex justify-content-center align-items-center' style={{ minHeight: '100vh' }}>
                 <div className='row w-100' style={{ maxWidth: '1550px' }}>
                     <div className={'col-md-7 p-5 border bg-white'}>
                         <div className={styles['form-group']}>
-                            <h4 className={styles['header_title']}>
+                            <div className={styles['header_title']}>
                                 <SplitText
                                     text="Chào mừng bạn đã quay trở lại"
                                     className="text-2xl font-semibold text-center"
@@ -150,7 +109,8 @@ function SignInForm() {
                                     rootMargin="-50px"
                                     onLetterAnimationComplete={() => setShowSecondLine(true)}
                                 />
-                            </h4>
+                            </div>
+
 
                             {showSecondLine ? (
                                 <p className={styles['header_caption'] + ' mb-3'}>

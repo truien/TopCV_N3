@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import JobCard from './JobCard';
 import { toast } from 'react-toastify';
 import styles from './Jobs.module.css';
 import Topai from '../../assets/images/label-toppy-ai.webp'
+import { getPromotedJobs, getJobDetail } from '@/api/jobApi';
+
 
 const ListJobs = () => {
     const [jobs, setJobs] = useState([]);
@@ -22,15 +23,13 @@ const ListJobs = () => {
     useEffect(() => {
         const fetchJobs = async () => {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/JobPosts/promoted`, {
-                    params: {
-                        page: currentPage,
-                        pageSize: jobsPerPage,
-                        location: selectedFilter !== 'Ngẫu Nhiên' ? selectedFilter : undefined,
-                    },
+                const data = await getPromotedJobs({
+                    page: currentPage,
+                    pageSize: jobsPerPage,
+                    location: selectedFilter !== 'Ngẫu Nhiên' ? selectedFilter : undefined,
                 });
-                setJobs(response.data.jobs);
-                setTotalJobs(response.data.totalJobs);
+                setJobs(data.jobs);
+                setTotalJobs(data.totalJobs);
             } catch (err) {
                 toast.error('Đã có lỗi xảy ra, vui lòng thử lại sau');
                 console.log('Lỗi', err);
@@ -40,11 +39,12 @@ const ListJobs = () => {
         fetchJobs();
     }, [currentPage, selectedFilter]);
 
+
     const prefetchJobDetail = async (id) => {
         if (!JobDetailCache[id]) {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/JobPosts/${id}`);
-                JobDetailCache[id] = response.data;
+                const data = await getJobDetail(id);
+                JobDetailCache[id] = data;
             } catch (error) {
                 console.error('Lỗi tải bài viết:', error);
             }

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using BACKEND.Models;
 using BACKEND.Enums;
+using System.Security.Claims;
 [ApiController]
 [Route("api/[controller]")]
 public class InterviewController : ControllerBase
@@ -25,7 +26,7 @@ public class InterviewController : ControllerBase
     [HttpPost("schedule")]
     public async Task<IActionResult> ScheduleInterview([FromBody] ScheduleInterviewDto dto)
     {
-        var employerIdClaim = _http.HttpContext?.User?.Claims?.FirstOrDefault(c => c.Type == "id");
+        var employerIdClaim = _http.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier);
         if (employerIdClaim == null) return Unauthorized();
         int employerId = int.Parse(employerIdClaim.Value);
 
@@ -92,7 +93,7 @@ public class InterviewController : ControllerBase
     [HttpGet("employer/all")]
     public async Task<IActionResult> GetAllInterviews()
     {
-        var employerIdClaim = _http.HttpContext?.User?.Claims?.FirstOrDefault(c => c.Type == "id");
+        var employerIdClaim = _http.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier);
         if (employerIdClaim == null) return Unauthorized();
         int employerId = int.Parse(employerIdClaim.Value);
 
@@ -124,7 +125,11 @@ public class InterviewController : ControllerBase
     [HttpGet("employer/active")]
     public async Task<IActionResult> GetActiveJobPosts()
     {
-        var employerId = int.Parse(User.Claims.First(c => c.Type == "id").Value);
+        var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userIdStr))
+            return Unauthorized();
+
+        int employerId = int.Parse(userIdStr);
         var jobs = await _context.JobPosts
             .Where(j => j.EmployerId == employerId && j.Status == "open")
             .Select(j => new { j.Id, j.Title })
@@ -153,8 +158,10 @@ public class InterviewController : ControllerBase
     [HttpGet("candidate/received")]
     public async Task<IActionResult> GetCandidateInterviews()
     {
-        var userId = int.Parse(User.Claims.First(c => c.Type == "id").Value);
-
+        var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userIdStr))
+            return Unauthorized();
+        var userId = int.Parse(userIdStr);
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
         var interviews = await _context.Interviews
             .Include(i => i.Job)

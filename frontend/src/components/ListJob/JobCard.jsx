@@ -6,14 +6,13 @@ import styles from './Jobs.module.css';
 import { Link } from 'react-router-dom'
 import { FaRegHeart } from "react-icons/fa6";
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { saveJob } from '@/api/saveJobApi';
+
 
 const JobCard = ({ job, fetchJobDetail, JobDetailCache, index }) => {
     // eslint-disable-next-line no-unused-vars
     const [visible, setVisible] = useState(false);
 
-    const navigate = useNavigate();
     const handleTooltipVisibleChange = async (visible) => {
         if (visible && !JobDetailCache[job.id]) {
             await fetchJobDetail(job.id);
@@ -22,30 +21,22 @@ const JobCard = ({ job, fetchJobDetail, JobDetailCache, index }) => {
     };
     const handleSaveJob = async () => {
         try {
-            const token = sessionStorage.getItem('token');
-            if (!token) {
-                toast.warning('Vui lòng đăng nhập để lưu tin!');
-                navigate("/")
-                return;
-            }
-            await axios.post(
-                `${import.meta.env.VITE_API_URL}/api/SaveJob/save-job/${job.id}`,
-                {},
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
+            await saveJob(job.id); // không cần token, cookie tự gửi
             toast.success('Đã lưu tin tuyển dụng!');
         } catch (error) {
             if (error.response?.status === 400) {
                 toast.info('Bạn đã lưu tin này rồi.');
-            } else {
+            }
+            else if (error.response?.status === 401)
+            {
+                toast.warning('Vui lòng đăng nhập');
+            }
+            else {
                 toast.error('Lỗi khi lưu tin.');
             }
         }
     };
+
 
     const placement = (index + 1) % 3 === 1 ? 'right' : 'left';
 

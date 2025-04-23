@@ -3,9 +3,10 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { MdDelete, MdOutlineClose } from "react-icons/md";
 import { toast } from "react-toastify";
+import { getAllUsers, deleteUser } from '@/api/authApi';
+
 
 function AccountManager() {
-    const token = sessionStorage.getItem("token");
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -16,36 +17,37 @@ function AccountManager() {
     const [totalPages, setTotalPages] = useState(1);
 
     useEffect(() => {
-        axios.get(`${import.meta.env.VITE_API_URL}/api/auth/users?page=${page}&pageSize=5`, {
-            headers: { Authorization: `Bearer ${token}` }
-        })
+        setLoading(true);
+        getAllUsers(page)
             .then((res) => {
-                setUsers(res.data.users);
-                setTotalPages(res.data.totalPages);
+                setUsers(res.users);
+                setTotalPages(res.totalPages);
                 setLoading(false);
             })
             .catch((err) => {
-                setError(err.response?.data || "Lỗi kết nối đến server.");
+                setError(err.message || "Lỗi kết nối đến server.");
                 setLoading(false);
             });
-    }, [token, page]);
+    }, [page]);
 
-    const handleDelete = () => {
+
+
+    const handleDelete = async () => {
         if (!selectedUser) return;
         setLoadingDelete(true);
-        axios.delete(`${import.meta.env.VITE_API_URL}/api/auth/delete/${selectedUser.id}`, {
-            headers: { Authorization: `Bearer ${token}` }
-        })
-            .then((res) => {
-                if (res.status === 204) {
-                    setUsers(users.filter((user) => user.id !== selectedUser.id));
-                    setShowModal(false);
-                    toast.success("Xóa thành công");
-                }
-            })
-            .catch((err) => toast.error(err.response?.data || "Có lỗi xảy ra khi xóa dữ liệu."))
-            .finally(() => setLoadingDelete(false));
+
+        try {
+            await deleteUser(selectedUser.id);
+            setUsers(users.filter((user) => user.id !== selectedUser.id));
+            setShowModal(false);
+            toast.success("Xóa thành công");
+        } catch (err) {
+            toast.error(err.message || "Có lỗi xảy ra khi xóa dữ liệu.");
+        } finally {
+            setLoadingDelete(false);
+        }
     };
+
 
     const confirmDelete = (user) => {
         setSelectedUser(user);

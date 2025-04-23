@@ -1,28 +1,33 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import { forgotPassword } from '@/api/authApi';
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState("");
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-    const apiUrl = import.meta.env.VITE_API_URL;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setMessage("");
+
         try {
-            const res = await axios.post(`${apiUrl}/api/auth/forgot-password`, { email });
-            setMessage(res.data.message);
-            setTimeout(() => navigate(`/reset-password?email=${encodeURIComponent(email)}`, { state: { email } }), 2000); // Tự động chuyển sau 2 giây
+            const res = await forgotPassword(email);
+            setMessage(res.message);
+            setTimeout(() => {
+                navigate(`/reset-password?email=${encodeURIComponent(email)}`, {
+                    state: { email }
+                });
+            }, 2000);
         } catch (error) {
-            setMessage(error.response?.data?.message || "Lỗi xảy ra!");
+            setMessage(error.message || "Lỗi xảy ra!");
         } finally {
             setLoading(false);
         }
     };
+
 
     return (
         <div className="  " >
@@ -77,9 +82,9 @@ const ForgotPassword = () => {
                 >
                     <div className="" >
                         <img src="https://static.topcv.vn/v4/image/auth/topcv_white.png" alt="TopCV" width="150" />
-                        <h5 className="mt-3" style={{fontSize: "40px",fontWeight: "700"}}>Tiếp lợi thế, nối thành công</h5>
+                        <h5 className="mt-3" style={{ fontSize: "40px", fontWeight: "700" }}>Tiếp lợi thế, nối thành công</h5>
                     </div>
-                    <img src="https://static.topcv.vn/v4/image/auth/auth_arrow.png" alt="arrow" width="80" className="mt-2" style={{height: "500px"}} />
+                    <img src="https://static.topcv.vn/v4/image/auth/auth_arrow.png" alt="arrow" width="80" className="mt-2" style={{ height: "500px" }} />
                 </div>
             </div>
         </div>

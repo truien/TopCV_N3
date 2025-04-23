@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { toast } from "react-toastify";
+import { register } from '@/api/authApi'; // API đã tạo
+
 
 
 function Sign() {
@@ -65,21 +67,20 @@ function Sign() {
         if (!validate()) return;
 
         try {
-            const response = await axios.post(
-                `${import.meta.env.VITE_API_URL}/api/auth/register`,
-                {
-                    name: formData.name,
-                    email: formData.email,
-                    password: formData.password,
-                    roleId: parseInt(formData.roleId),
-                }
-            );
-            console.log(response.data);
+            await register({
+                name: formData.name,
+                email: formData.email,
+                password: formData.password,
+                roleId: parseInt(formData.roleId),
+            });
+            toast.success("Đăng ký thành công!");
             navigate('/login');
         } catch (error) {
-            console.error(error);
+            console.error("Đăng ký thất bại:", error);
+            toast.error(error.response?.data?.message || "Có lỗi xảy ra khi đăng ký.");
         }
     };
+
 
     return (
         <div className='d-flex justify-content-center align-items-center' style={{ minHeight: '100vh' }}>

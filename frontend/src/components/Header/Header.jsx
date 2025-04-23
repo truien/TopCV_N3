@@ -3,29 +3,32 @@ import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../assets/images/topcv-logo-10-year.png';
 import avatarDefault from '../../assets/images/avatar-default.jpg';
 import { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
 import styles from './Header.module.css';
+import { getUserProfile } from '../../api/userApi';
+import { logout } from '../../api/authApi';
 
 const Header = () => {
     const navigate = useNavigate();
     const [userInfo, setUserInfo] = useState(null);
     const [showDropdown, setShowDropdown] = useState(false);
-    const token = sessionStorage.getItem('token');
     const dropdownRef = useRef(null);
+
     useEffect(() => {
         const fetchUser = async () => {
-            if (!token) return;
             try {
-                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/User/profile`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                setUserInfo(res.data);
+                const data = await getUserProfile();
+                setUserInfo(data);
             } catch (err) {
-                console.error('Lỗi lấy thông tin user:', err);
+                if (err.response?.status === 401) {
+                    console.warn("Chưa đăng nhập");
+                    setUserInfo(null);
+                } else {
+                    console.error("Lỗi lấy thông tin user:", err);
+                }
             }
         };
         fetchUser();
-    }, [token]);
+    }, []);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -33,24 +36,23 @@ const Header = () => {
                 setShowDropdown(false);
             }
         };
-
         document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
+        return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    const handleLogin = () => navigate('/login');
-    const handleRegister = () => navigate('/sign');
-    const handleLogout = () => {
-        sessionStorage.removeItem('token')
-        sessionStorage.removeItem('activeLink')
-        setUserInfo(null);
-
-        navigate('/');
+    const handleLogout = async () => {
+        try {
+            await logout(); // gọi API logout
+            setUserInfo(null);
+            navigate('/');
+        } catch (err) {
+            console.error('Lỗi khi đăng xuất:', err);
+        }
     };
 
     const toggleDropdown = () => setShowDropdown(!showDropdown);
+    const handleLogin = () => navigate('/login');
+    const handleRegister = () => navigate('/sign');
 
     return (
         <nav className={`navbar navbar-expand-lg navbar-light px-3 ${styles.navbar}`} role="navigation">

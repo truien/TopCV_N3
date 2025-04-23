@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using BACKEND.Models;
 using Microsoft.AspNetCore.Authorization;
 using BACKEND.Enums;
+using System.Security.Claims;
+
 
 [ApiController]
 [Route("api/[controller]")]
@@ -24,9 +26,11 @@ public class ApplicationsController : ControllerBase
     [Consumes("multipart/form-data")]
     public async Task<IActionResult> Apply([FromForm] ApplyRequest request)
     {
-        var userIdClaim = _http.HttpContext?.User?.Claims?.FirstOrDefault(c => c.Type == "id");
+        var userIdClaim = _http.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier);
         if (userIdClaim == null) return Unauthorized();
+
         int userId = int.Parse(userIdClaim.Value);
+
 
         var job = await _context.JobPosts.FindAsync(request.JobId);
         if (job == null) return NotFound("Không tìm thấy bài tuyển dụng.");
@@ -109,10 +113,10 @@ public class ApplicationsController : ControllerBase
     [HttpGet("has-applied/{jobId}")]
     public async Task<IActionResult> HasApplied(int jobId)
     {
-        var userIdClaim = _http.HttpContext?.User?.Claims?.FirstOrDefault(c => c.Type == "id");
+        var userIdClaim = _http.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier);
         if (userIdClaim == null) return Unauthorized();
-
         int userId = int.Parse(userIdClaim.Value);
+
 
         var hasApplied = await _context.Applications
             .AnyAsync(a => a.JobId == jobId && a.UserId == userId);
@@ -124,9 +128,11 @@ public class ApplicationsController : ControllerBase
     [HttpGet("employer/all")]
     public async Task<IActionResult> GetAllApplicationsByEmployer()
     {
-        var employerIdClaim = _http.HttpContext?.User?.Claims?.FirstOrDefault(c => c.Type == "id");
+        var employerIdClaim = _http.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier);
         if (employerIdClaim == null) return Unauthorized();
+
         int employerId = int.Parse(employerIdClaim.Value);
+
 
 #pragma warning disable CS8602
         var applications = await _context.Applications

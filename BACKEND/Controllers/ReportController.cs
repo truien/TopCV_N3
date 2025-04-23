@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BACKEND.Models;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -20,10 +21,12 @@ public class ReportController : ControllerBase
     [HttpPost("job")]
     public async Task<IActionResult> ReportJobPost([FromBody] ReportJobPostDto dto)
     {
-        var userIdClaim = _http.HttpContext?.User?.Claims?.FirstOrDefault(c => c.Type == "id");
-        if (userIdClaim == null) return Unauthorized("Không xác định người dùng.");
+        var userIdStr = _http.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userIdStr))
+            return Unauthorized("Không xác định người dùng.");
 
-        int userId = int.Parse(userIdClaim.Value);
+        int userId = int.Parse(userIdStr);
+
 
         var jobPost = await _context.JobPosts.FindAsync(dto.JobPostId);
         if (jobPost == null) return NotFound("Không tìm thấy bài tuyển dụng.");

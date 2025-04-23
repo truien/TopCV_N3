@@ -57,6 +57,7 @@ public partial class TopcvBeContext : DbContext
     public virtual DbSet<Warning> Warnings { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseMySql("server=localhost;database=topcv_be;user=root;password=admin", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.40-mysql"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -241,9 +242,11 @@ public partial class TopcvBeContext : DbContext
                 .HasColumnType("text")
                 .HasColumnName("description");
             entity.Property(e => e.EmployerId).HasColumnName("employer_id");
+            entity.Property(e => e.HighlightType).HasMaxLength(50);
             entity.Property(e => e.Interest)
                 .HasColumnType("text")
                 .HasColumnName("interest");
+            entity.Property(e => e.IsAutoBoost).HasDefaultValueSql("'0'");
             entity.Property(e => e.JobOpeningCount)
                 .HasDefaultValueSql("'1'")
                 .HasColumnName("job_opening_count");
@@ -254,6 +257,7 @@ public partial class TopcvBeContext : DbContext
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("timestamp")
                 .HasColumnName("post_date");
+            entity.Property(e => e.PriorityLevel).HasDefaultValueSql("'0'");
             entity.Property(e => e.Requirements)
                 .HasColumnType("text")
                 .HasColumnName("requirements");
@@ -436,6 +440,7 @@ public partial class TopcvBeContext : DbContext
             entity.ToTable("packages");
 
             entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.AutoBoostDaily).HasDefaultValueSql("'0'");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("timestamp")
@@ -444,12 +449,14 @@ public partial class TopcvBeContext : DbContext
                 .HasColumnType("text")
                 .HasColumnName("description");
             entity.Property(e => e.DurationDays).HasColumnName("duration_days");
+            entity.Property(e => e.HighlightType).HasMaxLength(50);
             entity.Property(e => e.Name)
                 .HasMaxLength(255)
                 .HasColumnName("name");
             entity.Property(e => e.Price)
                 .HasPrecision(10, 2)
                 .HasColumnName("price");
+            entity.Property(e => e.PriorityLevel).HasDefaultValueSql("'0'");
         });
 
         modelBuilder.Entity<ProPackage>(entity =>

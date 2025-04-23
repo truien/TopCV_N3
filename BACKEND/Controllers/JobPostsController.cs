@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using BACKEND.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.VisualBasic;
+using System.Security.Claims;
 
 namespace BACKEND.Controllers
 {
@@ -164,7 +165,6 @@ namespace BACKEND.Controllers
             return Ok(jobs);
         }
 
-#pragma warning disable CS8602
         [HttpGet("related")]
         public async Task<IActionResult> GetRelatedJobPosts(
             [FromQuery] string? fiels,
@@ -176,131 +176,50 @@ namespace BACKEND.Controllers
             var baseUrl = $"{Request.Scheme}://{Request.Host}";
             var now = DateTime.UtcNow;
 
-            // === PROMOTED JOBS ===
-            var promotedQuery = from promo in _context.JobPostPromotions
-                                join i in _context.JobPosts on promo.JobPostId equals i.Id
-                                join e in _context.CompanyProfiles on i.EmployerId equals e.UserId
-                                join u in _context.Users on e.UserId equals u.Id
-                                join f in _context.JobPostFields on i.Id equals f.JobPostId
-                                join em in _context.JobPostEmploymentTypes on i.Id equals em.JobPostId
-                                where i.Id != excludeId
-                                      && i.Status == "open"
-                                      && i.ApplyDeadline >= now
-                                      && promo.StartDate <= now && promo.EndDate >= now
-                                let score =
-                                    (f.Field.Name == fiels ? 1 : 0) +
-                                    (em.EmploymentType.Name == employment ? 1 : 0) +
-                                    (string.IsNullOrEmpty(location) || i.Location.Contains(location) ? 1 : 0)
-                                orderby score descending, i.PostDate descending
-                                select new RelatedJobPostDto
-                                {
-                                    Id = i.Id,
-                                    Title = i.Title,
-                                    CompanyName = e.CompanyName,
-                                    Avatar = string.IsNullOrEmpty(u.Avatar)
-                                        ? null
-                                        : (u.Avatar.StartsWith("http") ? u.Avatar : baseUrl + "/avatar/" + u.Avatar),
-                                    Location = i.Location,
-                                    ApplyDeadline = i.ApplyDeadline,
-                                    PostDate = i.PostDate,
-                                    SalaryRange = i.SalaryRange,
-                                    RelevanceScore = score
-                                };
+            var query = _context.JobPosts
+                .Include(j => j.Employer)
+                    .ThenInclude(e => e.CompanyProfiles)
+                .Include(j => j.JobPostFields)
+                    .ThenInclude(f => f.Field)
+                .Include(j => j.JobPostEmploymentTypes)
+                    .ThenInclude(em => em.EmploymentType)
+                .Where(j => j.Id != excludeId && j.Status == "open" && j.ApplyDeadline >= now);
 
-            var promotedJobs = await promotedQuery.Take(limitted).ToListAsync();
-            int remaining = limitted - promotedJobs.Count;
+            var jobs = await query
+                .Select(j => new
+                {
+                    j.Id,
+                    j.Title,
+                    j.Location,
+                    j.ApplyDeadline,
+                    j.PostDate,
+                    j.SalaryRange,
+                    CompanyName = j.Employer.CompanyProfiles.FirstOrDefault()!.CompanyName,
+                    Avatar = string.IsNullOrEmpty(j.Employer.Avatar) ? null :
+                            (j.Employer.Avatar.StartsWith("http") ? j.Employer.Avatar : baseUrl + "/avatar/" + j.Employer.Avatar),
+                    Score =
+                    (j.JobPostFields.Any(f => f.Field!.Name == fiels) ? 1 : 0) +
+                    (j.JobPostEmploymentTypes.Any(em => em.EmploymentType!.Name == employment) ? 1 : 0) +
+                    ((!string.IsNullOrEmpty(location) && !string.IsNullOrEmpty(j.Location) && j.Location.Contains(location)) ? 1 : 0)
 
-            // === NORMAL JOBS ===
-            var normalJobs = new List<RelatedJobPostDto>();
-            if (remaining > 0)
-            {
-                var normalQuery = from i in _context.JobPosts
-                                  join e in _context.CompanyProfiles on i.EmployerId equals e.UserId
-                                  join u in _context.Users on e.UserId equals u.Id
-                                  join f in _context.JobPostFields on i.Id equals f.JobPostId
-                                  join em in _context.JobPostEmploymentTypes on i.Id equals em.JobPostId
-                                  where i.Id != excludeId
-                                        && i.Status == "open"
-                                        && i.ApplyDeadline >= now
-                                        && !_context.JobPostPromotions
-                                            .Any(p => p.JobPostId == i.Id && p.StartDate <= now && p.EndDate >= now)
+                })
+                .OrderByDescending(j => j.Score)
+                .ThenByDescending(j => j.PostDate)
+                .Take(limitted)
+                .ToListAsync();
 
-                                  let score =
-                                      (f.Field.Name == fiels ? 1 : 0) +
-                                      (em.EmploymentType.Name == employment ? 1 : 0) +
-                                      (string.IsNullOrEmpty(location) || i.Location.Contains(location) ? 1 : 0)
-                                  orderby score descending, i.PostDate descending
-                                  select new RelatedJobPostDto
-                                  {
-                                      Id = i.Id,
-                                      Title = i.Title,
-                                      CompanyName = e.CompanyName,
-                                      Avatar = string.IsNullOrEmpty(u.Avatar)
-                                          ? null
-                                          : (u.Avatar.StartsWith("http") ? u.Avatar : baseUrl + "/avatar/" + u.Avatar),
-                                      Location = i.Location,
-                                      ApplyDeadline = i.ApplyDeadline,
-                                      PostDate = i.PostDate,
-                                      SalaryRange = i.SalaryRange,
-                                      RelevanceScore = score
-                                  };
-
-                normalJobs = await normalQuery.Take(remaining).ToListAsync();
-            }
-
-            // Combine promoted and normal jobs, ensuring no duplicates by JobPost Id
-            var combinedJobs = promotedJobs.Concat(normalJobs).ToList();
-
-            // Check if we need to add more jobs to reach the desired limit
-            if (combinedJobs.Count < limitted)
-            {
-                // Get additional promoted jobs (instead of normal jobs) to fill up the remaining slots
-                var additionalPromotedQuery = from promo in _context.JobPostPromotions
-                                              join i in _context.JobPosts on promo.JobPostId equals i.Id
-                                              join e in _context.CompanyProfiles on i.EmployerId equals e.UserId
-                                              join u in _context.Users on e.UserId equals u.Id
-                                              where i.Id != excludeId
-                                                    && i.Status == "open"
-                                                    && i.ApplyDeadline >= now
-                                                    && promo.StartDate <= now && promo.EndDate >= now
-                                              select new RelatedJobPostDto
-                                              {
-                                                  Id = i.Id,
-                                                  Title = i.Title,
-                                                  CompanyName = e.CompanyName,
-                                                  Avatar = string.IsNullOrEmpty(u.Avatar)
-                                                      ? null
-                                                      : (u.Avatar.StartsWith("http") ? u.Avatar : baseUrl + "/avatar/" + u.Avatar),
-                                                  Location = i.Location,
-                                                  ApplyDeadline = i.ApplyDeadline,
-                                                  PostDate = i.PostDate,
-                                                  SalaryRange = i.SalaryRange,
-                                                  RelevanceScore = 0  // You can set a default score or remove it based on your logic
-                                              };
-
-                // Get enough additional promoted jobs to meet the limit
-                var additionalPromotedJobs = await additionalPromotedQuery.Take(limitted - combinedJobs.Count).ToListAsync();
-
-                // Add additional promoted jobs to the list
-                combinedJobs.AddRange(additionalPromotedJobs);
-            }
-
-            // Remove duplicates by Id
-            var result = combinedJobs.GroupBy(job => job.Id)
-                                     .Select(group => group.First())
-                                     .ToList();
-
-            return Ok(result);
+            return Ok(jobs);
         }
-#pragma warning restore CS8602
+
         [Authorize(Roles = "employer")]
         [HttpPost("create")]
         public async Task<IActionResult> CreateJobPost([FromBody] CreateJobPostDto dto)
         {
-            var userIdClaim = HttpContext.User.FindFirst("id");
+            var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
             if (userIdClaim == null) return Unauthorized();
 
             int employerId = int.Parse(userIdClaim.Value);
+
 
             var jobPost = new JobPost
             {
