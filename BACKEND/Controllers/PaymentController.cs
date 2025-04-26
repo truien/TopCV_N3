@@ -137,7 +137,7 @@ public class PaymentController : ControllerBase
 
         await _context.SaveChangesAsync();
 
-        return Redirect("http://localhost:5173/thanh-toan/thanh-cong");
+        return Redirect("http://localhost:5173/employer");
     }
 
     [AllowAnonymous]
