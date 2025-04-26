@@ -1,4 +1,4 @@
-import styles from './Recommend.module.css'; // Import CSS Module
+import styles from './Recommend.module.css';
 import { GrFormNextLink } from "react-icons/gr";
 
 function Recommend() {
@@ -21,21 +21,20 @@ function Recommend() {
                             xây dựng hình ảnh chuyên nghiệp trong mắt nhà tuyển
                             dụng và tiếp cận với các cơ hội việc làm phù hợp.
                         </p>
+                        <p className={styles['section-subtitle']}>
+                            Sở hữu hơn 9 triệu người dùng và 200.000+ doanh nghiệp lớn tin dùng, TopCV khao khát kiến tạo một cầu nối có giá trị vững bền để những nhân tố đủ tâm xứng tầm chạm được nhau: đúng người, đúng thời, đúng hướng. TopCV thông qua các giải pháp công nghệ tiếp thêm lợi thế cho ứng viên và nhà tuyển dụng, hướng tới sự đồng hành lâu dài của ứng viên và sự phát triển bền vững của doanh nghiệp.
+                        </p>
                     </div>
-                    <div className={styles['impressive-numbers']}>
-                        <div
-                            className={
-                                styles['impressive-numbers-row'] +
-                                ' d-flex justify-content-center'
-                            }
-                            style={{ marginLeft: '20px' }}
+                    <div className="container">
+                        <div className={'d-flex justify-content-center'
+                        }
                         >
                             <div className={styles['impressive-numbers__item']}>
                                 <div className='d-flex flex-column'>
                                     <div
                                         className={
                                             styles[
-                                                'impressive-numbers__itemnumber'
+                                            'impressive-numbers__itemnumber'
                                             ]
                                         }
                                     >
@@ -44,7 +43,7 @@ function Recommend() {
                                     <div
                                         className={
                                             styles[
-                                                'box-impressive-numbers__item--title'
+                                            'box-impressive-numbers__item--title'
                                             ]
                                         }
                                     >
@@ -53,7 +52,7 @@ function Recommend() {
                                     <div
                                         className={
                                             styles[
-                                                'box-impressive-numbers__item--description'
+                                            'box-impressive-numbers__item--description'
                                             ]
                                         }
                                     >
@@ -67,7 +66,7 @@ function Recommend() {
                                     <div
                                         className={
                                             styles[
-                                                'impressive-numbers__itemnumber'
+                                            'impressive-numbers__itemnumber'
                                             ]
                                         }
                                     >
@@ -76,7 +75,7 @@ function Recommend() {
                                     <div
                                         className={
                                             styles[
-                                                'box-impressive-numbers__item--title'
+                                            'box-impressive-numbers__item--title'
                                             ]
                                         }
                                     >
@@ -85,7 +84,7 @@ function Recommend() {
                                     <div
                                         className={
                                             styles[
-                                                'box-impressive-numbers__item--description'
+                                            'box-impressive-numbers__item--description'
                                             ]
                                         }
                                     >
@@ -98,19 +97,16 @@ function Recommend() {
                             </div>
                         </div>
 
-                        <div
-                            className={
-                                styles['impressive-numbers__bottom'] +
-                                ' d-flex justify-content-center align-content-center'
-                            }
-                            style={{ marginLeft: '22px' }}
+                        <div className={styles['impressive_numbers_bottom'] +
+                            ' d-flex justify-content-center py-2'
+                        }
                         >
                             <div className={styles['impressive-numbers__item']}>
                                 <div className='d-flex flex-column'>
                                     <div
                                         className={
                                             styles[
-                                                'impressive-numbers__itemnumber'
+                                            'impressive-numbers__itemnumber'
                                             ]
                                         }
                                     >
@@ -119,7 +115,7 @@ function Recommend() {
                                     <div
                                         className={
                                             styles[
-                                                'box-impressive-numbers__item--title'
+                                            'box-impressive-numbers__item--title'
                                             ]
                                         }
                                     >
@@ -128,7 +124,7 @@ function Recommend() {
                                     <div
                                         className={
                                             styles[
-                                                'box-impressive-numbers__item--description'
+                                            'box-impressive-numbers__item--description'
                                             ]
                                         }
                                     >
@@ -138,13 +134,12 @@ function Recommend() {
                                     </div>
                                 </div>
                             </div>
-
                             <div className={styles['impressive-numbers__item']}>
                                 <div className='d-flex flex-column'>
                                     <div
                                         className={
                                             styles[
-                                                'impressive-numbers__itemnumber'
+                                            'impressive-numbers__itemnumber'
                                             ]
                                         }
                                     >
@@ -153,7 +148,7 @@ function Recommend() {
                                     <div
                                         className={
                                             styles[
-                                                'box-impressive-numbers__item--title'
+                                            'box-impressive-numbers__item--title'
                                             ]
                                         }
                                     >
@@ -162,7 +157,7 @@ function Recommend() {
                                     <div
                                         className={
                                             styles[
-                                                'box-impressive-numbers__item--description'
+                                            'box-impressive-numbers__item--description'
                                             ]
                                         }
                                     >
@@ -178,7 +173,7 @@ function Recommend() {
                 </div>
             </div>
             <div className={styles['topcv-ecosystem'] + ' py-5'} >
-                <div className='container'>
+                <div className='container '>
                     <h2
                         className='text-center mx-auto fw-bolder'
                         style={{ maxWidth: '700px', color: '#fff' }}
@@ -188,14 +183,14 @@ function Recommend() {
                     </h2>
                     <div className='row mt-4'>
                         <div className='col-md-6 mb-4'>
-                            <div className={styles['topcv-products-item']+ ' position-relative p-4 bg-white'}>
+                            <div className={styles['topcv-products-item'] + ' position-relative p-4 bg-white'}>
                                 <h3 className='topcv-product-title'>TopCV</h3>
                                 <div className='topcv-product-content'>
                                     Nền tảng công nghệ tuyển dụng thông minh
                                     TopCV.vn
                                 </div>
                                 <button className={styles['btn-custom-light'] + ' mt-3 p-1'}>
-                                    <span >Tìm hiểu thêm <GrFormNextLink/></span>
+                                    <span >Tìm hiểu thêm <GrFormNextLink /></span>
                                 </button>
                                 <div className='topcv-product-cover position-absolute top-0 end-0 bottom-0'>
                                     <img
@@ -211,7 +206,7 @@ function Recommend() {
                             </div>
                         </div>
                         <div className='col-md-6 mb-4'>
-                            <div className= {styles['topcv-products-item']+ ' position-relative p-4 bg-white'}>
+                            <div className={styles['topcv-products-item'] + ' position-relative p-4 bg-white'}>
                                 <h3 className='topcv-product-title'>
                                     HappyTime
                                 </h3>
@@ -219,8 +214,8 @@ function Recommend() {
                                     Nền tảng quản lý và gia tăng trải nghiệm
                                     nhân sự
                                 </div>
-                                <button  className={styles['btn-custom-light'] + ' mt-3 p-1'}>
-                                    <span >Tìm hiểu thêm <GrFormNextLink/></span>
+                                <button className={styles['btn-custom-light'] + ' mt-3 p-1'}>
+                                    <span >Tìm hiểu thêm <GrFormNextLink /></span>
                                 </button>
                                 <div className='topcv-product-cover position-absolute top-0 end-0 bottom-0'>
                                     <img
@@ -236,7 +231,7 @@ function Recommend() {
                             </div>
                         </div>
                         <div className='col-md-6 mb-4'>
-                            <div className={styles['topcv-products-item']+ ' position-relative p-4 bg-white'}>
+                            <div className={styles['topcv-products-item'] + ' position-relative p-4 bg-white'}>
                                 <h3 className='topcv-product-title'>
                                     TestCenter
                                 </h3>
@@ -245,7 +240,7 @@ function Recommend() {
                                     TestCenter.vn
                                 </div>
                                 <button className={styles['btn-custom-light'] + ' mt-3 p-1'}>
-                                    <span >Tìm hiểu thêm <GrFormNextLink/></span>
+                                    <span >Tìm hiểu thêm <GrFormNextLink /></span>
                                 </button>
                                 <div className='topcv-product-cover position-absolute top-0 end-0 bottom-0'>
                                     <img
@@ -261,14 +256,14 @@ function Recommend() {
                             </div>
                         </div>
                         <div className='col-md-6 mb-4'>
-                            <div className={styles['topcv-products-item']+ ' position-relative p-4 bg-white'}>
+                            <div className={styles['topcv-products-item'] + ' position-relative p-4 bg-white'}>
                                 <h3 className='topcv-product-title'>SHiring</h3>
                                 <div className='topcv-product-content'>
                                     Nền tảng tuyển dụng ứng viên tài năng
                                     SHiring.vn
                                 </div>
                                 <button className={styles['btn-custom-light'] + ' mt-3 p-1'}>
-                                    <span >Tìm hiểu thêm <GrFormNextLink/></span>
+                                    <span >Tìm hiểu thêm <GrFormNextLink /></span>
                                 </button>
                                 <div className='topcv-product-cover position-absolute top-0 end-0 bottom-0'>
                                     <img

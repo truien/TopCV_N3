@@ -79,7 +79,8 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(
            "http://localhost:5173",
-           "https://dv7bx2tt-5173.asse.devtunnels.ms"
+           "top-cv-n3-5zs5gnzq4-truiens-projects-27a8e364.vercel.app",
+           "https://top-cv-n3.vercel.app"
        )
              .AllowAnyHeader()
              .AllowAnyMethod()
@@ -96,7 +97,7 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
         listenOptions.UseHttps();
     });
 });
-
+builder.Services.AddHostedService<TopMaxPostDateUpdaterService>();
 builder.Services.AddScoped<IVnpay, Vnpay>();
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();

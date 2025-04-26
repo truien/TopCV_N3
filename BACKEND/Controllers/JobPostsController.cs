@@ -19,18 +19,21 @@ namespace BACKEND.Controllers
         }
 
         [HttpGet("promoted")]
-        public async Task<IActionResult> GetPromotedJobs(string location = "", int page = 1, int pageSize = 12)
+        public async Task<IActionResult> GetPromotedJobs(int page = 1, int pageSize = 12, string location = "")
         {
+#pragma warning disable CS8602
             var now = DateTime.UtcNow;
             int skip = (page - 1) * pageSize;
             var baseUrl = $"{Request.Scheme}://{Request.Host}/";
 
-            var query = from promo in _context.JobPostPromotions
-                        join job in _context.JobPosts on promo.JobPostId equals job.Id
+            var query = from job in _context.JobPosts
                         join user in _context.Users on job.EmployerId equals user.Id
-                        join company in _context.CompanyProfiles on user.Id equals company.UserId
-                        where promo.StartDate <= now && promo.EndDate >= now
-                            && job.Status == "open"
+                        join companyProfile in _context.CompanyProfiles on user.Id equals companyProfile.UserId into companyGroup
+                        from cp in companyGroup.DefaultIfEmpty()
+                        join promotion in _context.JobPostPromotions.Where(p => p.StartDate <= now && p.EndDate >= now)
+                            on job.Id equals promotion.JobPostId into promotionGroup
+                        from promo in promotionGroup.DefaultIfEmpty()
+                        where job.Status == "open" && job.ApplyDeadline >= now
                         select new
                         {
                             Id = job.Id,
@@ -38,11 +41,13 @@ namespace BACKEND.Controllers
                                     ? null
                                     : (user.Avatar.StartsWith("http") ? user.Avatar : baseUrl + "avatar/" + user.Avatar),
 
-                            Company = company.CompanyName,
+                            Company = cp != null ? cp.CompanyName : user.Username,
                             JobTitle = job.Title,
                             Salary = job.SalaryRange,
-                            Location = job.Location
+                            Location = job.Location,
+                            HighlightType = promo != null ? promo.Package.HighlightType : null
                         };
+#pragma warning restore CS8602 
 
             if (!string.IsNullOrEmpty(location))
             {
@@ -60,21 +65,25 @@ namespace BACKEND.Controllers
                 }
             }
 
+            var totalJobs = await query.CountAsync();
+
             var jobs = await query
+                .OrderByDescending(x => x.HighlightType == "TopMax")
+                .ThenByDescending(x => x.HighlightType == "TopPro")
+                .ThenByDescending(x => x.Id)
                 .Skip(skip)
                 .Take(pageSize)
                 .ToListAsync();
 
-            var totalJobs = await query.CountAsync();
-            var totalPages = (int)Math.Ceiling((double)totalJobs / pageSize);
-
             return Ok(new
             {
                 Jobs = jobs,
-                TotalPages = totalPages,
-                CurrentPage = page
+                TotalJobs = totalJobs,
+                CurrentPage = page,
+                TotalPages = (int)Math.Ceiling((double)totalJobs / pageSize)
             });
         }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetJobPostDetails(int id)
         {
