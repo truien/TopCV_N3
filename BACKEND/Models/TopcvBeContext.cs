@@ -40,6 +40,10 @@ public partial class TopcvBeContext : DbContext
 
     public virtual DbSet<JobPostReview> JobPostReviews { get; set; }
 
+    public virtual DbSet<Order> Orders { get; set; }
+
+    public virtual DbSet<Orderdetail> Orderdetails { get; set; }
+
     public virtual DbSet<Package> Packages { get; set; }
 
     public virtual DbSet<ProPackage> ProPackages { get; set; }
@@ -433,6 +437,62 @@ public partial class TopcvBeContext : DbContext
                 .HasConstraintName("job_post_reviews_ibfk_2");
         });
 
+        modelBuilder.Entity<Order>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("orders");
+
+            entity.HasIndex(e => e.UserId, "UserId");
+
+            entity.Property(e => e.Amount).HasPrecision(10, 2);
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp");
+            entity.Property(e => e.PaymentGateway)
+                .HasMaxLength(20)
+                .HasDefaultValueSql("'vnpay'");
+            entity.Property(e => e.Status)
+                .HasDefaultValueSql("'pending'")
+                .HasColumnType("enum('pending','paid','failed')");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Orders)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("orders_ibfk_1");
+        });
+
+        modelBuilder.Entity<Orderdetail>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("orderdetails");
+
+            entity.HasIndex(e => e.JobPostId, "JobPostId");
+
+            entity.HasIndex(e => e.OrderId, "OrderId");
+
+            entity.HasIndex(e => e.PackageId, "PackageId");
+
+            entity.Property(e => e.EndDate).HasColumnType("timestamp");
+            entity.Property(e => e.StartDate).HasColumnType("timestamp");
+
+            entity.HasOne(d => d.JobPost).WithMany(p => p.Orderdetails)
+                .HasForeignKey(d => d.JobPostId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("orderdetails_ibfk_3");
+
+            entity.HasOne(d => d.Order).WithMany(p => p.Orderdetails)
+                .HasForeignKey(d => d.OrderId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("orderdetails_ibfk_1");
+
+            entity.HasOne(d => d.Package).WithMany(p => p.Orderdetails)
+                .HasForeignKey(d => d.PackageId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("orderdetails_ibfk_2");
+        });
+
         modelBuilder.Entity<Package>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
@@ -440,7 +500,6 @@ public partial class TopcvBeContext : DbContext
             entity.ToTable("packages");
 
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.AutoBoostDaily).HasDefaultValueSql("'0'");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("timestamp")

@@ -1,0 +1,183 @@
+.wrapper {
+  display: flex;
+  gap: 2rem;
+  padding: 2rem;
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.sidebar {
+  flex: 1;
+  max-width: 300px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 177, 79, 0.1);
+  height: fit-content;
+  position: sticky;
+  top: 2rem;
+}
+
+.sidebar h2 {
+  color: #00b14f;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mainPanel {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 177, 79, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+.cardTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #00b14f;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+.cardTitle::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 50px;
+  height: 3px;
+  background-color: #00b14f;
+  border-radius: 2px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.95rem;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table thead {
+  background: #00b14f;
+  color: white;
+}
+
+.table th {
+  padding: 1rem 1.5rem;
+  text-align: left;
+  font-weight: 500;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.table td {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #eee;
+  color: #333;
+  transition: background-color 0.2s ease;
+}
+
+.table tbody tr:hover {
+  background-color: #f0fdf4;
+}
+
+.btn {
+  background-color: #00b14f;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn:hover {
+  background-color: #009944;
+  transform: translateY(-1px);
+}
+
+.statGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.statBox {
+  background: #ffffff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 177, 79, 0.1);
+  border-left: 4px solid #00b14f;
+  transition: transform 0.2s ease;
+}
+
+.statBox:hover {
+  transform: translateY(-2px);
+}
+
+.statBox h4 {
+  margin: 0;
+  font-size: 2rem;
+  color: #00b14f;
+  font-weight: 600;
+}
+
+.statBox span {
+  color: #666;
+  font-size: 0.9rem;
+  display: block;
+  margin-top: 0.5rem;
+}
+
+.actionBtns {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.actionBtns .btn {
+  padding: 0.5rem;
+  min-width: 36px;
+  height: 36px;
+  border-radius: 8px;
+}
+
+.actionBtns .btn:first-child {
+  background-color: #00b14f;
+}
+
+.actionBtns .btn:last-child {
+  background-color: #dc3545;
+}
+
+.actionBtns .btn:last-child:hover {
+  background-color: #c82333;
+}

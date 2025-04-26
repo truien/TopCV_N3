@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "iHDihrvR5F4ZvNrVNya7Z4yirJhgqxr9cCNdHzFXG3s=",
+  "Hash": "MYKnrBDwm4NTzvk8IiA8mLcUUUG4aAepScfxHZS8cLY=",
   "Source": "BACKEND",
   "BasePath": "_content/BACKEND",
   "Mode": "Default",
@@ -129,6 +129,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\cv\\17_9_638805402025196013.pdf"
+    },
+    {
+      "Identity": "C:\\Users\\ADMIN\\TopCV_N3\\BACKEND\\wwwroot\\cv\\18_4_638810689263898337.pdf",
+      "SourceId": "BACKEND",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\ADMIN\\TopCV_N3\\BACKEND\\wwwroot\\",
+      "BasePath": "_content/BACKEND",
+      "RelativePath": "cv/18_4_638810689263898337.pdf",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\cv\\18_4_638810689263898337.pdf"
     }
   ]
 }

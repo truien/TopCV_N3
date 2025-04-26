@@ -1,0 +1,88 @@
+.container {
+    font-family: 'Inter', sans-serif;
+}
+
+.title {
+    color: #00b14f;
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+.tap{
+    color: #000 !important;
+}
+
+.table_th,
+.table_td {
+    vertical-align: middle;
+    padding: 12px 16px;
+    font-size: 14px;
+}
+
+.btnview{
+    background-color: #fff;
+    border: 1px solid #00b14f !important;
+    color: #00b14f !important;
+}
+.btnview:hover{
+    background-color: #ccc !important;
+}
+.badge {
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 12px;
+    background-color: #00b14f !important;
+}
+
+.packageGroup {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.actionGroup {
+    display: flex !important;
+    align-items: center;
+    gap: 5px;
+    transition: 0.2s ease;
+}
+
+
+
+.topButton {
+    background-color: #00b14f;
+    color: white;
+    border: none;
+}
+
+.topButton:hover {
+    background-color: #019247;
+    transform: translateY(-5px);
+}
+
+
+.deleteButton {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+}
+
+.deleteButton:hover {
+    background-color: #bb2d3b;
+    transform: translateY(-5px);
+}
+
+.secondaryButton {
+    border: 1px solid #ccc;
+    background-color: white;
+    color: #333;
+}
+
+.secondaryButton:hover {
+    background-color: #f8f9fa;
+    color: #333 !important;
+    border: 1px solid #ccc;
+    transform: translateY(-5px);
+}

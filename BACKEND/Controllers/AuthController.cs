@@ -292,7 +292,6 @@ public async Task<IActionResult> Register([FromBody] RegisterRequest request)
                                   .Select(r => r.Name)
                                   .FirstOrDefaultAsync() ?? "user";
 
-        // ✅ Tạo cookie đăng nhập
         var claims = new List<Claim>
     {
         new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),

@@ -6,7 +6,7 @@ using BACKEND.Models;
 using Microsoft.EntityFrameworkCore;
 using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.Cookies;
-
+using VNPAY.NET;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<EmailService>();
@@ -94,6 +94,7 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
     });
 });
 
+builder.Services.AddScoped<IVnpay, Vnpay>();
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

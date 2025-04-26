@@ -39,6 +39,8 @@ public partial class User
 
     public virtual ICollection<JobPost> JobPosts { get; set; } = new List<JobPost>();
 
+    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+
     public virtual ICollection<ProSubscription> ProSubscriptions { get; set; } = new List<ProSubscription>();
 
     public virtual UserRole Role { get; set; } = null!;

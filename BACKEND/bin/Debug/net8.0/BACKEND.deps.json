@@ -20,7 +20,8 @@
           "Microsoft.EntityFrameworkCore.Tools": "8.0.13",
           "Pomelo.EntityFrameworkCore.MySql": "8.0.3",
           "Swashbuckle.AspNetCore": "6.6.2",
-          "System.IdentityModel.Tokens.Jwt": "8.6.1"
+          "System.IdentityModel.Tokens.Jwt": "8.6.1",
+          "VNPAY.NET": "8.5.0"
         },
         "runtime": {
           "BACKEND.dll": {}
@@ -145,6 +146,17 @@
             "assemblyVersion": "8.0.2.0",
             "fileVersion": "8.0.224.6804"
           }
+        }
+      },
+      "Microsoft.AspNetCore.Http.Abstractions/2.1.1": {
+        "dependencies": {
+          "Microsoft.AspNetCore.Http.Features": "2.1.1",
+          "System.Text.Encodings.Web": "6.0.0"
+        }
+      },
+      "Microsoft.AspNetCore.Http.Features/2.1.1": {
+        "dependencies": {
+          "Microsoft.Extensions.Primitives": "8.0.0"
         }
       },
       "Microsoft.AspNetCore.OpenApi/8.0.12": {
@@ -1751,6 +1763,17 @@
           "System.Threading": "4.3.0",
           "System.Xml.ReaderWriter": "4.3.0"
         }
+      },
+      "VNPAY.NET/8.5.0": {
+        "dependencies": {
+          "Microsoft.AspNetCore.Http.Abstractions": "2.1.1"
+        },
+        "runtime": {
+          "lib/net8.0/VNPAY.NET.dll": {
+            "assemblyVersion": "8.5.0.0",
+            "fileVersion": "8.5.0.0"
+          }
+        }
       }
     }
   },
@@ -1829,6 +1852,20 @@
       "sha512": "sha512-7qJkk5k5jabATZZrMIQgpUB9yjDNAAApSqw+8d0FEyK1AJ4j+wv1qOMl2byUr837xbK+MjehtPnQ32yZ5Gtzlw==",
       "path": "microsoft.aspnetcore.authentication.jwtbearer/8.0.2",
       "hashPath": "microsoft.aspnetcore.authentication.jwtbearer.8.0.2.nupkg.sha512"
+    },
+    "Microsoft.AspNetCore.Http.Abstractions/2.1.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-kQUEVOU4loc8CPSb2WoHFTESqwIa8Ik7ysCBfTwzHAd0moWovc9JQLmhDIHlYLjHbyexqZAlkq/FPRUZqokebw==",
+      "path": "microsoft.aspnetcore.http.abstractions/2.1.1",
+      "hashPath": "microsoft.aspnetcore.http.abstractions.2.1.1.nupkg.sha512"
+    },
+    "Microsoft.AspNetCore.Http.Features/2.1.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-VklZ7hWgSvHBcDtwYYkdMdI/adlf7ebxTZ9kdzAhX+gUs5jSHE9mZlTamdgf9miSsxc1QjNazHXTDJdVPZKKTw==",
+      "path": "microsoft.aspnetcore.http.features/2.1.1",
+      "hashPath": "microsoft.aspnetcore.http.features.2.1.1.nupkg.sha512"
     },
     "Microsoft.AspNetCore.OpenApi/8.0.12": {
       "type": "package",
@@ -2900,6 +2937,13 @@
       "sha512": "sha512-5zJ0XDxAIg8iy+t4aMnQAu0MqVbqyvfoUVl1yDV61xdo3Vth45oA2FoY4pPkxYAH5f8ixpmTqXeEIya95x0aCQ==",
       "path": "system.xml.xdocument/4.3.0",
       "hashPath": "system.xml.xdocument.4.3.0.nupkg.sha512"
+    },
+    "VNPAY.NET/8.5.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-rdiNL0StLkIQ0F2bODf+/6rOFTkk7JXtQrpo0Zbl1xQ/ZhPIl4dfR0a5bOp8reeb44bkPuG2qRAEM0AJ3R36/Q==",
+      "path": "vnpay.net/8.5.0",
+      "hashPath": "vnpay.net.8.5.0.nupkg.sha512"
     }
   }
 }

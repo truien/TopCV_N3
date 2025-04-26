@@ -1,0 +1,165 @@
+
+.container {
+  padding: 2rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f9fafb;
+}
+
+.title {
+  text-align: center;
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: #00b14f;
+  margin-bottom: 2rem;
+}
+
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  background: #00b14f;
+  color: white;
+  padding: 0.75rem;
+  text-align: center;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+}
+
+.table td {
+  padding: 0.75rem;
+  text-align: center;
+  vertical-align: middle;
+  background-color: #fefefe;
+}
+
+.rowHover:hover {
+  background-color: #f0fdf4;
+}
+
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #00b14f;
+}
+
+.badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  background: #e6fffa;
+  color: #006644;
+  font-weight: 500;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2rem;
+  gap: 1rem;
+}
+
+.pageIndicator {
+  font-weight: bold;
+  color: #555;
+}
+
+.btnOutline {
+  border: 1px solid #00b14f;
+  background: white;
+  padding: 0.5rem 1.2rem;
+  border-radius: 6px;
+  color: #00b14f;
+  transition: all 0.3s ease;
+}
+
+.btnOutline:hover {
+  background: #00b14f;
+  color: white;
+}
+
+.btnDanger {
+  background: #e53935;
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.btnDanger:hover {
+  background-color: #c62828;
+}
+
+.modal {
+  background-color: rgba(0, 0, 0, 0.6);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1050;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modalDialog {
+  max-width: 500px;
+  width: 100%;
+}
+
+.modalContent {
+  border-radius: 10px;
+  overflow: hidden;
+  background: white;
+}
+
+.modalHeader {
+  background: linear-gradient(135deg, #00b14f, #009e46);
+  padding: 1rem;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btnClose {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  padding: 1rem;
+  gap: 1rem;
+}
+
+.noData {
+  text-align: center;
+  padding: 1rem;
+  font-style: italic;
+  color: #999;
+}
+
+.loader {
+  text-align: center;
+  font-size: 1.2rem;
+  padding: 2rem;
+}

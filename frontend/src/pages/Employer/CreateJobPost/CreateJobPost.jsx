@@ -2,19 +2,18 @@ import React, { useEffect, useState } from 'react';
 import styles from './CreateJobPost.module.css';
 import RichTextEditor from '../../../components/RichTextEditor/RichTextEditor';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
-import { createJobPost } from '@/api/jobApi';
 import axiosInstance from '@/api/axiosInstance';
+import { createJobPost } from '@/api/jobApi'
+import { useNavigate } from 'react-router-dom'
 
 
 function CreateJobPost() {
-    const navigate = useNavigate();
     const [jobFields, setJobFields] = useState([]);
     const [employmentTypes, setEmploymentTypes] = useState([]);
     const [selectedFields, setSelectedFields] = useState([]);
     const [selectedEmploymentTypes, setSelectedEmploymentTypes] = useState([]);
-
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -67,18 +66,20 @@ function CreateJobPost() {
         if (!validate()) return;
 
         try {
-            await createJobPost({
+            const res = await createJobPost({
                 ...formData,
                 jobFieldIds: selectedFields.map(f => f.value),
                 employmentTypeIds: selectedEmploymentTypes.map(e => e.value)
             });
-            toast.success('Đăng tin thành công');
+
+            toast.success(res.message);
             navigate('/employer');
         } catch (err) {
             toast.error('Có lỗi xảy ra khi đăng tin');
             console.error(err);
         }
     };
+
 
 
     return (

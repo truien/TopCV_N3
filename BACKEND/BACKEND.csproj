@@ -34,6 +34,7 @@
     
     <!-- MySQL (nếu cần) -->
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.3" />
+    <PackageReference Include="VNPAY.NET" Version="8.5.0" />
   </ItemGroup>
 
 </Project>

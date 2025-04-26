@@ -24,4 +24,6 @@ public partial class Package
     public bool? AutoBoostDaily { get; set; }
 
     public virtual ICollection<JobPostPromotion> JobPostPromotions { get; set; } = new List<JobPostPromotion>();
+
+    public virtual ICollection<Orderdetail> Orderdetails { get; set; } = new List<Orderdetail>();
 }

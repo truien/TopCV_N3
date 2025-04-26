@@ -96,6 +96,10 @@
             "System.IdentityModel.Tokens.Jwt": {
               "target": "Package",
               "version": "[8.6.1, )"
+            },
+            "VNPAY.NET": {
+              "target": "Package",
+              "version": "[8.5.0, )"
             }
           },
           "imports": [

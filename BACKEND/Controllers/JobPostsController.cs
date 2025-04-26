@@ -264,9 +264,105 @@ namespace BACKEND.Controllers
 
             return Ok(new { message = "Tạo bài viết thành công!", jobId = jobPost.Id });
         }
+        [HttpGet("employer")]
+        [Authorize(Roles = "employer")]
+        public async Task<IActionResult> GetJobPostsByEmployer()
+        {
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdStr, out int userId)) return Unauthorized();
 
+            var posts = await _context.JobPosts
+                .Where(p => p.EmployerId == userId)
+                .OrderByDescending(p => p.PostDate)
+                .Select(p => new
+                {
+                    p.Id,
+                    p.Title,
+                    p.Status,
+                    p.Location,
+                    p.PostDate,
+                    p.ApplyDeadline,
+                    p.SalaryRange
+                })
+                .ToListAsync();
 
+            return Ok(posts);
+        }
 
+        [HttpPut("{id}/status")]
+        [Authorize(Roles = "employer")]
+        public async Task<IActionResult> UpdateJobPostStatus(int id, [FromBody] string status)
+        {
+            if (status != "open" && status != "closed")
+                return BadRequest("Trạng thái không hợp lệ");
+
+            var jobPost = await _context.JobPosts.FindAsync(id);
+            if (jobPost == null) return NotFound();
+
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (jobPost.EmployerId.ToString() != userIdStr)
+                return Forbid("Bạn không có quyền sửa bài viết này");
+
+            jobPost.Status = status;
+            await _context.SaveChangesAsync();
+            return Ok("Cập nhật trạng thái thành công");
+        }
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "employer")]
+        public async Task<IActionResult> DeleteJobPost(int id)
+        {
+            var jobPost = await _context.JobPosts.FindAsync(id);
+            if (jobPost == null) return NotFound();
+
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (jobPost.EmployerId.ToString() != userIdStr)
+                return Forbid("Bạn không có quyền xoá bài viết này");
+
+            var hasApplications = await _context.Applications.AnyAsync(a => a.JobId == id);
+            if (hasApplications)
+                return BadRequest("Bài viết đã có ứng viên ứng tuyển, không thể xoá");
+
+            _context.JobPosts.Remove(jobPost);
+            await _context.SaveChangesAsync();
+            return Ok("Xoá bài viết thành công");
+        }
+
+        [HttpGet("employer-with-package")]
+        [Authorize(Roles = "employer")]
+        public async Task<IActionResult> GetJobPostsWithPackage()
+        {
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdStr, out int userId)) return Unauthorized();
+
+            var baseUrl = $"{Request.Scheme}://{Request.Host}";
+
+            var posts = await _context.JobPosts
+                .Where(p => p.EmployerId == userId)
+                .OrderByDescending(p => p.PostDate)
+                .Select(p => new
+                {
+                    p.Id,
+                    p.Title,
+                    p.Status,
+                    p.Location,
+                    p.PostDate,
+                    p.ApplyDeadline,
+                    p.SalaryRange,
+                    Package = _context.JobPostPromotions
+                        .Where(pp => pp.JobPostId == p.Id)
+                        .OrderByDescending(pp => pp.StartDate)
+                        .Select(pp => new
+                        {
+                            pp.StartDate,
+                            pp.EndDate,
+                            PackageName = pp.Package.Name
+                        })
+                        .FirstOrDefault()
+                })
+                .ToListAsync();
+
+            return Ok(posts);
+        }
 
     }
 }

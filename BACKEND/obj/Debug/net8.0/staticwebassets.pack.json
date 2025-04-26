@@ -25,6 +25,10 @@
       "PackagePath": "staticwebassets\\cv\\17_9_638805402025196013.pdf"
     },
     {
+      "Id": "C:\\Users\\ADMIN\\TopCV_N3\\BACKEND\\wwwroot\\cv\\18_4_638810689263898337.pdf",
+      "PackagePath": "staticwebassets\\cv\\18_4_638810689263898337.pdf"
+    },
+    {
       "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.BACKEND.Microsoft.AspNetCore.StaticWebAssets.props",
       "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
     },

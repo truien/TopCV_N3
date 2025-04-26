@@ -53,6 +53,8 @@ public partial class JobPost
 
     public virtual ICollection<JobPostReview> JobPostReviews { get; set; } = new List<JobPostReview>();
 
+    public virtual ICollection<Orderdetail> Orderdetails { get; set; } = new List<Orderdetail>();
+
     public virtual ICollection<SavedJob> SavedJobs { get; set; } = new List<SavedJob>();
 
     public virtual ICollection<Warning> Warnings { get; set; } = new List<Warning>();
