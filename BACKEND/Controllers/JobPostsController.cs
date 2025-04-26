@@ -83,6 +83,35 @@ namespace BACKEND.Controllers
                 TotalPages = (int)Math.Ceiling((double)totalJobs / pageSize)
             });
         }
+        [HttpGet("urgent")]
+        public async Task<IActionResult> GetUrgentJobs()
+        {
+            var now = DateTime.UtcNow;
+            var baseUrl = $"{Request.Scheme}://{Request.Host}/";
+
+            var jobs = await _context.JobPosts
+                .Include(j => j.Employer)
+                    .ThenInclude(e => e.CompanyProfiles)
+                .Where(j => j.HighlightType == "gap" && j.Status == "open" && (j.ApplyDeadline == null || j.ApplyDeadline > now))
+                .OrderByDescending(j => j.PostDate)
+                .Take(4)
+                .Select(j => new
+                {
+                    j.Id,
+                    JobTitle = j.Title,
+                    CompanyName = j.Employer.CompanyProfiles.FirstOrDefault()!.CompanyName,
+                    Avatar = string.IsNullOrEmpty(j.Employer.Avatar)
+                        ? null
+                        : (j.Employer.Avatar.StartsWith("http") ? j.Employer.Avatar : baseUrl + "avatar/" + j.Employer.Avatar),
+                    j.Location,
+                    j.SalaryRange
+                })
+                .ToListAsync();
+
+            return Ok(jobs);
+        }
+
+
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetJobPostDetails(int id)

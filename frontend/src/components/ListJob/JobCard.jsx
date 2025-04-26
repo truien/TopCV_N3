@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Tippy from '@tippyjs/react';
 import JobDetailTooltip from '../JobDetailTooltip/JobDetailTooltip.jsx';
 import logo from '../../assets/images/topcv-logo-10-year.png';
+import gap from '../../assets/images/icon-flash.webp';
 import styles from './Jobs.module.css';
 import { Link } from 'react-router-dom'
 import { FaRegHeart } from "react-icons/fa6";
@@ -27,8 +28,7 @@ const JobCard = ({ job, fetchJobDetail, JobDetailCache, index }) => {
             if (error.response?.status === 400) {
                 toast.info('Bạn đã lưu tin này rồi.');
             }
-            else if (error.response?.status === 401)
-            {
+            else if (error.response?.status === 401) {
                 toast.warning('Vui lòng đăng nhập');
             }
             else {
@@ -45,20 +45,39 @@ const JobCard = ({ job, fetchJobDetail, JobDetailCache, index }) => {
             <div className={`card ${styles.card}`}>
                 <div className={`card-body d-flex flex-column gap-2 ${styles.jobCard}`}>
                     <div className='d-flex gap-3'>
-                        <div className='company-logo'>
-                            <img
-                                src={job.avatar || logo}
-                                alt='Company Logo'
-                                style={{
-                                    width: '70px',
-                                    height: '70px',
-                                    objectFit: 'contain',
-                                    borderRadius: '8px',
-                                    border: '1px solid #f3f5f7',
-                                    padding: '1px'
-                                }}
-                            />
+                        <div className={styles.outerBorder} style={{ position: 'relative', display: 'inline-block' }}>
+                            {job.highlightType === 'gap' && (
+                                <img
+                                    src={gap}
+                                    alt="Gap Icon"
+                                    style={{
+                                        position: 'absolute',
+                                        top: '-15px',
+                                        left: '-5px',
+                                        width: '20px',
+
+                                        zIndex: 2
+                                    }}
+                                />
+                            )}
+                            <div className={
+                                job.highlightType === 'gap'
+                                    ? styles.companyLogoTopMax
+                                    : job.highlightType === 'hot'
+                                        ? styles.companyLogoTopVip
+                                        : styles.companyLogo
+                            }>
+                                <img
+                                    src={job.avatar || logo}
+                                    alt="Company Logo"
+                                    className={styles.companyLogoImage}
+                                />
+                            </div>
                         </div>
+
+
+
+
                         <div className='flex-grow-1 overflow-hidden'>
                             <Tippy
                                 delay={[200, 0]}
@@ -78,9 +97,13 @@ const JobCard = ({ job, fetchJobDetail, JobDetailCache, index }) => {
                                 onShow={() => handleTooltipVisibleChange(true)}
                                 onHide={() => handleTooltipVisibleChange(false)}
                             >
-                                <Link to={`/jobposts/${job.id}`} className={`${styles.jobTitle} `}>
+                                <Link
+                                    to={`/jobposts/${job.id}`}
+                                    className={`${styles.jobTitle} ${job.highlightType === 'gap' ? styles.jobTitleUrgent : ''}`}
+                                >
                                     {job.jobTitle}
                                 </Link>
+
                             </Tippy>
                             <p className={`mb-1 ${styles.companyName}`}>{job.company}</p>
                         </div>

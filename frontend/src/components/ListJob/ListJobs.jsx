@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState, useEffect } from 'react';
 import JobCard from './JobCard';
 import { toast } from 'react-toastify';
@@ -8,6 +9,8 @@ import { getPromotedJobs, getJobDetail } from '@/api/jobApi';
 
 const ListJobs = () => {
     const [jobs, setJobs] = useState([]);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
     const [totalJobs, setTotalJobs] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedFilter, setSelectedFilter] = useState('Ngẫu Nhiên');
@@ -38,6 +41,14 @@ const ListJobs = () => {
 
         fetchJobs();
     }, [currentPage, selectedFilter]);
+    // Auto next page mỗi 60 giây
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setPage((prev) => (prev < totalPages ? prev + 1 : 1));
+        }, 60000);
+
+        return () => clearInterval(interval);
+    }, [totalPages]);
 
 
     const prefetchJobDetail = async (id) => {

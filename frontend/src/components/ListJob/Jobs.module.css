@@ -61,7 +61,7 @@
 .jobCard {
     border: 0px solid #fff;
     border-radius: 8px;
-    padding: 5px !important;
+    padding: 15px !important;
 }
 
 .jobTitle {
@@ -76,6 +76,21 @@
     overflow: hidden;
     text-overflow: ellipsis;
     word-break: break-word;
+}
+
+.jobTitleUrgent {
+    font-size: 17px;
+    font-weight: bold;
+    color: var(--text-dark);
+    text-decoration: none;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+    color: red !important;
 }
 
 .jobTitle:hover {
@@ -114,4 +129,38 @@
 
 :global(.tippy-box[data-placement^="left"] > .tippy-arrow) {
     left: 500px;
+}
+
+.outerBorder {
+    padding: 2px;
+    /* viền dày hơn thì chỉnh */
+    border-radius: 14px;
+    display: inline-block;
+}
+
+.companyLogoTopMax {
+    background: linear-gradient(201.63deg, #003e86 14.36%, #02d15e 95.71%);
+    border-radius: 12px;
+    padding: 2px;
+}
+
+.companyLogoTopVip {
+    background: linear-gradient(45deg, #ff9900, #ff6600);
+    border-radius: 12px;
+    padding: 2px;
+}
+
+.companyLogo {
+    background: white;
+    border-radius: 12px;
+    padding: 2px;
+}
+
+.companyLogoImage {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    border-radius: 8px;
+    display: block;
+    background: #fff;
 }
