@@ -15,6 +15,7 @@ export const updateJobPostStatus = async (id, status) => {
     });
     return res.data;
 };
+
 export const deleteJobPost = async (id) => {
     const res = await axiosInstance.delete(`/api/jobposts/${id}`);
     return res.data;

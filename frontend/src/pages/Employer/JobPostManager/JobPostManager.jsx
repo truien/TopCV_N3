@@ -113,20 +113,24 @@ const JobPostManager = () => {
                                     </Badge>
                                 </td>
                                 <td className={`${styles.table_td}`}>
-                                    {post.package ? (
-                                        <Button
-                                            className={`${styles.btnview}`}
-                                            size="sm"
-                                            variant={isExpired(post.package.endDate) ? 'outline-danger' : 'outline-success'}
-                                            onClick={() =>
-                                                isExpired(post.package.endDate)
-                                                    ? setSelectedJob(post)
-                                                    : setPackageDetail(post.package)
-                                            }
-                                        >
-                                            {isExpired(post.package.endDate) ? 'Gia hạn' : 'Xem gói'}
-                                        </Button>
-
+                                    {post.package && post.package.length > 0 ? (
+                                        <div className={styles.packageGroup}>
+                                            {post.package.map((pkg, idx) => (
+                                                <Button
+                                                    key={idx}
+                                                    size="sm"
+                                                    variant={isExpired(pkg.endDate) ? 'outline-danger' : 'outline-success'}
+                                                    className={styles.btnview}
+                                                    onClick={() =>
+                                                        isExpired(pkg.endDate)
+                                                            ? setSelectedJob(post)
+                                                            : setPackageDetail(pkg)
+                                                    }
+                                                >
+                                                    {pkg.packageName} - {isExpired(pkg.endDate) ? 'Gia hạn' : 'Xem gói'}
+                                                </Button>
+                                            ))}
+                                        </div>
                                     ) : (
                                         <span className="text-muted fst-italic">Chưa mua</span>
                                     )}

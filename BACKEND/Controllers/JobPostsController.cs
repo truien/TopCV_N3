@@ -86,7 +86,7 @@ namespace BACKEND.Controllers
         [HttpGet("urgent")]
         public async Task<IActionResult> GetUrgentJobs([FromQuery] int limit = 0)
         {
-            var now = DateTime.UtcNow; 
+            var now = DateTime.UtcNow;
             var baseUrl = $"{Request.Scheme}://{Request.Host}/";
 
             var query = from i in _context.JobPosts
@@ -399,7 +399,7 @@ namespace BACKEND.Controllers
                             pp.EndDate,
                             PackageName = pp.Package.Name
                         })
-                        .FirstOrDefault()
+                        .ToList()
                 })
                 .ToListAsync();
 
