@@ -1,8 +1,11 @@
-.wrapper {
-    padding: 30px;
+.main {
     background-image: url('https://cdn-new.topcv.vn/unsafe/https://static.topcv.vn/v4/image/welcome/box-flash-badge/cover.png');
     background-size: cover;
     background-position: center;
+}
+
+.wrapper {
+    padding: 30px;
     color: white;
     position: relative;
     margin-top: 50px;
@@ -15,15 +18,18 @@
     padding: 2px;
     position: relative;
 }
-.logoFlag{
+
+.logoFlag {
     position: absolute;
     top: -15px;
     left: -10px;
 }
-.companylogo{
+
+.companylogo {
     border-radius: 4px;
     background-color: #fff;
 }
+
 .left {
     flex: 1;
     max-width: 40%;
