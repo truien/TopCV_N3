@@ -17,6 +17,8 @@ public partial class ProSubscription
 
     public DateTime? CreatedAt { get; set; }
 
+    public int? PostsLeftThisPeriod { get; set; }
+
     public virtual ProPackage Package { get; set; } = null!;
 
     public virtual User User { get; set; } = null!;

@@ -559,6 +559,7 @@ public partial class TopcvBeContext : DbContext
                 .HasColumnType("datetime")
                 .HasColumnName("end_date");
             entity.Property(e => e.PackageId).HasColumnName("package_id");
+            entity.Property(e => e.PostsLeftThisPeriod).HasDefaultValueSql("'0'");
             entity.Property(e => e.StartDate)
                 .HasColumnType("datetime")
                 .HasColumnName("start_date");
