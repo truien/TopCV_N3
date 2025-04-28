@@ -8,6 +8,9 @@ import { Link } from 'react-router-dom'
 import { FaRegHeart } from "react-icons/fa6";
 import { toast } from 'react-toastify';
 import { saveJob } from '@/api/saveJobApi';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import Tooltip from 'react-bootstrap/Tooltip';
+
 
 
 const JobCard = ({ job, fetchJobDetail, JobDetailCache, index }) => {
@@ -43,7 +46,7 @@ const JobCard = ({ job, fetchJobDetail, JobDetailCache, index }) => {
     return (
         <div className='col-12 col-md-6 col-lg-4 mb-3'>
             <div className={`card ${styles.card}`}>
-                <div className={`card-body d-flex flex-column gap-2 ${styles.jobCard}`}>
+                <div className={` d-flex flex-column gap-2 ${styles.jobCard}`}>
                     <div className='d-flex gap-3'>
                         <div className={styles.outerBorder} style={{ position: 'relative', display: 'inline-block' }}>
                             {job.highlightType === 'gap' && (
@@ -75,9 +78,6 @@ const JobCard = ({ job, fetchJobDetail, JobDetailCache, index }) => {
                             </div>
                         </div>
 
-
-
-
                         <div className='flex-grow-1 overflow-hidden'>
                             <Tippy
                                 delay={[200, 0]}
@@ -105,7 +105,21 @@ const JobCard = ({ job, fetchJobDetail, JobDetailCache, index }) => {
                                 </Link>
 
                             </Tippy>
-                            <p className={`mb-1 ${styles.companyName}`}>{job.company}</p>
+                            <p
+                                className={`mb-1 ${job.employerIsPro ? styles.companyNamePro : styles.companyName}`}
+                            >
+                                {job.employerIsPro && (
+                                    <OverlayTrigger
+                                        placement="top"
+                                        overlay={<Tooltip id={`tooltip-pro-${job.id}`} style={{
+                                            fontSize: '10px'
+                                        }} >Nhà tuyển dụng là Pro Company</Tooltip>}
+                                    >
+                                        <span className={styles.proBadge}>Pro</span>
+                                    </OverlayTrigger>
+                                )}
+                                {job.company}
+                            </p>
                         </div>
                     </div>
 

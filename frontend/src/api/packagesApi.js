@@ -20,3 +20,6 @@ export const updatePackage = (id, data) =>
 
 export const deletePackage = (id) =>
     axiosInstance.delete(`/api/PackagesPost/${id}`);
+export const getAllProPackages = () =>
+    axiosInstance.get('/api/PackagesPro/pro-packages').then(res => res.data);
+

@@ -5,7 +5,9 @@ import { toast } from 'react-toastify';
 import Select from 'react-select';
 import axiosInstance from '@/api/axiosInstance';
 import { createJobPost } from '@/api/jobApi'
+import { getProSubscription } from '@/api/userApi';
 import { useNavigate } from 'react-router-dom'
+import BuyProModal from '@/components/BuyProModal/BuyProModal';
 
 
 function CreateJobPost() {
@@ -13,6 +15,7 @@ function CreateJobPost() {
     const [employmentTypes, setEmploymentTypes] = useState([]);
     const [selectedFields, setSelectedFields] = useState([]);
     const [selectedEmploymentTypes, setSelectedEmploymentTypes] = useState([]);
+    const [showBuyProModal, setShowBuyProModal] = useState(false);
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         title: '',
@@ -64,6 +67,12 @@ function CreateJobPost() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!validate()) return;
+        const proInfo = await getProSubscription();
+        if (proInfo.postsLeft <= 0) {
+            toast.warning('Bạn đã hết lượt đăng bài miễn phí. Vui lòng mua gói Pro.');
+            setShowBuyProModal(true);
+            return;
+        }
 
         try {
             const res = await createJobPost({
@@ -166,6 +175,7 @@ function CreateJobPost() {
                                 <button type='submit' className={`btn ${styles['btn-custome']}`}>Đăng tin</button>
                             </div>
                         </form>
+                        <BuyProModal show={showBuyProModal} onClose={() => setShowBuyProModal(false)} />
                     </div>
                 </div>
             </div>

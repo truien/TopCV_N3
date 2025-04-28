@@ -89,5 +89,54 @@ public class UserController : ControllerBase
         });
     }
 
+    [Authorize(Roles = "employer")]
+    [HttpGet("pro-subscription")]
+    public async Task<IActionResult> GetProSubscription()
+    {
+        var userIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier);
+
+        if (userIdClaim == null)
+            return Unauthorized(new { message = "Không xác định được người dùng." });
+
+        int userId = int.Parse(userIdClaim.Value);
+        var now = DateTime.UtcNow;
+
+        var pro = await _context.ProSubscriptions
+            .Where(p => p.UserId == userId && p.StartDate <= now && p.EndDate >= now)
+            .Select(p => new
+            {
+                p.StartDate,
+                p.EndDate,
+                p.PostsLeftThisPeriod
+            })
+            .FirstOrDefaultAsync();
+
+        if (pro == null)
+        {
+            var monthStart = new DateTime(now.Year, now.Month, 1);
+
+            int postsThisMonth = await _context.JobPosts
+                .Where(j => j.EmployerId == userId && j.PostDate >= monthStart)
+                .CountAsync();
+
+            int freeQuota = 5;
+            int postsLeft = Math.Max(0, freeQuota - postsThisMonth);
+
+            return Ok(new
+            {
+                isPro = false,
+                postsLeft = postsLeft
+            });
+        }
+
+
+        return Ok(new
+        {
+            isPro = true,
+            startDate = pro.StartDate,
+            endDate = pro.EndDate,
+            postsLeft = pro.PostsLeftThisPeriod
+        });
+    }
 
 }

@@ -90,7 +90,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     word-break: break-word;
-    color: red !important;
+    color: #ff453a !important;
 }
 
 .jobTitle:hover {
@@ -111,6 +111,31 @@
     overflow: hidden;
     text-overflow: ellipsis;
     word-break: break-word;
+}
+
+.companyNamePro {
+    color: #e69920;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 16px;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+}
+
+.proBadge {
+    background: linear-gradient(259.43deg, #ffb94b -3.83%, #ffe7bf 29.35%, #ffb94b 92.22%);
+    color: #513101;
+    font-size: 12px;
+    letter-spacing: .01em;
+    text-align: center;
+    padding: 2px 6px;
+    border-radius: 12px;
+    margin-right: 6px;
 }
 
 .jobSalary,
@@ -146,7 +171,7 @@
 
 .companyLogoTopVip {
     background: linear-gradient(45deg, #ff9900, #ff6600);
-    border-radius:8px;
+    border-radius: 8px;
     padding: 2px;
 }
 
@@ -163,4 +188,5 @@
     border-radius: 8px;
     display: block;
     background: #fff;
+    text-align: center;
 }

@@ -114,31 +114,77 @@ public class PaymentController : ControllerBase
 
         order.Status = "paid";
 
-        foreach (var detail in order.Orderdetails)
+        if (order.Orderdetails != null && order.Orderdetails.Any())
         {
-            var existingPromotion = await _context.JobPostPromotions
-                .FirstOrDefaultAsync(x => x.JobPostId == detail.JobPostId && x.PackageId == detail.PackageId);
-
-            if (existingPromotion != null)
+            // ➡️ Đây là đơn mua gói bài viết
+            foreach (var detail in order.Orderdetails)
             {
-                existingPromotion.EndDate = existingPromotion.EndDate.AddDays((detail.EndDate - detail.StartDate).Days);
+                var existingPromotion = await _context.JobPostPromotions
+                    .FirstOrDefaultAsync(x => x.JobPostId == detail.JobPostId && x.PackageId == detail.PackageId);
+
+                if (existingPromotion != null)
+                {
+                    existingPromotion.EndDate = existingPromotion.EndDate.AddDays((detail.EndDate - detail.StartDate).Days);
+                }
+                else
+                {
+                    _context.JobPostPromotions.Add(new JobPostPromotion
+                    {
+                        JobPostId = detail.JobPostId,
+                        PackageId = detail.PackageId,
+                        StartDate = DateTime.UtcNow,
+                        EndDate = DateTime.UtcNow.AddDays((detail.EndDate - detail.StartDate).Days)
+                    });
+                }
+            }
+        }
+        else if (order.PackageId.HasValue)
+        {
+            // ➡️ Đây là đơn mua gói Pro (Dựa vào PackageId lưu trong Order)
+            var package = await _context.ProPackages.FindAsync(order.PackageId.Value);
+
+            if (package == null)
+                return NotFound("Không tìm thấy gói Pro để kích hoạt.");
+
+            var proSub = await _context.ProSubscriptions
+                .FirstOrDefaultAsync(p => p.UserId == order.UserId);
+
+            if (proSub != null)
+            {
+                if (proSub.EndDate > DateTime.UtcNow)
+                {
+                    proSub.EndDate = proSub.EndDate.AddDays(package.DurationDays);
+                }
+                else
+                {
+                    proSub.StartDate = DateTime.UtcNow;
+                    proSub.EndDate = DateTime.UtcNow.AddDays(package.DurationDays);
+                }
+                proSub.PostsLeftThisPeriod = 20; // Reset số lượt bài
             }
             else
             {
-                _context.JobPostPromotions.Add(new JobPostPromotion
+                _context.ProSubscriptions.Add(new ProSubscription
                 {
-                    JobPostId = detail.JobPostId,
-                    PackageId = detail.PackageId,
+                    UserId = order.UserId,
+                    PackageId = package.Id,
                     StartDate = DateTime.UtcNow,
-                    EndDate = DateTime.UtcNow.AddDays((detail.EndDate - detail.StartDate).Days)
+                    EndDate = DateTime.UtcNow.AddDays(package.DurationDays),
+                    PostsLeftThisPeriod = 20
                 });
             }
+        }
+        else
+        {
+            // Nếu không xác định được đơn gì
+            return BadRequest("Đơn hàng không hợp lệ: thiếu thông tin package hoặc chi tiết.");
         }
 
         await _context.SaveChangesAsync();
 
-        return Redirect("http://localhost:5173/employer");
+        return Redirect("http://localhost:5173/thanh-toan/thanh-cong");
     }
+
 
     [AllowAnonymous]
     [HttpGet("ipn")]
@@ -192,6 +238,57 @@ public class PaymentController : ControllerBase
 
         return Ok("Thanh toán thành công.");
     }
+
+    [Authorize(Roles = "employer")]
+    [HttpPost("pro-create")]
+    public async Task<IActionResult> CreateProVNPayOrder([FromBody] BuyProRequest request)
+    {
+        var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userIdStr))
+            return Unauthorized();
+        int userId = int.Parse(userIdStr);
+
+        var package = await _context.ProPackages.FindAsync(request.PackageId);
+        if (package == null)
+            return BadRequest(new { message = "Gói Pro không tồn tại." });
+
+        var order = new Order
+        {
+            UserId = userId,
+            Amount = (int)package.Price,
+            CreatedAt = DateTime.UtcNow,
+            PaymentGateway = "vnpay",
+            Status = "pending",
+            TransactionId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+            PackageId = package.Id // ➡️ Ghi nhớ luôn PackageId khi tạo đơn!
+        };
+
+        _context.Orders.Add(order);
+        await _context.SaveChangesAsync();
+
+        var paymentRequest = new PaymentRequest
+        {
+            PaymentId = (long)order.TransactionId,
+            Money = (int)package.Price,
+            Description = $"Thanh toán gói Pro {package.Name}",
+            IpAddress = NetworkHelper.GetIpAddress(HttpContext),
+            CreatedDate = DateTime.Now,
+            Currency = Currency.VND,
+            Language = DisplayLanguage.Vietnamese,
+            BankCode = BankCode.ANY
+        };
+
+        var paymentUrl = _vnpay.GetPaymentUrl(paymentRequest);
+
+        return Ok(new { paymentUrl });
+    }
+
+
+    public class BuyProRequest
+    {
+        public int PackageId { get; set; }
+    }
+
     public class MomoCreateRequest
     {
         public int JobPostId { get; set; }

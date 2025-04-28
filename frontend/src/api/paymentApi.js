@@ -14,3 +14,9 @@ export const createVNPayOrder = async (packageId, jobPostId) => {
     });
     return res.data;
 };
+export const createProVNPayOrder = async (packageId) => {
+    const res = await axios.post('/api/payment/pro-create', {
+        packageId: packageId,
+    });
+    return res.data;
+};

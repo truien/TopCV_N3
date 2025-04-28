@@ -3,7 +3,9 @@ import {
     Container, Tabs, Tab, Table, Badge, Button, Modal, Alert, Spinner
 } from 'react-bootstrap';
 import { getJobPostsWithPackage, updateJobPostStatus, deleteJobPost } from '@/api/jobApi';
+import { getProSubscription } from '@/api/userApi';
 import BuyPackageModal from '@/components/BuyPackageModal/BuyPackageModal';
+import BuyProModal from '@/components/BuyProModal/BuyProModal';
 import PackageDetailModal from '@/components/PackageDetailModal/PackageDetailModal';
 import { toast } from 'react-toastify';
 import styles from './JobPostManager.module.css';
@@ -18,6 +20,8 @@ const JobPostManager = () => {
     const [packageDetail, setPackageDetail] = useState(null);
     const [loading, setLoading] = useState(false);
     const [refresh, setRefresh] = useState(false);
+    const [proInfo, setProInfo] = useState(null);
+    const [showBuyProModal, setShowBuyProModal] = useState(false);
 
     useEffect(() => {
         const fetchPosts = async () => {
@@ -33,6 +37,17 @@ const JobPostManager = () => {
         };
         fetchPosts();
     }, [refresh]);
+    useEffect(() => {
+        const fetchPro = async () => {
+            try {
+                const res = await getProSubscription();
+                setProInfo(res);
+            } catch {
+                console.error('Không thể tải thông tin Pro');
+            }
+        };
+        fetchPro();
+    }, []);
 
     const filteredPosts = posts.filter(post => tab === 'all' || post.status === tab);
 
@@ -72,11 +87,32 @@ const JobPostManager = () => {
             toast.error(err?.response?.data || 'Không thể xoá bài viết');
         }
     };
+    const daysLeft = proInfo?.isPro
+        ? Math.ceil((new Date(proInfo.endDate) - new Date()) / (1000 * 60 * 60 * 24))
+        : 0;
 
     return (
         <Container className="mt-4">
             <h3 className={styles.title}>Quản lý bài viết tuyển dụng</h3>
 
+            {/* Banner trạng thái Pro */}
+            {proInfo && (
+                proInfo.isPro ? (
+                    <Alert variant="success" className="d-flex justify-content-between align-items-center">
+                        <div>Bạn đang sử dụng tài khoản Pro. Còn {daysLeft} ngày và {proInfo.postsLeft} lượt đăng bài miễn phí.</div>
+                        <Button variant="outline-light" size="sm" onClick={() => setShowBuyProModal(true)}>
+                            Gia hạn Pro
+                        </Button>
+                    </Alert>
+                ) : (
+                    <Alert variant="warning" className="d-flex justify-content-between align-items-center">
+                        <div>Bạn chưa có tài khoản Pro. Hãy nâng cấp để đăng bài miễn phí và ưu tiên hiển thị!</div>
+                        <Button variant="success" size="sm" onClick={() => setShowBuyProModal(true)}>
+                            Mua Pro ngay
+                        </Button>
+                    </Alert>
+                )
+            )}
             <Tabs activeKey={tab} onSelect={setTab} className="mb-3" fill>
                 <Tab eventKey="all" title="Tất cả" />
                 <Tab eventKey="open" title="Đang hoạt động" />
@@ -197,12 +233,12 @@ const JobPostManager = () => {
                 </Modal.Body>
             </Modal>
 
-            {/* Modal Chi tiết gói */}
             <PackageDetailModal
                 show={!!packageDetail}
                 onClose={() => setPackageDetail(null)}
                 packageInfo={packageDetail}
             />
+            <BuyProModal onClose={() => setShowBuyProModal(false)} show={showBuyProModal} />
         </Container>
     );
 };

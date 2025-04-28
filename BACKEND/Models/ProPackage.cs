@@ -17,5 +17,7 @@ public partial class ProPackage
 
     public DateTime? CreatedAt { get; set; }
 
+    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+
     public virtual ICollection<ProSubscription> ProSubscriptions { get; set; } = new List<ProSubscription>();
 }

@@ -45,7 +45,8 @@ namespace BACKEND.Controllers
                             JobTitle = job.Title,
                             Salary = job.SalaryRange,
                             Location = job.Location,
-                            HighlightType = promo != null ? promo.Package.HighlightType : null
+                            HighlightType = promo != null ? promo.Package.HighlightType : null,
+                            EmployerIsPro = _context.ProSubscriptions.Any(p => p.UserId == user.Id && p.StartDate <= now && p.EndDate >= now)
                         };
 #pragma warning restore CS8602 
 
@@ -70,6 +71,7 @@ namespace BACKEND.Controllers
             var jobs = await query
                 .OrderByDescending(x => x.HighlightType == "TopMax")
                 .ThenByDescending(x => x.HighlightType == "TopPro")
+                .ThenByDescending(x => x.EmployerIsPro)
                 .ThenByDescending(x => x.Id)
                 .Skip(skip)
                 .Take(pageSize)
@@ -83,6 +85,7 @@ namespace BACKEND.Controllers
                 TotalPages = (int)Math.Ceiling((double)totalJobs / pageSize)
             });
         }
+
         [HttpGet("urgent")]
         public async Task<IActionResult> GetUrgentJobs([FromQuery] int limit = 0)
         {

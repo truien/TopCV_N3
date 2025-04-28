@@ -61,6 +61,7 @@ public partial class TopcvBeContext : DbContext
     public virtual DbSet<Warning> Warnings { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseMySql("server=localhost;database=topcv_be;user=root;password=admin", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.40-mysql"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -444,6 +445,8 @@ public partial class TopcvBeContext : DbContext
 
             entity.HasIndex(e => e.UserId, "UserId");
 
+            entity.HasIndex(e => e.PackageId, "fk_orders_package");
+
             entity.Property(e => e.Amount).HasPrecision(10, 2);
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
@@ -454,6 +457,10 @@ public partial class TopcvBeContext : DbContext
             entity.Property(e => e.Status)
                 .HasDefaultValueSql("'pending'")
                 .HasColumnType("enum('pending','paid','failed')");
+
+            entity.HasOne(d => d.Package).WithMany(p => p.Orders)
+                .HasForeignKey(d => d.PackageId)
+                .HasConstraintName("fk_orders_package");
 
             entity.HasOne(d => d.User).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.UserId)
