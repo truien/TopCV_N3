@@ -1,0 +1,196 @@
+.wrapper {
+    padding: 30px;
+    background-image: url('https://cdn-new.topcv.vn/unsafe/https://static.topcv.vn/v4/image/welcome/box-flash-badge/cover.png');
+    background-size: cover;
+    background-position: center;
+    color: white;
+    position: relative;
+    margin-top: 50px;
+}
+
+.logo {
+    margin-right: 5px;
+    background: linear-gradient(201.63deg, #003e86 14.36%, #02d15e 95.71%);
+    border-radius: 4px;
+    padding: 2px;
+    position: relative;
+}
+.logoFlag{
+    position: absolute;
+    top: -15px;
+    left: -10px;
+}
+.companylogo{
+    border-radius: 4px;
+    background-color: #fff;
+}
+.left {
+    flex: 1;
+    max-width: 40%;
+}
+
+.title {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.subTitle {
+    font-size: 18px;
+    opacity: 0.8;
+    margin-bottom: 20px;
+}
+
+.count {
+    font-size: 22px;
+    margin-bottom: 30px;
+}
+
+.count_span {
+    font-size: 28px;
+    color: #00e676;
+    font-weight: bold;
+}
+
+.timer {
+    display: flex;
+    font-size: 36px;
+    font-weight: bold;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.timeBox {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px 15px;
+    border-radius: 10px;
+    min-width: 50px;
+    text-align: center;
+}
+
+.reloadText {
+    font-size: 14px;
+    opacity: 0.7;
+}
+
+.right {
+    flex: 1;
+    max-width: 55%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.bigBadge {
+    height: 280.14px;
+    width: 332.27px;
+    filter: drop-shadow(0 2.44297px 64.1279px rgba(146, 255, 178, .4));
+    z-index: 1000;
+    position: absolute;
+    top: -70px;
+    right: 10px;
+}
+
+.jobList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px
+}
+
+.jobCard {
+    position: relative;
+    display: flex;
+    background: linear-gradient(90deg, #fff 2.85%, #d7ffe9 111.07%);
+    border-radius: 6px;
+    padding: 10px 15px;
+    align-items: center;
+    backdrop-filter: blur(6px);
+    min-width: 252px;
+}
+
+.flashIcon {
+    width: 24px;
+    height: 24px;
+    margin-right: 12px;
+}
+
+.jobInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.jobTitle {
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    color: #212f3f;
+    display: -webkit-box;
+    font-family: Inter, sans-serif;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 16px;
+    margin-bottom: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.companyName {
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    -webkit-box-orient: vertical;
+    color: #6f7882;
+    display: -webkit-box;
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 14px;
+    margin-bottom: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+}
+
+.location {
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    -webkit-box-orient: vertical;
+    color: #6f7882;
+    display: -webkit-box;
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 14px;
+    margin-bottom: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.listTitle {
+    color: #f2fbf6;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 29px;
+    margin-bottom: 12px;
+    text-align: center;
+    width: 220px;
+}
+
+.viewButton {
+    background-color: #07a76b;
+    color: #ffffff;
+    width: 100%;
+    font-size: 14;
+    font-weight: 600;
+    height: 40.33px;
+    line-height: 21px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+.viewButton:hover {
+    background-color: #2c955b;
+}

@@ -84,33 +84,37 @@ namespace BACKEND.Controllers
             });
         }
         [HttpGet("urgent")]
-        public async Task<IActionResult> GetUrgentJobs()
+        public async Task<IActionResult> GetUrgentJobs([FromQuery] int limit = 0)
         {
-            var now = DateTime.UtcNow;
+            var now = DateTime.UtcNow; 
             var baseUrl = $"{Request.Scheme}://{Request.Host}/";
 
-            var jobs = await _context.JobPosts
-                .Include(j => j.Employer)
-                    .ThenInclude(e => e.CompanyProfiles)
-                .Where(j => j.HighlightType == "gap" && j.Status == "open" && (j.ApplyDeadline == null || j.ApplyDeadline > now))
-                .OrderByDescending(j => j.PostDate)
-                .Take(4)
-                .Select(j => new
-                {
-                    j.Id,
-                    JobTitle = j.Title,
-                    CompanyName = j.Employer.CompanyProfiles.FirstOrDefault()!.CompanyName,
-                    Avatar = string.IsNullOrEmpty(j.Employer.Avatar)
-                        ? null
-                        : (j.Employer.Avatar.StartsWith("http") ? j.Employer.Avatar : baseUrl + "avatar/" + j.Employer.Avatar),
-                    j.Location,
-                    j.SalaryRange
-                })
-                .ToListAsync();
+            var query = from i in _context.JobPosts
+                        join j in _context.JobPostPromotions on i.Id equals j.JobPostId
+                        join k in _context.Users on i.EmployerId equals k.Id
+                        join m in _context.CompanyProfiles on k.Id equals m.UserId
+                        where i.ApplyDeadline > now && j.PackageId == 3
+                        orderby i.PostDate descending
+                        select new
+                        {
+                            i.Id,
+                            i.Title,
+                            m.CompanyName,
+                            i.Location,
+                            i.SalaryRange,
+                            Avatar = string.IsNullOrEmpty(k.Avatar)
+                                ? null
+                                : (k.Avatar.StartsWith("http") ? k.Avatar : baseUrl + "avatar/" + k.Avatar)
+                        };
 
-            return Ok(jobs);
+            if (limit > 0)
+            {
+                query = query.Take(limit);
+            }
+
+            var result = await query.ToListAsync();
+            return Ok(result);
         }
-
 
 
         [HttpGet("{id}")]

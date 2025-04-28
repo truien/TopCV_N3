@@ -140,25 +140,25 @@
 
 .companyLogoTopMax {
     background: linear-gradient(201.63deg, #003e86 14.36%, #02d15e 95.71%);
-    border-radius: 12px;
+    border-radius: 8px;
     padding: 2px;
 }
 
 .companyLogoTopVip {
     background: linear-gradient(45deg, #ff9900, #ff6600);
-    border-radius: 12px;
+    border-radius:8px;
     padding: 2px;
 }
 
 .companyLogo {
     background: white;
-    border-radius: 12px;
+    border-radius: 8px;
     padding: 2px;
 }
 
 .companyLogoImage {
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
     object-fit: contain;
     border-radius: 8px;
     display: block;
