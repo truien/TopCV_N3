@@ -158,7 +158,6 @@
 
 .outerBorder {
     padding: 2px;
-    /* viền dày hơn thì chỉnh */
     border-radius: 14px;
     display: inline-block;
 }
@@ -170,7 +169,7 @@
 }
 
 .companyLogoTopVip {
-    background: linear-gradient(45deg, #ff9900, #ff6600);
+    background: linear-gradient(90deg, #35A98A 0%, #6DD400);
     border-radius: 8px;
     padding: 2px;
 }

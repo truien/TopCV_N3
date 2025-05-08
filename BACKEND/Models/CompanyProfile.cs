@@ -11,6 +11,8 @@ public partial class CompanyProfile
 
     public string CompanyName { get; set; } = null!;
 
+    public string Slug { get; set; } = null!;
+
     public string? Description { get; set; }
 
     public string? Website { get; set; }

@@ -3,7 +3,6 @@ import styles from './styles.module.css';
 import { toast } from "react-toastify";
 import { Link, useNavigate } from 'react-router-dom';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
-import GradientText from '../GradientText/GradientText';
 import SplitText from '../SplitText/SplitText';
 import { login, googleLogin, registerWithGoogle } from '@/api/authApi';
 
@@ -95,7 +94,7 @@ function SignInForm() {
         <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
             <div className='d-flex justify-content-center align-items-center' style={{ minHeight: '100vh' }}>
                 <div className='row w-100' style={{ maxWidth: '1550px' }}>
-                    <div className={'col-md-7 p-5 border bg-white'}>
+                    <div className={'col-md-7 p-5 bg-white'}>
                         <div className={styles['form-group']}>
                             <div className={styles['header_title']}>
                                 <SplitText
@@ -147,22 +146,8 @@ function SignInForm() {
                                             value={password} onChange={(e) => setPassword(e.target.value)} />
                                     </div>
                                 </div>
-                                <button type='submit' style={{
-                                    width: '100vh',
-                                    border: 'none',
-                                    background: '#fff'
-                                }}>
-                                    <GradientText
-                                        colors={["#00b14f", "#009e46", "#007c3a", "#3cb878", "#b2f5ea"]}
-                                        animationSpeed={4}
-                                        showBorder={true}
-                                        className="custom-class p-2"
-                                    >
-                                        Đăng nhập
-                                    </GradientText>
-                                </button>
 
-                                {/* <button type='submit' className='btn btn-success w-100 mb-3'>Đăng nhập</button> */}
+                                <button type='submit' className='btn btn-success w-100 mb-3'>Đăng nhập</button>
                                 <button type='button' className='btn btn-link text-decoration-none'>
                                     <Link to="/forgot-password">Quên mật khẩu</Link>
                                 </button>

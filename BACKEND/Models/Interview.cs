@@ -19,6 +19,8 @@ public partial class Interview
 
     public string Message { get; set; } = null!;
 
+    public string? SecureToken { get; set; }
+
     public virtual User? CandidateUser { get; set; }
 
     public virtual User Employer { get; set; } = null!;
