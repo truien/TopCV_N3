@@ -78,4 +78,11 @@ public class FollowController : ControllerBase
             .AnyAsync(f => f.UserId == userId && f.EmployerId == employerId);
         return Ok(new { isFollowing });
     }
+    [HttpGet("employer/{employerId}/followers-count")]
+    public async Task<IActionResult> GetFollowerCount(int employerId)
+    {
+        int count = await _context.UserFollows.CountAsync(f => f.EmployerId == employerId);
+        return Ok(new { followerCount = count });
+    }
+
 }

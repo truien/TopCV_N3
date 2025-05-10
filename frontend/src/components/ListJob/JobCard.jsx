@@ -12,7 +12,6 @@ import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
 
 
-
 const JobCard = ({ job, fetchJobDetail, JobDetailCache, index }) => {
     // eslint-disable-next-line no-unused-vars
     const [visible, setVisible] = useState(false);
@@ -117,8 +116,15 @@ const JobCard = ({ job, fetchJobDetail, JobDetailCache, index }) => {
                                     >
                                         <span className={styles.proBadge}>Pro</span>
                                     </OverlayTrigger>
-                                )}
-                                {job.company}
+                                )}<Link
+                                    to={`/company/${job.slug}`}
+                                    style={{
+                                        textDecoration: 'none',
+                                        color: '#333',
+                                    }}  
+                                >
+                                    {job.company}
+                                </Link>
                             </p>
                         </div>
                     </div>

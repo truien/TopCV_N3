@@ -46,7 +46,8 @@ namespace BACKEND.Controllers
                             Salary = job.SalaryRange,
                             Location = job.Location,
                             HighlightType = promo != null ? promo.Package.HighlightType : null,
-                            EmployerIsPro = _context.ProSubscriptions.Any(p => p.UserId == user.Id && p.StartDate <= now && p.EndDate >= now)
+                            EmployerIsPro = _context.ProSubscriptions.Any(p => p.UserId == user.Id && p.StartDate <= now && p.EndDate >= now),
+                            slug = cp != null ? cp.Slug : user.Username,
                         };
 #pragma warning restore CS8602 
 
@@ -408,6 +409,23 @@ namespace BACKEND.Controllers
 
             return Ok(posts);
         }
+        [HttpGet("company/{companyId}")]
+        public async Task<IActionResult> GetByCompany(int companyId)
+        {
+            var now = DateTime.UtcNow;
+            var jobs = await _context.JobPosts
+                .Where(j => j.EmployerId == companyId && j.Status == "open" && (j.ApplyDeadline == null || j.ApplyDeadline >= now))
+                .Select(j => new
+                {
+                    j.Id,
+                    j.Title,
+                    j.Location,
+                    j.SalaryRange,
+                    j.ApplyDeadline
+                })
+                .ToListAsync();
 
+            return Ok(jobs);
+        }
     }
 }

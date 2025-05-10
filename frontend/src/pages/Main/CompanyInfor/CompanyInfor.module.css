@@ -1,0 +1,94 @@
+.text {
+    color: #212f3f !important;
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    line-height: 20px !important;
+    padding: 0 4px 0 0 !important;
+    text-decoration: none !important;
+}
+.bg_customer {
+    background-color: #f3f5f7 !important;
+}
+.bg_company {
+    background: linear-gradient(90deg, #212f3f, #00b14f);
+}
+.logo {
+    height: 150px;
+    width: 150px;
+}
+.top {
+    top: 42% !important;
+}
+.ps_6 {
+    padding-left: 6rem !important;
+}
+.title {
+    background: linear-gradient(90deg, #1c4742, #22c96d);
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 26px;
+    margin: 0;
+    padding: 12px 16px;
+}
+.icon {
+    color: #00b14f;
+    text-align: center;
+}
+.text_c4 {
+    color: #212f3f;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+}
+.box-copy {
+    align-items: center;
+    background: #fff;
+    border: 1px solid #e9eaec;
+    border-radius: 6px;
+    -moz-column-gap: 10px;
+    column-gap: 10px;
+    display: flex;
+    height: 48px;
+    margin-bottom: 20px;
+    padding: 10px 12px;
+}
+.input_copy {
+    border: none;
+    color: #6f7882;
+    flex: 1;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    outline: none;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+.btn-copy-url {
+    align-items: center;
+    background: #f4f5f5;
+    border: none;
+    border-radius: 2px;
+    display: flex;
+    height: 28px;
+    justify-content: center;
+    outline: none;
+    transition: background 0.2s ease;
+    width: 28px;
+}
+.box-share {
+    align-items: center;
+    border: 1px solid #e9eaec;
+    border-radius: 100px;
+    display: flex;
+    height: 48px;
+    justify-content: center;
+    transition: all 0.2s ease;
+    width: 48px;
+}
+.boder_custum {
+    border: 1px solid rgba(0, 0, 0, 0.175) !important;
+    border-radius: 8px !important;
+    background-color: #fff !important;
+}

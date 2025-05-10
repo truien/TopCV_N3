@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { Link, useNavigate } from 'react-router-dom';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import SplitText from '../SplitText/SplitText';
-import { login, googleLogin, registerWithGoogle } from '@/api/authApi';
+import { login, googleLogin } from '@/api/authApi';
 
 
 function SignInForm() {
@@ -12,6 +12,7 @@ function SignInForm() {
     const [password, setPassword] = useState('');
     const [showRoleSelection, setShowRoleSelection] = useState(false);
     const [googleUser, setGoogleUser] = useState(null);
+    const [googleToken, setGoogleToken] = useState(null);
     const [selectedRole, setSelectedRole] = useState("");
     const [showSecondLine, setShowSecondLine] = useState(false);
     const navigate = useNavigate();
@@ -31,9 +32,7 @@ function SignInForm() {
 
         try {
             const data = await login({ UserName: email, Password: password });
-
             toast.success("Đăng nhập thành công!", { position: "top-right" });
-
             redirectByRole(data.user.role);
         } catch (error) {
             toast.error(error.message || "Đăng nhập thất bại.", { position: "top-right" });
@@ -43,9 +42,10 @@ function SignInForm() {
 
     const handleGoogleLogin = async (credentialResponse) => {
         try {
-            const data = await googleLogin(credentialResponse.credential);
+            const data = await googleLogin({ token: credentialResponse.credential });
 
             if (data.requireRoleSelection) {
+                setGoogleToken(credentialResponse.credential);
                 setGoogleUser(data);
                 setShowRoleSelection(true);
             } else {
@@ -67,27 +67,25 @@ function SignInForm() {
 
     const handleRegisterWithGoogle = async () => {
         if (!selectedRole) {
-            toast.warning("Vui lòng chọn vai trò.", { position: "top-right" });
-            return;
+            return toast.warning("Vui lòng chọn vai trò.", { position: "top-right" });
         }
 
         try {
-            const payload = {
-                email: googleUser.email,
-                name: googleUser.name,
-                avatar: googleUser.avatar,
-                roleId: selectedRole
-            };
+            const res = await googleLogin({
+                token: googleToken,
+                roleId: parseInt(selectedRole, 10),
+                fullName: selectedRole === '3' ? googleUser.name : undefined,
+                companyName: selectedRole === '1' ? googleUser.name : undefined,
+            });
 
-            await registerWithGoogle(payload);
-            toast.success("Đăng ký thành công!", { position: "top-right" });
-            navigate('/');
+            toast.success("Đăng nhập Google thành công!", { position: "top-right" });
+            setShowRoleSelection(false);
+            redirectByRole(res.user.role);
         } catch (error) {
             toast.error(error.message || "Đăng ký Google thất bại.", { position: "top-right" });
             console.error("Google Register Error:", error);
         }
     };
-
 
 
     return (
@@ -112,7 +110,7 @@ function SignInForm() {
 
 
                             {showSecondLine ? (
-                                <p className={styles['header_caption'] + ' mb-3'}>
+                                <p className={styles['header_caption'] + ' mb-3 mt-1'}>
                                     <SplitText
                                         text="Cùng xây dựng một hồ sơ nổi bật và nhận được các cơ hội sự nghiệp lý tưởng"
                                         className="text-2xl font-semibold text-center"

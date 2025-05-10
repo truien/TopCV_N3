@@ -75,83 +75,92 @@ public class AuthController : ControllerBase
         return Ok(new { message = "Đăng xuất thành công!" });
     }
     [HttpPost("register")]
-public async Task<IActionResult> Register([FromBody] RegisterRequest request)
-{
-    var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-    if (existingUser != null)
+    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        return BadRequest(new { message = "Email đã tồn tại." });
-    }
-
-    string hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
-
-    var newUser = new User
-    {
-        Username = request.Name,
-        Email = request.Email,
-        Password = hashedPassword,
-        RoleId = request.RoleId,
-        CreatedAt = DateTime.UtcNow
-    };
-
-    _context.Users.Add(newUser);
-    await _context.SaveChangesAsync();
-
-    // Nếu là employer hoặc candidate thì tạo profile
-    if (request.RoleId == 2)
-    {
-        var employer = new CompanyProfile
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+        var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
+        if (existingUser != null)
         {
-            UserId = newUser.Id,
-            CompanyName = "Chưa cập nhật"
-        };
-        _context.CompanyProfiles.Add(employer);
-    }
-    else if (request.RoleId == 3)
-    {
-        var candidate = new CandidateProfile
+            return BadRequest(new { message = "Email đã tồn tại." });
+        }
+
+        string hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
+
+        var newUser = new User
         {
-            UserId = newUser.Id,
+            Username = request.Name ?? "Người dùng mới",
+            Email = request.Email ?? "",
+            Password = hashedPassword,
+            RoleId = request.RoleId,
+            CreatedAt = DateTime.UtcNow
         };
-        _context.CandidateProfiles.Add(candidate);
-    }
 
-    await _context.SaveChangesAsync();
+        _context.Users.Add(newUser);
+        await _context.SaveChangesAsync();
 
-    string role = await _context.UserRoles
-        .Where(r => r.Id == newUser.RoleId)
-        .Select(r => r.Name)
-        .FirstOrDefaultAsync() ?? "user";
+        // Nếu là employer hoặc candidate thì tạo profile
+        if (request.RoleId == 1)  // employer
+        {
+            var companyName = !string.IsNullOrWhiteSpace(request.CompanyName)
+                                    ? request.CompanyName
+                                    : "Chưa cập nhật";
 
-    // ✅ Đăng nhập tự động sau đăng ký
-    var claims = new List<Claim>
+            _context.CompanyProfiles.Add(new CompanyProfile
+            {
+                UserId = newUser.Id,
+                CompanyName = companyName,
+                Slug = GenerateSlug(companyName)
+            });
+        }
+
+        else if (request.RoleId == 3)
+        {
+            _context.CandidateProfiles.Add(new CandidateProfile
+            {
+                UserId = newUser.Id,
+                Fullname = !string.IsNullOrWhiteSpace(request.FullName)
+                        ? request.FullName
+                        : request.Name
+            });
+        }
+
+        await _context.SaveChangesAsync();
+
+        string role = await _context.UserRoles
+            .Where(r => r.Id == newUser.RoleId)
+            .Select(r => r.Name)
+            .FirstOrDefaultAsync() ?? "user";
+
+        // Đăng nhập tự động sau đăng ký
+        var claims = new List<Claim>
     {
         new Claim(ClaimTypes.NameIdentifier, newUser.Id.ToString()),
         new Claim(ClaimTypes.Role, role)
     };
 
-    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-    var authProperties = new AuthenticationProperties
-    {
-        IsPersistent = true,
-        ExpiresUtc = DateTimeOffset.UtcNow.AddHours(100)
-    };
-
-    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
-
-    return Ok(new
-    {
-        message = "Đăng ký thành công",
-        user = new
+        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var authProperties = new AuthenticationProperties
         {
-            newUser.Id,
-            newUser.Username,
-            newUser.Email,
-            newUser.Avatar,
-            Role = role
-        }
-    });
-}
+            IsPersistent = true,
+            ExpiresUtc = DateTimeOffset.UtcNow.AddHours(100)
+        };
+
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
+
+        return Ok(new
+        {
+            message = "Đăng ký thành công",
+            user = new
+            {
+                newUser.Id,
+                newUser.Username,
+                newUser.Email,
+                newUser.Avatar,
+                Role = role
+            }
+        });
+    }
 
     private string GenerateJwtToken(User user, string role)
     {
@@ -255,57 +264,117 @@ public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         return NoContent();
     }
 
+    // trong AuthController.cs
+
+    // Helper tạo slug đơn giản
+    private string GenerateSlug(string text)
+    {
+        return text?
+            .Trim()
+            .ToLowerInvariant()
+            .Replace(" ", "-")
+            .Replace(".", "")
+            .Replace(",", "")
+            ?? "";
+    }
+
     [HttpPost("google-login")]
     public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequest request)
     {
+        // 1. Validate token giống trước
         var settings = new GoogleJsonWebSignature.ValidationSettings
         {
             Audience = new List<string?> { _config["GoogleAuth:ClientId"] }
         };
-
         GoogleJsonWebSignature.Payload payload;
         try
         {
             payload = await GoogleJsonWebSignature.ValidateAsync(request.Token, settings);
         }
-        catch (Exception)
+        catch
         {
             return BadRequest(new { message = "Token không hợp lệ!" });
         }
 
+        // 2. Tìm user
         var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == payload.Email);
 
-        // Nếu chưa có user, yêu cầu chọn vai trò
+        // 3. Nếu chưa có user
         if (user == null)
         {
-            return Ok(new
+            // 3a. Chưa chọn role → yêu cầu client gửi lại kèm role + info
+            if (!request.RoleId.HasValue)
             {
-                requireRoleSelection = true,
-                email = payload.Email,
-                name = payload.Name,
-                avatar = payload.Picture
-            });
+                return Ok(new
+                {
+                    requireRoleSelection = true,
+                    email = payload.Email,
+                    name = payload.Name,
+                    avatar = payload.Picture
+                });
+            }
+
+            // 3b. Tạo mới User
+            var newUser = new User
+            {
+                Username = payload.Name ?? "User",
+                Email = payload.Email,
+                Avatar = payload.Picture,
+                RoleId = request.RoleId.Value,
+                CreatedAt = DateTime.UtcNow
+            };
+            _context.Users.Add(newUser);
+            await _context.SaveChangesAsync();
+
+            // 3c. Tạo profile + slug nếu cần
+            if (request.RoleId.Value == 1)  // employer
+            {
+                var companyName = !string.IsNullOrWhiteSpace(request.CompanyName)
+                                      ? request.CompanyName
+                                      : payload.Name ?? "Chưa cập nhật";
+
+                _context.CompanyProfiles.Add(new CompanyProfile
+                {
+                    UserId = newUser.Id,
+                    CompanyName = companyName,
+                    Slug = GenerateSlug(companyName)
+                });
+            }
+            else if (request.RoleId.Value == 3)  // candidate
+            {
+                var fullName = !string.IsNullOrWhiteSpace(request.FullName)
+                                      ? request.FullName
+                                      : payload.Name ?? "Chưa cập nhật";
+
+                _context.CandidateProfiles.Add(new CandidateProfile
+                {
+                    UserId = newUser.Id,
+                    Fullname = fullName
+                });
+            }
+
+            await _context.SaveChangesAsync();
+            user = newUser;
         }
 
-        var role = await _context.UserRoles
-                                  .Where(r => r.Id == user.RoleId)
-                                  .Select(r => r.Name)
-                                  .FirstOrDefaultAsync() ?? "user";
+        // 4. Sign-in như bình thường
+        var roleName = await _context.UserRoles
+                              .Where(r => r.Id == user.RoleId)
+                              .Select(r => r.Name)
+                              .FirstOrDefaultAsync() ?? "user";
 
-        var claims = new List<Claim>
-    {
+        var claims = new List<Claim> {
         new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-        new Claim(ClaimTypes.Role, role)
+        new Claim(ClaimTypes.Role, roleName)
     };
-
-        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        var authProperties = new AuthenticationProperties
+        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var principal = new ClaimsPrincipal(identity);
+        var props = new AuthenticationProperties
         {
             IsPersistent = true,
             ExpiresUtc = DateTimeOffset.UtcNow.AddHours(100)
         };
-
-        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
+        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, props);
 
         return Ok(new
         {
@@ -316,95 +385,10 @@ public async Task<IActionResult> Register([FromBody] RegisterRequest request)
                 user.Username,
                 user.Email,
                 user.Avatar,
-                Role = role
+                Role = roleName
             }
         });
     }
-
-
-    [HttpPost("register-with-google")]
-    public async Task<IActionResult> RegisterWithGoogle([FromBody] RegisterGoogleRequest request)
-    {
-        var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
-        if (existingUser != null)
-        {
-            return BadRequest(new { message = "Người dùng đã tồn tại!" });
-        }
-
-        var role = await _context.UserRoles.FirstOrDefaultAsync(r => r.Id == request.RoleId);
-        if (role == null)
-        {
-            return BadRequest(new { message = "Vai trò không hợp lệ." });
-        }
-
-        var newUser = new User
-        {
-            Username = request.Name ?? "Người dùng mới",
-            Email = request.Email ?? "",
-            Avatar = request.Avatar,
-            RoleId = request.RoleId,
-            CreatedAt = DateTime.UtcNow
-        };
-
-        _context.Users.Add(newUser);
-        await _context.SaveChangesAsync();
-
-        // Nếu là employer hoặc candidate thì tạo profile
-        if (request.RoleId == 2)
-        {
-            var company = new CompanyProfile
-            {
-                UserId = newUser.Id,
-                CompanyName = "Chưa cập nhật"
-            };
-            _context.CompanyProfiles.Add(company);
-        }
-        else if (request.RoleId == 3)
-        {
-            var candidate = new CandidateProfile
-            {
-                UserId = newUser.Id
-            };
-            _context.CandidateProfiles.Add(candidate);
-        }
-
-        await _context.SaveChangesAsync();
-
-        // ✅ Tạo cookie đăng nhập giống như login thường
-        var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.NameIdentifier, newUser.Id.ToString()),
-        new Claim(ClaimTypes.Role, role.Name)
-    };
-
-        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-        var authProperties = new AuthenticationProperties
-        {
-            IsPersistent = true,
-            ExpiresUtc = DateTimeOffset.UtcNow.AddHours(100)
-        };
-
-        await HttpContext.SignInAsync(
-            CookieAuthenticationDefaults.AuthenticationScheme,
-            new ClaimsPrincipal(claimsIdentity),
-            authProperties);
-
-        return Ok(new
-        {
-            message = "Đăng ký Google thành công",
-            user = new
-            {
-                newUser.Id,
-                newUser.Username,
-                newUser.Email,
-                newUser.Avatar,
-                Role = role.Name
-            }
-        });
-    }
-
-
-
     [HttpPost("forgot-password")]
     public IActionResult ForgotPassword([FromBody] ForgotPasswordRequest request)
     {
@@ -445,7 +429,6 @@ public async Task<IActionResult> Register([FromBody] RegisterRequest request)
 
         return Ok(new { message = "Mật khẩu đã được đặt lại thành công." });
     }
-
 }
 
 

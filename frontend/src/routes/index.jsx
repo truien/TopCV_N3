@@ -15,6 +15,7 @@ import CreateJobPost from "../pages/Employer/CreateJobPost/CreateJobPost.jsx";
 import ApplicantManagement from "../pages/Employer/ApplicantManagement/ApplicantManagement.jsx"
 import InterviewManagement from "../pages/Employer/InterviewManagement/InterviewManagement.jsx"
 import JobPostManager from '../pages/Employer/JobPostManager/JobPostManager.jsx'
+import CompanyInfor from "../pages/Main/CompanyInfor/CompanyInfor.jsx";
 function AppRoutes() {
     return (
         <Router>
@@ -37,6 +38,7 @@ function AppRoutes() {
                 <Route path="/sign" element={<SignPage />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/company/:slug" element={<CompanyInfor />} />
                 <Route path="*" element={<NotFoundPage />} />
             </Routes>
         </Router>
