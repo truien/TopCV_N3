@@ -13,6 +13,7 @@ import {
 import { FaTwitter } from 'react-icons/fa';
 import styles from './CompanyInfor.module.css';
 import coverPhoto from '../../../assets/images/company_cover.jpg';
+import logoDefaltt from '../../../assets/images/avatar-default.jpg';
 import { TbBuildings } from 'react-icons/tb';
 import { useState, useEffect } from 'react';
 import RelatedJobs from '../../../components/RelatedJobs/RelatedJobs';
@@ -47,16 +48,17 @@ const CompanyInfor = () => {
             .then(companyId => {
                 getCompanyJobs(companyId).then(setJobs);
                 isFollowingEmployer(companyId).then(setIsFollowing);
-                getFollowersCount(companyId).then(res => setFollowersCount(res.count));
+                getFollowersCount(companyId).then(count => setFollowersCount(count.data.followerCount));
             })
             .catch(console.error);
     }, [slug]);
 
 
     const handleFollowToggle = () => {
+        console.log(company);
         if (!company) return;
         const action = isFollowing ? unfollowEmployer : followEmployer;
-        action(company.id)
+        action(company.userId)
             .then(() => {
                 setIsFollowing(prev => !prev);
                 setFollowersCount(prev => prev + (isFollowing ? -1 : 1));
@@ -162,7 +164,7 @@ const CompanyInfor = () => {
                             }
                         >
                             <img
-                                src={company.avatar}
+                                src={company.avatar ? company.avatar : logoDefaltt}
                                 alt='Logo'
                                 className={styles['logo'] + ' rounded-circle'}
                             />
@@ -339,7 +341,7 @@ const CompanyInfor = () => {
                                         className={styles['box-copy'] + ' m-3'}
                                     >
                                         <input
-                                            readOnly
+                                            readOnly =""
                                             type='text'
                                             defaultValue={copyLink}
                                             className={styles['input_copy']}

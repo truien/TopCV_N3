@@ -45,7 +45,6 @@ const ApplicantManagement = () => {
                 ? selectedApps
                 : [selectedApp.id];
 
-            // chỉ giữ những ID thực sự còn hiển thị (status === "0")
             const idsToProcess = ids.filter(id =>
                 visibleApps.some(app => app.id === id)
             );
@@ -53,8 +52,7 @@ const ApplicantManagement = () => {
             await Promise.all(idsToProcess.map(id => {
                 const app = applications.find(a => a.id === id);
                 return scheduleInterview({
-                    jobId: app.jobId,
-                    candidateUserId: app.userId,
+                    applicationId: app.id,
                     message: interviewMessage,
                 });
             }));

@@ -11,4 +11,4 @@ export const followEmployer = (employerId) =>
 export const unfollowEmployer = (employerId) =>
     axiosInstance.delete(`/api/Follow/unfollow-employer/${employerId}`);
 export const getFollowersCount = employerId =>
-    axiosInstance.get(`/api/Follow/employer/${employerId}/followers-count`).then(res => res.data.count);  
+    axiosInstance.get(`/api/Follow/employer/${employerId}/followers-count`);  

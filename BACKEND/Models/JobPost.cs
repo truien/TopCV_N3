@@ -41,8 +41,6 @@ public partial class JobPost
 
     public virtual User Employer { get; set; } = null!;
 
-    public virtual ICollection<Interview> Interviews { get; set; } = new List<Interview>();
-
     public virtual ICollection<JobPostEmploymentType> JobPostEmploymentTypes { get; set; } = new List<JobPostEmploymentType>();
 
     public virtual ICollection<JobPostField> JobPostFields { get; set; } = new List<JobPostField>();

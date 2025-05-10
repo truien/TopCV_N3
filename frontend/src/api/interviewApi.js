@@ -6,3 +6,7 @@ export const getAllInterviews = () =>
 
 export const getActiveJobs = () =>
     axiosInstance.get('/api/interview/employer/active').then(res => res.data);
+export const confirmInterviewByToken = (token, response) =>
+    axiosInstance.get(
+        `/api/interview/confirm/${token}/${response}`
+    ).then(res => res.data);

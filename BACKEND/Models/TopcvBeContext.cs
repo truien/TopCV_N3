@@ -184,20 +184,14 @@ public partial class TopcvBeContext : DbContext
 
             entity.ToTable("interviews");
 
-            entity.HasIndex(e => e.CandidateUserId, "applicant_id");
-
-            entity.HasIndex(e => e.EmployerId, "employer_id");
-
-            entity.HasIndex(e => e.JobId, "job_id");
+            entity.HasIndex(e => e.ApplicationId, "interviews_applications_FK");
 
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.CandidateUserId).HasColumnName("candidate_user_id");
+            entity.Property(e => e.ApplicationId).HasColumnName("application_id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("timestamp")
                 .HasColumnName("created_at");
-            entity.Property(e => e.EmployerId).HasColumnName("employer_id");
-            entity.Property(e => e.JobId).HasColumnName("job_id");
             entity.Property(e => e.Message)
                 .HasColumnType("text")
                 .HasColumnName("message");
@@ -209,18 +203,9 @@ public partial class TopcvBeContext : DbContext
                 .HasColumnType("enum('pending','accepted','declined')")
                 .HasColumnName("status");
 
-            entity.HasOne(d => d.CandidateUser).WithMany(p => p.InterviewCandidateUsers)
-                .HasForeignKey(d => d.CandidateUserId)
-                .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("interviews_ibfk_2");
-
-            entity.HasOne(d => d.Employer).WithMany(p => p.InterviewEmployers)
-                .HasForeignKey(d => d.EmployerId)
-                .HasConstraintName("interviews_ibfk_3");
-
-            entity.HasOne(d => d.Job).WithMany(p => p.Interviews)
-                .HasForeignKey(d => d.JobId)
-                .HasConstraintName("interviews_ibfk_1");
+            entity.HasOne(d => d.Application).WithMany(p => p.Interviews)
+                .HasForeignKey(d => d.ApplicationId)
+                .HasConstraintName("interviews_applications_FK");
         });
 
         modelBuilder.Entity<JobField>(entity =>
@@ -479,18 +464,17 @@ public partial class TopcvBeContext : DbContext
 
             entity.ToTable("orderdetails");
 
-            entity.HasIndex(e => e.JobPostId, "JobPostId");
-
             entity.HasIndex(e => e.OrderId, "OrderId");
 
             entity.HasIndex(e => e.PackageId, "PackageId");
+
+            entity.HasIndex(e => e.JobPostId, "orderdetails_ibfk_3");
 
             entity.Property(e => e.EndDate).HasColumnType("timestamp");
             entity.Property(e => e.StartDate).HasColumnType("timestamp");
 
             entity.HasOne(d => d.JobPost).WithMany(p => p.Orderdetails)
                 .HasForeignKey(d => d.JobPostId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("orderdetails_ibfk_3");
 
             entity.HasOne(d => d.Order).WithMany(p => p.Orderdetails)

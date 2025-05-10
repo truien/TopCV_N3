@@ -116,7 +116,6 @@ public class PaymentController : ControllerBase
 
         if (order.Orderdetails != null && order.Orderdetails.Any())
         {
-            // ➡️ Đây là đơn mua gói bài viết
             foreach (var detail in order.Orderdetails)
             {
                 var existingPromotion = await _context.JobPostPromotions
@@ -140,7 +139,6 @@ public class PaymentController : ControllerBase
         }
         else if (order.PackageId.HasValue)
         {
-            // ➡️ Đây là đơn mua gói Pro (Dựa vào PackageId lưu trong Order)
             var package = await _context.ProPackages.FindAsync(order.PackageId.Value);
 
             if (package == null)
@@ -260,7 +258,7 @@ public class PaymentController : ControllerBase
             PaymentGateway = "vnpay",
             Status = "pending",
             TransactionId = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
-            PackageId = package.Id // ➡️ Ghi nhớ luôn PackageId khi tạo đơn!
+            PackageId = package.Id 
         };
 
         _context.Orders.Add(order);
@@ -289,11 +287,6 @@ public class PaymentController : ControllerBase
         public int PackageId { get; set; }
     }
 
-    public class MomoCreateRequest
-    {
-        public int JobPostId { get; set; }
-        public int PackageId { get; set; }
-    }
 
     public class CreateOrderDto
     {
@@ -301,10 +294,5 @@ public class PaymentController : ControllerBase
         public int JobPostId { get; set; }
     }
 
-    public class CreatePaymentRequest
-    {
-        public double Amount { get; set; }
-        public string Description { get; set; } = string.Empty;
-    }
 }
 

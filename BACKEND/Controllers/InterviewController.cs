@@ -26,97 +26,103 @@ public class InterviewController : ControllerBase
     [HttpPost("schedule")]
     public async Task<IActionResult> ScheduleInterview([FromBody] ScheduleInterviewDto dto)
     {
-        var employerIdClaim = _http.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier);
-        if (employerIdClaim == null) return Unauthorized();
+        var employerIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (employerIdClaim == null)
+            return Unauthorized();
         int employerId = int.Parse(employerIdClaim.Value);
 
-        // Kiểm tra công việc tồn tại và thuộc quyền của nhà tuyển dụng
-        var job = await _context.JobPosts.FindAsync(dto.JobId);
-        if (job == null || job.EmployerId != employerId)
-            return BadRequest("Không tìm thấy công việc này hoặc bạn không phải nhà tuyển dụng cho công việc này.");
+        var application = await _context.Applications
+            .Include(a => a.Job)
+            .Include(a => a.User)
+            .FirstOrDefaultAsync(a => a.Id == dto.ApplicationId);
+        if (application == null)
+            return BadRequest("Hồ sơ ứng tuyển không tồn tại.");
+        if (application.Job.EmployerId != employerId)
+            return Forbid("Bạn không có quyền lên lịch phỏng vấn cho hồ sơ này.");
 
-        // Kiểm tra ứng viên đã có lịch phỏng vấn chưa
-        var already = await _context.Interviews.AnyAsync(i =>
-            i.JobId == dto.JobId && i.CandidateUserId == dto.CandidateUserId);
-        if (already)
-            return BadRequest("Ứng viên này đã có lịch phỏng vấn cho công việc này.");
-
-        // Tạo lịch phỏng vấn mới
+        var token = Guid.NewGuid().ToString("N");
         var interview = new Interview
         {
-            JobId = dto.JobId,
-            EmployerId = employerId,
-            CandidateUserId = dto.CandidateUserId,
-            Message = dto.Message,  // Thông điệp từ nhà tuyển dụng
-            Status = "pending", // Trạng thái phỏng vấn ban đầu
-            CreatedAt = DateTime.UtcNow,
+            ApplicationId = dto.ApplicationId,
+            Message = dto.Message,
+            CreatedAt = dto.InterviewDate,
+            SecureToken = token,
+            Status = "pending"
         };
-
-        // Thêm vào bảng Interviews
         _context.Interviews.Add(interview);
+
+        // 4. Cập nhật trạng thái application
+        application.Status = (int)ApplicationStatus.InvitedToInterview;
+
         await _context.SaveChangesAsync();
 
-        // Cập nhật trạng thái của ứng viên trong bảng Applications
-        var application = await _context.Applications
-            .FirstOrDefaultAsync(a => a.JobId == dto.JobId && a.UserId == dto.CandidateUserId);
+        // Lấy URL API từ config
+        var apiBase = _config["BackEndApiUrl"];  // ví dụ "https://api.yoursite.com"
 
-        if (application != null)
-        {
-            application.Status = (int)ApplicationStatus.InvitedToInterview;
-            await _context.SaveChangesAsync();
-        }
+        // Tạo link đến API confirm
+        var acceptLink = $"{apiBase}/api/interview/confirm/{token}/accepted";
+        var declineLink = $"{apiBase}/api/interview/confirm/{token}/declined";
 
-        var candidate = await _context.Users.FindAsync(dto.CandidateUserId);
-        if (candidate != null)
-        {
-            string subject = "Thông báo mời phỏng vấn";
-            string body = $@"
-            Chúc mừng! Bạn đã được mời tham gia phỏng vấn cho vị trí {job.Title}.
-            <br><br><hr>
-            Lịch hẹn phỏng vấn: {dto.Message}
-            <br>
-            Nhà tuyển dụng đã mời bạn phỏng vấn. Vui lòng xác nhận tham gia hoặc không tham gia cuộc phỏng vấn bằng cách nhấn vào một trong các liên kết dưới đây:
-            <br><br>
-            <a href='{Request.Scheme}://{Request.Host}/api/Interview/confirm?interviewId={interview.Id}&userId={dto.CandidateUserId}&response=accepted'> <button>Xác nhận tham gia phỏng vấn</button></a>
-            <br>
-            <a href='{Request.Scheme}://{Request.Host}/api/Interview/confirm?interviewId={interview.Id}&userId={dto.CandidateUserId}&response=rejected'> <button>Xác nhận tham không gia phỏng vấn</button></a>
-            <br><br>
-        ";
+        var htmlBody = $@"
+        <p>Chào <strong>{application.User.Username}</strong>,</p>
+        <p>Bạn được mời phỏng vấn cho <em>{application.Job.Title}</em>.</p>
+        <p>Nội dung: {dto.Message}</p>
+        <p>Vui lòng bấm một trong hai nút bên dưới để phản hồi:</p>
+        <p>
+        <a href=""{acceptLink}"" style=""display:inline-block;padding:10px 20px;
+            background-color:#28a745;color:#fff;text-decoration:none;
+            border-radius:4px;margin-right:10px;"">Xác nhận</a>
+        <a href=""{declineLink}"" style=""display:inline-block;padding:10px 20px;
+            background-color:#dc3545;color:#fff;text-decoration:none;
+            border-radius:4px;"">Từ chối</a>
+        </p>
+    ";
 
-            _emailService.SendEmail(candidate.Email, subject, body);
-        }
+        _emailService.SendEmail(
+            application.User.Email,
+            "Lời mời phỏng vấn – Vui lòng xác nhận",
+            htmlBody
+        );
 
-        return Ok(new { message = "Lịch phỏng vấn đã được tạo và thông báo qua email đã được gửi!" });
+        return Ok(new { message = "Lịch phỏng vấn đã tạo và email xác nhận đã gửi." });
+    }
+    private string GenerateToken()
+    {
+        var token = Guid.NewGuid().ToString();
+        return token;
     }
 
     [Authorize(Roles = "employer")]
     [HttpGet("employer/all")]
-    public async Task<IActionResult> GetAllInterviews()
+    public async Task<IActionResult> GetAllForEmployer()
     {
         var employerIdClaim = _http.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier);
         if (employerIdClaim == null) return Unauthorized();
         int employerId = int.Parse(employerIdClaim.Value);
 
-#pragma warning disable CS8602
-        var interviews = await _context.Interviews
-            .Include(i => i.Job)
-            .Include(i => i.CandidateUser)
-                .ThenInclude(u => u.CandidateProfiles)
-            .Where(i => i.EmployerId == employerId)
-            .OrderByDescending(i => i.CreatedAt)
-            .Select(i => new
-            {
-
-                Id = i.Id,
-                JobId = i.Job.Id,
-                JobTitle = i.Job.Title,
-                CandidateName = i.CandidateUser.CandidateProfiles.FirstOrDefault().Fullname ?? i.CandidateUser.Username,
-                Email = i.CandidateUser.Email,
-                i.Status,
-                i.CreatedAt
-            })
-            .ToListAsync();
-#pragma warning restore CS8602
+        var interviews = await (
+        from i in _context.Interviews
+        join a in _context.Applications on i.ApplicationId equals a.Id
+        join u in _context.Users on a.UserId equals u.Id
+        // Left‐join CandidateProfiles để không bỏ qua ai chưa có profile
+        join pgroup in _context.CandidateProfiles
+            on u.Id equals pgroup.UserId into cpGroup
+        from p in cpGroup.DefaultIfEmpty()    // p có thể null
+        join j in _context.JobPosts on a.JobId equals j.Id
+        where j.EmployerId == employerId
+        orderby i.CreatedAt descending
+        select new
+        {
+            i.Id,
+            CandidateName = p != null
+                ? p.Fullname
+                : "(Chưa cập nhật tên)",
+            Email = u.Email,
+            JobTitle = j.Title,
+            i.Status,
+            i.CreatedAt
+        }
+    ).ToListAsync();
 
         return Ok(interviews);
     }
@@ -137,20 +143,41 @@ public class InterviewController : ControllerBase
 
         return Ok(jobs);
     }
+    [AllowAnonymous]
+    [HttpGet("confirm/{secureToken}/{response}")]
+    public async Task<IActionResult> ConfirmByToken(string secureToken, string response)
+    {
+        var interview = await _context.Interviews
+            .FirstOrDefaultAsync(i => i.SecureToken == secureToken);
 
+        if (interview == null
+            || interview.Status != "pending"
+            || (response != "accepted" && response != "declined"))
+        {
+            return Redirect($"{_config["FrontEndBaseUrl"]}/confirm?status=error");
+        }
+
+        // update
+        interview.Status = response;
+        interview.SecureToken = null;
+        await _context.SaveChangesAsync();
+        return Redirect($"{_config["FrontEndBaseUrl"]}/confirm?status={response}");
+    }
+
+
+    [Authorize(Roles = "candidate")]
     [Authorize(Roles = "employer")]
     [HttpPut("{id}/status")]
     public async Task<IActionResult> UpdateInterviewStatus(int id, [FromBody] string status)
     {
         var interview = await _context.Interviews.FindAsync(id);
-        if (interview == null) return NotFound();
-
-        if (status != "pending" && status != "accepted" && status != "declined")
+        if (interview == null)
+            return NotFound("Không tìm thấy lịch phỏng vấn.");
+        if (status is not ("pending" or "accepted" or "declined"))
             return BadRequest("Trạng thái không hợp lệ.");
 
         interview.Status = status;
         await _context.SaveChangesAsync();
-
         return Ok(new { message = "Cập nhật trạng thái thành công." });
     }
 
@@ -158,72 +185,26 @@ public class InterviewController : ControllerBase
     [HttpGet("candidate/received")]
     public async Task<IActionResult> GetCandidateInterviews()
     {
-        var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (string.IsNullOrEmpty(userIdStr))
-            return Unauthorized();
-        var userId = int.Parse(userIdStr);
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
+        var userIdStr = _http.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdStr == null) return Unauthorized();
+        int userId = int.Parse(userIdStr.Value);
+
         var interviews = await _context.Interviews
-            .Include(i => i.Job)
-            .Include(i => i.Employer)
-                .ThenInclude(e => e.CompanyProfiles)
-            .Where(i => i.CandidateUserId == userId)
+            .Include(i => i.Application)
+                .ThenInclude(a => a.Job)
+            .Where(i => i.Application.UserId == userId)
             .OrderByDescending(i => i.CreatedAt)
             .Select(i => new
             {
                 i.Id,
-                JobTitle = i.Job.Title,
-                Company = i.Employer.CompanyProfiles.FirstOrDefault().CompanyName,
+                JobTitle = i.Application.Job.Title,
                 i.Status,
                 i.Message,
                 i.CreatedAt
             })
             .ToListAsync();
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
 
         return Ok(interviews);
-    }
-
-
-    [HttpGet("confirm")]
-    public async Task<IActionResult> ConfirmInterview([FromQuery] int interviewId, [FromQuery] int userId, [FromQuery] string response)
-    {
-        // Kiểm tra sự tồn tại của cuộc phỏng vấn
-        var interview = await _context.Interviews.FindAsync(interviewId);
-        if (interview == null)
-        {
-            return NotFound("Lịch phỏng vấn không tồn tại.");
-        }
-
-        // Kiểm tra ứng viên tồn tại và có quyền tham gia
-        var applicant = await _context.Users.FindAsync(userId);
-        if (applicant == null)
-        {
-            return NotFound("Ứng viên không tồn tại.");
-        }
-
-        if (interview.CandidateUserId != userId)
-        {
-            return Unauthorized("Bạn không phải là ứng viên cho lịch phỏng vấn này.");
-        }
-
-        // Cập nhật trạng thái cuộc phỏng vấn dựa trên phản hồi từ ứng viên
-        if (response.ToLower() == "accepted")
-        {
-            interview.Status = "accepted";  // Ứng viên xác nhận tham gia
-        }
-        else if (response.ToLower() == "declined")
-        {
-            interview.Status = "declined";
-        }
-        else
-        {
-            return BadRequest("Phản hồi không hợp lệ.");
-        }
-
-        await _context.SaveChangesAsync();
-
-        return Ok(new { message = $"Bạn đã xác nhận {response} cuộc phỏng vấn thành công." });
     }
 
 
@@ -255,11 +236,11 @@ public class InterviewController : ControllerBase
     }
     public class ScheduleInterviewDto
     {
-        public int JobId { get; set; }
-        public int CandidateUserId { get; set; }
+        public int ApplicationId { get; set; }
         public required string Message { get; set; }
-        public DateTime InterviewDate { get; set; }
+        public DateTime InterviewDate { get; set; } = DateTime.Now;
     }
+
 
 
 }

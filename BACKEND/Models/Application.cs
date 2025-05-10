@@ -19,6 +19,8 @@ public partial class Application
 
     public string? RejectReason { get; set; }
 
+    public virtual ICollection<Interview> Interviews { get; set; } = new List<Interview>();
+
     public virtual JobPost Job { get; set; } = null!;
 
     public virtual User User { get; set; } = null!;

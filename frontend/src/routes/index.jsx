@@ -16,6 +16,7 @@ import ApplicantManagement from "../pages/Employer/ApplicantManagement/Applicant
 import InterviewManagement from "../pages/Employer/InterviewManagement/InterviewManagement.jsx"
 import JobPostManager from '../pages/Employer/JobPostManager/JobPostManager.jsx'
 import CompanyInfor from "../pages/Main/CompanyInfor/CompanyInfor.jsx";
+import ConfirmPage from "../pages/ConfirmPage.jsx";
 function AppRoutes() {
     return (
         <Router>
@@ -39,6 +40,7 @@ function AppRoutes() {
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/company/:slug" element={<CompanyInfor />} />
+                <Route path="/confirm" element={<ConfirmPage />} />
                 <Route path="*" element={<NotFoundPage />} />
             </Routes>
         </Router>

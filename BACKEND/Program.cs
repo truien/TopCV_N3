@@ -10,7 +10,7 @@ using VNPAY.NET;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<EmailService>();
-DotNetEnv.Env.Load();
+Env.Load();
 builder.Services.AddDbContext<TopcvBeContext>(options =>
     options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))));
