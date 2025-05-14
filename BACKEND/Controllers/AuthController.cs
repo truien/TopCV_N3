@@ -51,7 +51,7 @@ public class AuthController : ControllerBase
         var authProperties = new AuthenticationProperties
         {
             IsPersistent = true,
-            ExpiresUtc = DateTimeOffset.UtcNow.AddHours(100)
+            ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1)
         };
 
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);

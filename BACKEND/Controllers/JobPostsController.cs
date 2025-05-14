@@ -120,6 +120,85 @@ namespace BACKEND.Controllers
             return Ok(result);
         }
 
+        // [HttpGet("filter")]
+        // public async Task<IActionResult> Filter(
+        //     [FromQuery] int jobFieldId = 0,
+        //     [FromQuery] int employmentTypeId = 0,
+        //     [FromQuery] string? location = null,
+        //     [FromQuery] string? salaryRange = null,
+        //     [FromQuery] int page = 1,
+        //     [FromQuery] int pageSize = 10)
+        // {
+        //     var now = DateTime.UtcNow;
+
+        //     // 1. Build query cơ bản (như trước) :contentReference[oaicite:4]{index=4}:contentReference[oaicite:5]{index=5}
+        //     var baseQuery = _context.JobPosts
+        //         .Include(j => j.Employer).ThenInclude(e => e.CompanyProfiles)
+        //         .Include(j => j.JobPostFields).ThenInclude(f => f.Field)
+        //         .Include(j => j.JobPostEmploymentTypes).ThenInclude(et => et.EmploymentType)
+        //         .Where(j => j.Status == "open" 
+        //                     && (j.ApplyDeadline == null || j.ApplyDeadline >= now));
+        //     if (jobFieldId > 0)
+        //         baseQuery = baseQuery.Where(j => j.JobPostFields.Any(f => f.FieldId == jobFieldId));
+        //     if (employmentTypeId > 0)
+        //         baseQuery = baseQuery.Where(j => 
+        //             j.JobPostEmploymentTypes.Any(et => et.EmploymentTypeId == employmentTypeId));
+        //     if (!string.IsNullOrEmpty(location))
+        //         baseQuery = baseQuery.Where(j => j.Location.Contains(location));
+        //     if (!string.IsNullOrEmpty(salaryRange))
+        //         baseQuery = baseQuery.Where(j => j.SalaryRange == salaryRange);
+
+        //     // 2. Project ra DTO kèm Priority
+        //     var dataWithPriority = await baseQuery
+        //         .Select(j => new {
+        //             j.Id,
+        //             j.Title,
+        //             CompanyName = j.Employer.CompanyProfiles.FirstOrDefault()!.CompanyName,
+        //             Avatar = string.IsNullOrEmpty(j.Employer.Avatar)
+        //                 ? null
+        //                 : (j.Employer.Avatar.StartsWith("http")
+        //                     ? j.Employer.Avatar
+        //                     : $"{Request.Scheme}://{Request.Host}/{j.Employer.Avatar}"),
+        //             j.Location,
+        //             j.SalaryRange,
+        //             j.ApplyDeadline,
+        //             j.PostDate,
+        //             // Tính priority:
+        //             Priority =
+        //                 // 0 = TopMax
+        //                 j.JobPostPromotions
+        //                 .Where(pp => pp.EndDate > now && pp.Package.Name == "TopMax")
+        //                 .Any() ? 0
+        //                 // 1 = TopPro
+        //             : j.JobPostPromotions
+        //                 .Where(pp => pp.EndDate > now && pp.Package.Name == "TopPro")
+        //                 .Any() ? 1
+        //                 // 2 = Bài của công ty mua gói Pro (Order thành công còn hạn)
+        //             : _context.Orders
+        //                 .Where(o => o.UserId == j.EmployerId 
+        //                             && o.Status == "success"
+        //                             && now <= o.CreatedAt.AddDays(o.ProPackage.DurationDays))
+        //                 .Any() ? 2
+        //             : 3
+        //         })
+  
+        //         .OrderBy(x => x.Priority)
+        //         .ThenByDescending(x => x.PostDate)
+        //         // 4. Phân trang
+        //         .Skip((page - 1) * pageSize)
+        //         .Take(pageSize)
+        //         .ToListAsync();
+
+        //     // 5. Đếm tổng để FE hiển thị pagination
+        //     var totalCount = await baseQuery.CountAsync();
+
+        //     return Ok(new {
+        //         data = dataWithPriority,
+        //         totalCount
+        //     });
+        // }
+
+
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetJobPostDetails(int id)
