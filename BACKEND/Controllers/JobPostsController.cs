@@ -17,100 +17,379 @@ namespace BACKEND.Controllers
         {
             _context = context;
         }
-
-        [HttpGet("promoted")]
-        public async Task<IActionResult> GetPromotedJobs(int page = 1, int pageSize = 12, string location = "")
+        [HttpGet("search")]
+        public async Task<ActionResult> SearchJobPosts(
+          string? keyword = null,
+          string? fieldId = null,
+          string? employmentTypeId = null,
+          string? location = null,
+          string? minSalary = null,
+          string? maxSalary = null,
+          string? sortBy = "1",
+          int page = 1,
+          int pageSize = 10)
         {
-#pragma warning disable CS8602
-            var now = DateTime.UtcNow;
-            int skip = (page - 1) * pageSize;
             var baseUrl = $"{Request.Scheme}://{Request.Host}/";
+            var now = DateTime.UtcNow;
+
 
             var query = from job in _context.JobPosts
                         join user in _context.Users on job.EmployerId equals user.Id
                         join companyProfile in _context.CompanyProfiles on user.Id equals companyProfile.UserId into companyGroup
                         from cp in companyGroup.DefaultIfEmpty()
-                        join promotion in _context.JobPostPromotions.Where(p => p.StartDate <= now && p.EndDate >= now)
-                            on job.Id equals promotion.JobPostId into promotionGroup
-                        from promo in promotionGroup.DefaultIfEmpty()
+                        where job.Status == "open" && job.ApplyDeadline >= now
+                        select new
+                        {
+                            Id = job.Id,
+                            CompanyLogo = string.IsNullOrEmpty(user.Avatar)
+                                ? null
+                                : (user.Avatar.StartsWith("http") ? user.Avatar : baseUrl + "avatar/" + user.Avatar),
+                            CompanyName = cp != null ? cp.CompanyName : user.Username,
+                            Title = job.Title,
+                            Salary = job.SalaryRange,
+                            Location = job.Location,
+                            DueDate = job.ApplyDeadline,
+                            PostedDate = job.PostDate,
+                            UserId = user.Id,
+                        };
+
+            // Đảm bảo không có bản ghi trùng lặp
+            query = query.Distinct();            // Truy vấn riêng để lấy thông tin gói quảng cáo hiện tại
+            // Xử lý để tránh lỗi khi có nhiều promotion cho cùng một job post
+            var promotionsData = await _context.JobPostPromotions
+                .Where(p => p.StartDate <= now && p.EndDate >= now)
+                .Select(p => new { p.JobPostId, p.Package.HighlightType, p.Package.PriorityLevel })
+                .ToListAsync();
+
+            // Group by job post ID and select the promotion with highest priority
+            var activePromotions = promotionsData
+                .GroupBy(p => p.JobPostId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.OrderByDescending(p => p.PriorityLevel)
+                         .ThenBy(p => p.HighlightType == "TopMax" ? 0 :
+                                      p.HighlightType == "TopPro" ? 1 : 2)
+                         .First().HighlightType
+                );
+
+            // Truy vấn riêng để lấy JobFieldIds
+            var jobFieldIds = await _context.JobPostFields
+                .AsNoTracking()
+                .GroupBy(jpf => jpf.JobPostId)
+                .Select(g => new
+                {
+                    JobPostId = g.Key,
+                    FieldIds = g.Select(jpf => jpf.FieldId).ToList()
+                })
+                .ToDictionaryAsync(g => g.JobPostId, g => g.FieldIds);
+
+            // Truy vấn riêng để lấy EmploymentTypeIds
+            var employmentTypeIds = await _context.JobPostEmploymentTypes
+                .AsNoTracking()
+                .GroupBy(jpt => jpt.JobPostId)
+                .Select(g => new
+                {
+                    JobPostId = g.Key,
+                    TypeIds = g.Select(jpt => jpt.EmploymentTypeId).ToList()
+                })
+                .ToDictionaryAsync(g => g.JobPostId, g => g.TypeIds);
+
+            // Lấy thông tin về Pro subscriptions - tối ưu bằng cách lấy cả UserId và Status trong một truy vấn
+            var proUsers = await _context.ProSubscriptions
+                .Where(p => p.StartDate <= now && p.EndDate >= now)
+                .Select(p => p.UserId)
+                .Distinct()
+                .ToListAsync();
+
+            // Kết hợp các dữ liệu để tạo đối tượng kết quả trong bộ nhớ
+            var jobResults = await query.ToListAsync();
+
+            var enrichedJobs = jobResults.Select(job => new
+            {
+                job.Id,
+                job.CompanyLogo,
+                job.CompanyName,
+                job.Title,
+                job.Salary,
+                job.Location,
+                job.DueDate,
+                job.PostedDate,
+                JobFieldIds = jobFieldIds.ContainsKey(job.Id) ? jobFieldIds[job.Id] : new List<int>(),
+                EmploymentTypeIds = employmentTypeIds.ContainsKey(job.Id) ? employmentTypeIds[job.Id] : new List<int>(),
+                HighlightType = activePromotions.ContainsKey(job.Id) ? activePromotions[job.Id] : null,
+                EmployerIsPro = proUsers.Contains(job.UserId)
+            }).ToList();
+
+            // Áp dụng các bộ lọc trong bộ nhớ cho tối ưu hóa
+            var filteredJobs = enrichedJobs.AsEnumerable();
+
+            // Lọc theo lĩnh vực ngành nghề
+            if (!string.IsNullOrEmpty(fieldId))
+            {
+                int fieldIdValue = int.Parse(fieldId);
+                filteredJobs = filteredJobs.Where(j => j.JobFieldIds.Contains(fieldIdValue));
+            }
+
+            // Lọc theo hình thức làm việc
+            if (!string.IsNullOrEmpty(employmentTypeId))
+            {
+                int employmentIdValue = int.Parse(employmentTypeId);
+                filteredJobs = filteredJobs.Where(j => j.EmploymentTypeIds.Contains(employmentIdValue));
+            }
+
+            // Lọc theo từ khóa tìm kiếm
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                string keywordLower = keyword.ToLower();
+                filteredJobs = filteredJobs.Where(j =>
+                    j.Title.ToLower().Contains(keywordLower) ||
+                    j.CompanyName.ToLower().Contains(keywordLower) ||
+                    (j.Location != null && j.Location.ToLower().Contains(keywordLower))
+                );
+            }
+
+            // Lọc theo địa điểm
+            if (!string.IsNullOrEmpty(location))
+            {
+                filteredJobs = filteredJobs.Where(j => j.Location != null && j.Location.Contains(location));
+            }
+
+            // Lọc theo khoảng lương
+            if (!string.IsNullOrEmpty(minSalary) && decimal.TryParse(minSalary, out decimal minSalaryValue))
+            {
+                filteredJobs = filteredJobs.Where(j => j.Salary != null && (
+                    j.Salary.Contains(minSalaryValue.ToString()) ||
+                    j.Salary.Contains("Thỏa thuận") ||
+                    j.Salary.Contains("Cạnh tranh")
+                ));
+            }
+
+            if (!string.IsNullOrEmpty(maxSalary) && decimal.TryParse(maxSalary, out decimal maxSalaryValue))
+            {
+                filteredJobs = filteredJobs.Where(j => j.Salary != null && (
+                    j.Salary.Contains(maxSalaryValue.ToString()) ||
+                    j.Salary.Contains("Thỏa thuận") ||
+                    j.Salary.Contains("Cạnh tranh")
+                ));
+            }
+
+            // Áp dụng sắp xếp với ưu tiên gói quảng cáo và người dùng Pro
+            IOrderedEnumerable<dynamic> orderedJobs;
+
+            switch (sortBy)
+            {
+                case "2": // Sắp xếp theo hạn nộp hồ sơ với ưu tiên
+                    orderedJobs = filteredJobs
+                        .OrderByDescending(j => j.HighlightType == "TopMax")
+                        .ThenByDescending(j => j.HighlightType == "TopPro")
+                        .ThenByDescending(j => j.EmployerIsPro)
+                        .ThenBy(j => j.DueDate);
+                    break;
+                case "1":
+                case "all":
+                default:
+                    // Sắp xếp theo ngày đăng (mới nhất) với ưu tiên
+                    orderedJobs = filteredJobs
+                        .OrderByDescending(j => j.HighlightType == "TopMax")
+                        .ThenByDescending(j => j.HighlightType == "TopPro")
+                        .ThenByDescending(j => j.EmployerIsPro)
+                        .ThenByDescending(j => j.PostedDate);
+                    break;
+            }
+
+            // Đếm tổng số bản ghi phù hợp với điều kiện lọc
+            var totalCount = orderedJobs.Count();
+
+            // Phân trang
+            var paginatedJobs = orderedJobs
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(j => new
+                {
+                    j.Id,
+                    j.CompanyLogo,
+                    j.CompanyName,
+                    j.Title,
+                    j.Salary,
+                    j.Location,
+                    j.DueDate,
+                    j.HighlightType,
+                    j.EmployerIsPro,
+                    j.PostedDate
+                })
+                .ToList();
+
+            return Ok(new
+            {
+                items = paginatedJobs,
+                totalCount = totalCount,
+                page = page,
+                pageSize = pageSize,
+                totalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
+            });
+        }
+        [HttpGet("promoted")]
+        public async Task<IActionResult> GetPromotedJobs(int page = 1, int pageSize = 12, string location = "")
+        {
+            var now = DateTime.UtcNow;
+            int skip = (page - 1) * pageSize;
+            var baseUrl = $"{Request.Scheme}://{Request.Host}/";
+
+            // Tối ưu truy vấn cơ bản
+            var query = from job in _context.JobPosts
+                        join user in _context.Users on job.EmployerId equals user.Id
+                        join companyProfile in _context.CompanyProfiles on user.Id equals companyProfile.UserId into companyGroup
+                        from cp in companyGroup.DefaultIfEmpty()
                         where job.Status == "open" && job.ApplyDeadline >= now
                         select new
                         {
                             Id = job.Id,
                             Avatar = string.IsNullOrEmpty(user.Avatar)
-                                    ? null
-                                    : (user.Avatar.StartsWith("http") ? user.Avatar : baseUrl + "avatar/" + user.Avatar),
-
+                                  ? null
+                                  : (user.Avatar.StartsWith("http") ? user.Avatar : baseUrl + "avatar/" + user.Avatar),
                             Company = cp != null ? cp.CompanyName : user.Username,
                             JobTitle = job.Title,
                             Salary = job.SalaryRange,
                             Location = job.Location,
-                            HighlightType = promo != null ? promo.Package.HighlightType : null,
-                            EmployerIsPro = _context.ProSubscriptions.Any(p => p.UserId == user.Id && p.StartDate <= now && p.EndDate >= now),
-                            slug = cp != null ? cp.Slug : user.Username,
+                            UserId = user.Id,
+                            Slug = cp != null ? cp.Slug : user.Username,
                         };
-#pragma warning restore CS8602 
+
+            // Đảm bảo không có bản ghi trùng lặp
+            query = query.Distinct();
+
+            // Lấy thông tin jobs để xử lý trong bộ nhớ
+            var jobResults = await query.ToListAsync();            // Truy vấn riêng để lấy thông tin gói quảng cáo
+            // Xử lý để tránh lỗi khi có nhiều promotion cho cùng một job post
+            var promotionsData = await _context.JobPostPromotions
+                .Where(p => p.StartDate <= now && p.EndDate >= now)
+                .Select(p => new { p.JobPostId, p.Package.HighlightType, p.Package.PriorityLevel })
+                .ToListAsync();
+
+            // Group by job post ID và chọn promotion có priority cao nhất
+            var activePromotions = promotionsData
+                .GroupBy(p => p.JobPostId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.OrderByDescending(p => p.PriorityLevel)
+                         .ThenBy(p => p.HighlightType == "TopMax" ? 0 :
+                                      p.HighlightType == "TopPro" ? 1 : 2)
+                         .First().HighlightType
+                );
+
+            // Lấy thông tin về Pro subscriptions
+            var proUsers = await _context.ProSubscriptions
+                .Where(p => p.StartDate <= now && p.EndDate >= now)
+                .Select(p => p.UserId)
+                .Distinct()
+                .ToListAsync();
+
+            // Kết hợp dữ liệu trong bộ nhớ
+            var enrichedJobs = jobResults.Select(job => new
+            {
+                job.Id,
+                job.Avatar,
+                job.Company,
+                job.JobTitle,
+                job.Salary,
+                job.Location,
+                HighlightType = activePromotions.ContainsKey(job.Id) ? activePromotions[job.Id] : null,
+                EmployerIsPro = proUsers.Contains(job.UserId),
+                job.Slug
+            }).ToList();
+
+            // Lọc theo địa điểm trong bộ nhớ (in-memory)
+            var filteredJobs = enrichedJobs.AsEnumerable();
 
             if (!string.IsNullOrEmpty(location))
             {
                 if (location == "Miền Bắc")
                 {
-                    query = query.Where(x => x.Location.Contains("Hà Nội") || x.Location.Contains("Hải Dương") || x.Location.Contains("Hải Phòng"));
+                    filteredJobs = filteredJobs.Where(x => x.Location != null && (
+                        x.Location.Contains("Hà Nội") ||
+                        x.Location.Contains("Hải Dương") ||
+                        x.Location.Contains("Hải Phòng")
+                    ));
                 }
                 else if (location == "Miền Nam")
                 {
-                    query = query.Where(x => x.Location.Contains("TP.HCM") || x.Location.Contains("Long An") || x.Location.Contains("Nha Trang"));
+                    filteredJobs = filteredJobs.Where(x => x.Location != null && (
+                        x.Location.Contains("TP.HCM") ||
+                        x.Location.Contains("Long An") ||
+                        x.Location.Contains("Nha Trang")
+                    ));
                 }
                 else
                 {
-                    query = query.Where(x => x.Location.Contains(location));
+                    filteredJobs = filteredJobs.Where(x => x.Location != null && x.Location.Contains(location));
                 }
             }
 
-            var totalJobs = await query.CountAsync();
+            // Đếm tổng số bản ghi phù hợp với điều kiện lọc
+            var totalJobs = filteredJobs.Count();
 
-            var jobs = await query
+            // Sắp xếp với ưu tiên gói quảng cáo và người dùng Pro
+            var orderedJobs = filteredJobs
                 .OrderByDescending(x => x.HighlightType == "TopMax")
                 .ThenByDescending(x => x.HighlightType == "TopPro")
                 .ThenByDescending(x => x.EmployerIsPro)
-                .ThenByDescending(x => x.Id)
+                .ThenByDescending(x => x.Id);
+
+            // Phân trang trong bộ nhớ
+            var paginatedJobs = orderedJobs
                 .Skip(skip)
                 .Take(pageSize)
-                .ToListAsync();
+                .ToList();
 
             return Ok(new
             {
-                Jobs = jobs,
+                Jobs = paginatedJobs,
                 TotalJobs = totalJobs,
                 CurrentPage = page,
                 TotalPages = (int)Math.Ceiling((double)totalJobs / pageSize)
             });
         }
-
         [HttpGet("urgent")]
         public async Task<IActionResult> GetUrgentJobs([FromQuery] int limit = 0)
         {
             var now = DateTime.UtcNow;
             var baseUrl = $"{Request.Scheme}://{Request.Host}/";
 
-            var query = from i in _context.JobPosts
-                        join j in _context.JobPostPromotions on i.Id equals j.JobPostId
-                        join k in _context.Users on i.EmployerId equals k.Id
-                        join m in _context.CompanyProfiles on k.Id equals m.UserId
-                        where i.ApplyDeadline > now && j.PackageId == 3
-                        orderby i.PostDate descending
+            // 1. Lấy danh sách jobPostId có package id = 3 (urgent)
+            var urgentJobIds = await _context.JobPostPromotions
+                .Where(p => p.StartDate <= now && p.EndDate >= now && p.PackageId == 3)
+                .Select(p => p.JobPostId)
+                .Distinct()
+                .ToListAsync();
+
+            if (urgentJobIds.Count == 0)
+            {
+                return Ok(new List<object>());
+            }
+
+            // 2. Truy vấn thông tin job với các id đã lọc
+            var query = from job in _context.JobPosts
+                        join user in _context.Users on job.EmployerId equals user.Id
+                        join companyProfile in _context.CompanyProfiles on user.Id equals companyProfile.UserId into companyGroup
+                        from cp in companyGroup.DefaultIfEmpty()
+                        where job.ApplyDeadline > now && urgentJobIds.Contains(job.Id) && job.Status == "open"
                         select new
                         {
-                            i.Id,
-                            i.Title,
-                            m.CompanyName,
-                            i.Location,
-                            i.SalaryRange,
-                            Avatar = string.IsNullOrEmpty(k.Avatar)
+                            Id = job.Id,
+                            Title = job.Title,
+                            CompanyName = cp != null ? cp.CompanyName : user.Username,
+                            Location = job.Location,
+                            SalaryRange = job.SalaryRange,
+                            PostDate = job.PostDate,
+                            Avatar = string.IsNullOrEmpty(user.Avatar)
                                 ? null
-                                : (k.Avatar.StartsWith("http") ? k.Avatar : baseUrl + "avatar/" + k.Avatar)
+                                : (user.Avatar.StartsWith("http") ? user.Avatar : baseUrl + "avatar/" + user.Avatar)
                         };
 
+            // Sắp xếp theo ngày đăng (mới nhất)
+            query = query.OrderByDescending(j => j.PostDate);
+
+            // Giới hạn kết quả nếu cần
             if (limit > 0)
             {
                 query = query.Take(limit);
@@ -119,85 +398,6 @@ namespace BACKEND.Controllers
             var result = await query.ToListAsync();
             return Ok(result);
         }
-
-        // [HttpGet("filter")]
-        // public async Task<IActionResult> Filter(
-        //     [FromQuery] int jobFieldId = 0,
-        //     [FromQuery] int employmentTypeId = 0,
-        //     [FromQuery] string? location = null,
-        //     [FromQuery] string? salaryRange = null,
-        //     [FromQuery] int page = 1,
-        //     [FromQuery] int pageSize = 10)
-        // {
-        //     var now = DateTime.UtcNow;
-
-        //     // 1. Build query cơ bản (như trước) :contentReference[oaicite:4]{index=4}:contentReference[oaicite:5]{index=5}
-        //     var baseQuery = _context.JobPosts
-        //         .Include(j => j.Employer).ThenInclude(e => e.CompanyProfiles)
-        //         .Include(j => j.JobPostFields).ThenInclude(f => f.Field)
-        //         .Include(j => j.JobPostEmploymentTypes).ThenInclude(et => et.EmploymentType)
-        //         .Where(j => j.Status == "open" 
-        //                     && (j.ApplyDeadline == null || j.ApplyDeadline >= now));
-        //     if (jobFieldId > 0)
-        //         baseQuery = baseQuery.Where(j => j.JobPostFields.Any(f => f.FieldId == jobFieldId));
-        //     if (employmentTypeId > 0)
-        //         baseQuery = baseQuery.Where(j => 
-        //             j.JobPostEmploymentTypes.Any(et => et.EmploymentTypeId == employmentTypeId));
-        //     if (!string.IsNullOrEmpty(location))
-        //         baseQuery = baseQuery.Where(j => j.Location.Contains(location));
-        //     if (!string.IsNullOrEmpty(salaryRange))
-        //         baseQuery = baseQuery.Where(j => j.SalaryRange == salaryRange);
-
-        //     // 2. Project ra DTO kèm Priority
-        //     var dataWithPriority = await baseQuery
-        //         .Select(j => new {
-        //             j.Id,
-        //             j.Title,
-        //             CompanyName = j.Employer.CompanyProfiles.FirstOrDefault()!.CompanyName,
-        //             Avatar = string.IsNullOrEmpty(j.Employer.Avatar)
-        //                 ? null
-        //                 : (j.Employer.Avatar.StartsWith("http")
-        //                     ? j.Employer.Avatar
-        //                     : $"{Request.Scheme}://{Request.Host}/{j.Employer.Avatar}"),
-        //             j.Location,
-        //             j.SalaryRange,
-        //             j.ApplyDeadline,
-        //             j.PostDate,
-        //             // Tính priority:
-        //             Priority =
-        //                 // 0 = TopMax
-        //                 j.JobPostPromotions
-        //                 .Where(pp => pp.EndDate > now && pp.Package.Name == "TopMax")
-        //                 .Any() ? 0
-        //                 // 1 = TopPro
-        //             : j.JobPostPromotions
-        //                 .Where(pp => pp.EndDate > now && pp.Package.Name == "TopPro")
-        //                 .Any() ? 1
-        //                 // 2 = Bài của công ty mua gói Pro (Order thành công còn hạn)
-        //             : _context.Orders
-        //                 .Where(o => o.UserId == j.EmployerId 
-        //                             && o.Status == "success"
-        //                             && now <= o.CreatedAt.AddDays(o.ProPackage.DurationDays))
-        //                 .Any() ? 2
-        //             : 3
-        //         })
-  
-        //         .OrderBy(x => x.Priority)
-        //         .ThenByDescending(x => x.PostDate)
-        //         // 4. Phân trang
-        //         .Skip((page - 1) * pageSize)
-        //         .Take(pageSize)
-        //         .ToListAsync();
-
-        //     // 5. Đếm tổng để FE hiển thị pagination
-        //     var totalCount = await baseQuery.CountAsync();
-
-        //     return Ok(new {
-        //         data = dataWithPriority,
-        //         totalCount
-        //     });
-        // }
-
 
 
         [HttpGet("{id}")]
@@ -265,26 +465,32 @@ namespace BACKEND.Controllers
         public async Task<IActionResult> GetJobPostByEmployerId(int employerId, [FromQuery] int excludeId = 0)
         {
             var baseUrl = $"{Request.Scheme}://{Request.Host}";
+            var now = DateTime.UtcNow;
 
-            var query = from i in _context.JobPosts
-                        join e in _context.CompanyProfiles on i.EmployerId equals e.UserId
-                        join u in _context.Users on i.EmployerId equals u.Id
-                        where i.EmployerId == employerId && i.Id != excludeId && i.Status == "open"
-                        && (i.ApplyDeadline == null || i.ApplyDeadline >= DateTime.UtcNow)
-                        orderby i.PostDate descending
-                        select new
-                        {
-                            id = i.Id,
-                            title = i.Title,
-                            companyName = e.CompanyName,
-                            avatar = string.IsNullOrEmpty(u.Avatar)
-                                            ? null
-                                            : (u.Avatar.StartsWith("http") ? u.Avatar : baseUrl + u.Avatar),
-                            location = i.Location,
-                            applyDeadline = i.ApplyDeadline,
-                            postDate = i.PostDate,
-                            salaryRange = i.SalaryRange
-                        };
+            // Tối ưu truy vấn để cải thiện hiệu suất và đảm bảo không có trùng lặp
+            var query = (from job in _context.JobPosts
+                         join companyProfile in _context.CompanyProfiles on job.EmployerId equals companyProfile.UserId
+                         join user in _context.Users on job.EmployerId equals user.Id
+                         where job.EmployerId == employerId
+                               && job.Id != excludeId
+                               && job.Status == "open"
+                               && (job.ApplyDeadline == null || job.ApplyDeadline >= now)
+                         select new
+                         {
+                             id = job.Id,
+                             title = job.Title,
+                             companyName = companyProfile.CompanyName,
+                             avatar = string.IsNullOrEmpty(user.Avatar)
+                                     ? null
+                                     : (user.Avatar.StartsWith("http") ? user.Avatar : baseUrl + "/avatar/" + user.Avatar),
+                             location = job.Location,
+                             applyDeadline = job.ApplyDeadline,
+                             postDate = job.PostDate,
+                             salaryRange = job.SalaryRange
+                         })
+                        .AsNoTracking() // Cải thiện hiệu suất khi chỉ đọc dữ liệu
+                        .Distinct()
+                        .OrderByDescending(j => j.postDate);
 
             var jobs = await query.Take(10).ToListAsync();
             return Ok(jobs);
@@ -301,6 +507,7 @@ namespace BACKEND.Controllers
             var baseUrl = $"{Request.Scheme}://{Request.Host}";
             var now = DateTime.UtcNow;
 
+            // Cách giải quyết đơn giản và hiệu quả hơn, tương tự như đã được triển khai
             var query = _context.JobPosts
                 .Include(j => j.Employer)
                     .ThenInclude(e => e.CompanyProfiles)
@@ -308,8 +515,11 @@ namespace BACKEND.Controllers
                     .ThenInclude(f => f.Field)
                 .Include(j => j.JobPostEmploymentTypes)
                     .ThenInclude(em => em.EmploymentType)
-                .Where(j => j.Id != excludeId && j.Status == "open" && j.ApplyDeadline >= now);
+                .Where(j => j.Id != excludeId && j.Status == "open" && j.ApplyDeadline >= now)
+                .AsNoTracking()  // Cải thiện hiệu suất khi chỉ đọc dữ liệu
+                .Distinct();      // Đảm bảo không có bản ghi trùng lặp
 
+            // Sử dụng Distinct để tránh trùng lặp kết quả
             var jobs = await query
                 .Select(j => new
                 {
@@ -323,11 +533,11 @@ namespace BACKEND.Controllers
                     Avatar = string.IsNullOrEmpty(j.Employer.Avatar) ? null :
                             (j.Employer.Avatar.StartsWith("http") ? j.Employer.Avatar : baseUrl + "/avatar/" + j.Employer.Avatar),
                     Score =
-                    (j.JobPostFields.Any(f => f.Field!.Name == fiels) ? 1 : 0) +
-                    (j.JobPostEmploymentTypes.Any(em => em.EmploymentType!.Name == employment) ? 1 : 0) +
-                    ((!string.IsNullOrEmpty(location) && !string.IsNullOrEmpty(j.Location) && j.Location.Contains(location)) ? 1 : 0)
-
+                        (j.JobPostFields.Any(f => f.Field!.Name == fiels) ? 1 : 0) +
+                        (j.JobPostEmploymentTypes.Any(em => em.EmploymentType!.Name == employment) ? 1 : 0) +
+                        ((!string.IsNullOrEmpty(location) && !string.IsNullOrEmpty(j.Location) && j.Location.Contains(location)) ? 1 : 0)
                 })
+                .Distinct()      // Loại bỏ các bản ghi trùng lặp
                 .OrderByDescending(j => j.Score)
                 .ThenByDescending(j => j.PostDate)
                 .Take(limitted)

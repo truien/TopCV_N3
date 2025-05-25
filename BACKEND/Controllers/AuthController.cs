@@ -84,6 +84,12 @@ public class AuthController : ControllerBase
         {
             return BadRequest(new { message = "Email đã tồn tại." });
         }
+        var roleExists = await _context.UserRoles
+        .AnyAsync(r => r.Id == request.RoleId);
+        if (!roleExists)
+        {
+            request.RoleId = 2;
+        }
 
         string hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
 
@@ -264,9 +270,6 @@ public class AuthController : ControllerBase
         return NoContent();
     }
 
-    // trong AuthController.cs
-
-    // Helper tạo slug đơn giản
     private string GenerateSlug(string text)
     {
         return text?

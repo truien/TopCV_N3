@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { BsChevronDown, BsSearch } from 'react-icons/bs';
 import { CiLocationOn } from 'react-icons/ci';
 import styles from './styles.module.css'; // Import CSS Module
@@ -8,8 +9,10 @@ import Concentrix_Banner from '../../assets/images/Concentrix_Banner.png';
 import f88 from '../../assets/images/f88.png';
 
 const Search = () => {
+    const navigate = useNavigate();
     const [selectedCity, setSelectedCity] = useState('');
     const [isOpen, setIsOpen] = useState(false);
+    const [searchKeyword, setSearchKeyword] = useState('');
 
     const handleCityChange = (city) => {
         setSelectedCity(city);
@@ -36,15 +39,16 @@ const Search = () => {
                         height: '60px',
                         borderRadius: '20px',
                     }}
-                >
-                    <form className="col-8 mx-2">
+                >                    <div className="col-8 mx-2">
                         <input
                             type="text"
                             className={`form-control border-0 ${styles.inputCustom}`} // Sử dụng styles.inputCustom
                             placeholder="Vị trí tuyển dụng, tên công ty"
                             style={{ borderRadius: '20px' }}
+                            value={searchKeyword}
+                            onChange={(e) => setSearchKeyword(e.target.value)}
                         />
-                    </form>
+                    </div>
                     <div className="section d-flex align-items-center position-relative col-2">
                         <div>
                             <CiLocationOn />
@@ -73,8 +77,16 @@ const Search = () => {
                                 </div>
                             )}
                         </div>
-                    </div>
-                    <button className={`btn btn-customer-gren ms-3 text-light ${styles.btnCustomerGren}`} style={{ borderRadius: '20px' }}> {/* Sử dụng styles.btnCustomerGren */}
+                    </div>                    <button
+                        className={`btn btn-customer-gren ms-3 text-light ${styles.btnCustomerGren}`}
+                        style={{ borderRadius: '20px' }}
+                        onClick={() => {
+                            const queryParams = new URLSearchParams();
+                            if (searchKeyword) queryParams.append('keyword', searchKeyword);
+                            if (selectedCity) queryParams.append('location', selectedCity);
+                            navigate(`/search-job${queryParams.toString() ? '?' + queryParams.toString() : ''}`);
+                        }}
+                    >
                         <BsSearch />
                         Tìm kiếm
                     </button>

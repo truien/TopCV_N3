@@ -5,6 +5,7 @@ export const getPromotedJobs = (params) => axiosInstance.get('/api/JobPosts/prom
 export const getRelatedJobs = (params) => axiosInstance.get('/api/JobPosts/related', { params }).then(res => res.data);
 export const getCompanyJobs = (employerId) => axiosInstance.get(`/api/JobPosts/get-jobpost-by-id/${employerId}`).then(res => res.data);
 export const createJobPost = (data) => axiosInstance.post('/api/JobPosts/create', data);
+export const searchJobs = (params) => axiosInstance.get('/api/JobPosts/search', { params }).then(res => res.data);
 export const getEmployerJobPosts = async () => {
     const res = await axiosInstance.get('/api/jobposts/employer');
     return res.data;

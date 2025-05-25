@@ -77,9 +77,8 @@ const Header = () => {
                             <Link to="/" className={`nav-link ${styles.navLinkCustom} ${styles.customText}`}>
                                 Trang chủ
                             </Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link to="/jobs" className={`nav-link ${styles.navLinkCustom} ${styles.customText}`}>
+                        </li>                        <li className="nav-item">
+                            <Link to="/search-job" className={`nav-link ${styles.navLinkCustom} ${styles.customText}`}>
                                 Tìm việc
                             </Link>
                         </li>

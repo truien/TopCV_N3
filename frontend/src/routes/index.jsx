@@ -17,12 +17,14 @@ import InterviewManagement from "../pages/Employer/InterviewManagement/Interview
 import JobPostManager from '../pages/Employer/JobPostManager/JobPostManager.jsx'
 import CompanyInfor from "../pages/Main/CompanyInfor/CompanyInfor.jsx";
 import ConfirmPage from "../pages/ConfirmPage.jsx";
+import SearchJob from "../pages/SearchJob/SearchJob.jsx";
 function AppRoutes() {
     return (
         <Router>
             <Routes>
                 <Route path="/" element={<MainLayout />}>
                     <Route index element={<HomePage />} />
+                    <Route path="search-job" element={<SearchJob />} />
                 </Route>
                 <Route path='/admin' element={<AdminLayout />}>
                     <Route index element={<AccountMangnager />} />
