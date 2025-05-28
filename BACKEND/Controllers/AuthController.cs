@@ -222,13 +222,19 @@ public class AuthController : ControllerBase
     }
     [Authorize(Roles = "admin")]
     [HttpGet("users")]
-    public async Task<IActionResult> GetAllUsers([FromQuery] int page = 1, [FromQuery] int pageSize = 5)
+    public async Task<IActionResult> GetAllUsers([FromQuery] int page = 1, [FromQuery] int pageSize = 5, [FromQuery] string? search = null)
     {
         var baseUrl = $"{Request.Scheme}://{Request.Host}/";
 
-        var totalUsers = await _context.Users.CountAsync();
+        var query = _context.Users.AsQueryable();
+        if (!string.IsNullOrEmpty(search))
+        {
+            query = query.Where(u => u.Username.Contains(search) || u.Email.Contains(search));
+        }
 
-        var users = await _context.Users
+        var totalUsers = await query.CountAsync();
+
+        var users = await query
             .OrderBy(u => u.Id)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
@@ -251,6 +257,32 @@ public class AuthController : ControllerBase
             PageSize = pageSize,
             TotalPages = (int)Math.Ceiling(totalUsers / (double)pageSize),
             Users = users
+        });
+    }
+
+    [Authorize(Roles = "admin")]
+    [HttpGet("user-stats")]
+    public async Task<IActionResult> GetUserStats()
+    {
+        var totalUsers = await _context.Users.CountAsync();
+        var now = DateTime.UtcNow;
+        var firstDayOfMonth = new DateTime(now.Year, now.Month, 1);
+        var newUsersThisMonth = await _context.Users.CountAsync(u => u.CreatedAt >= firstDayOfMonth);
+        var roleStats = await _context.Users
+            .GroupBy(u => u.RoleId)
+            .Select(g => new
+            {
+                RoleId = g.Key,
+                RoleName = _context.UserRoles.Where(r => r.Id == g.Key).Select(r => r.Name).FirstOrDefault(),
+                Count = g.Count()
+            })
+            .ToListAsync();
+
+        return Ok(new
+        {
+            TotalUsers = totalUsers,
+            NewUsersThisMonth = newUsersThisMonth,
+            RoleStats = roleStats
         });
     }
 

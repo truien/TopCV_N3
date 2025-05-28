@@ -160,3 +160,4 @@ C:\Users\ADMIN\TopCV_N3\BACKEND\obj\Debug\net8.0\refint\BACKEND.dll
 C:\Users\ADMIN\TopCV_N3\BACKEND\obj\Debug\net8.0\BACKEND.pdb
 C:\Users\ADMIN\TopCV_N3\BACKEND\obj\Debug\net8.0\BACKEND.genruntimeconfig.cache
 C:\Users\ADMIN\TopCV_N3\BACKEND\obj\Debug\net8.0\ref\BACKEND.dll
+C:\Users\ADMIN\TopCV_N3\BACKEND\bin\Debug\net8.0\FuzzySharp.dll

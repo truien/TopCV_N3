@@ -607,7 +607,7 @@ public partial class TopcvBeContext : DbContext
 
             entity.HasIndex(e => e.Email, "email").IsUnique();
 
-            entity.HasIndex(e => e.FacebookId, "facebook_id").IsUnique();
+            // entity.HasIndex(e => e.FacebookId, "facebook_id").IsUnique();
 
             entity.HasIndex(e => e.RoleId, "fk_users_role");
 
@@ -622,7 +622,7 @@ public partial class TopcvBeContext : DbContext
                 .HasColumnType("timestamp")
                 .HasColumnName("created_at");
             entity.Property(e => e.Email).HasColumnName("email");
-            entity.Property(e => e.FacebookId).HasColumnName("facebook_id");
+            // entity.Property(e => e.FacebookId).HasColumnName("facebook_id");
             entity.Property(e => e.GoogleId).HasColumnName("google_id");
             entity.Property(e => e.Password)
                 .HasMaxLength(255)

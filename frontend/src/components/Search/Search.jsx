@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BsChevronDown, BsSearch } from 'react-icons/bs';
 import { CiLocationOn } from 'react-icons/ci';
@@ -7,16 +7,48 @@ import headerBg from '../../assets/images/header-bg.png';
 import Banner_1 from '../../assets/images/Banner 1.png';
 import Concentrix_Banner from '../../assets/images/Concentrix_Banner.png';
 import f88 from '../../assets/images/f88.png';
+import axios from 'axios';
+
 
 const Search = () => {
     const navigate = useNavigate();
     const [selectedCity, setSelectedCity] = useState('');
     const [isOpen, setIsOpen] = useState(false);
     const [searchKeyword, setSearchKeyword] = useState('');
+    const [provinces, setProvinces] = useState([]);
+    const [loading, setLoading] = useState(false);
 
+    useEffect(() => {
+        const fetchProvinces = async () => {
+            setLoading(true);
+            try {
+                const response = await axios("https://open.oapi.vn/location/provinces?page=0&size=63");
+                setProvinces(response.data.data.map(province => province.name));
+            } catch (error) {
+                console.error('Error fetching provinces:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProvinces();
+    }, []);
     const handleCityChange = (city) => {
         setSelectedCity(city);
         setIsOpen(false);
+    };
+
+    const handleSearch = () => {
+        const queryParams = new URLSearchParams();
+        if (searchKeyword) queryParams.append('keyword', searchKeyword);
+        if (selectedCity) queryParams.append('location', selectedCity);
+        navigate(`/search-job${queryParams.toString() ? '?' + queryParams.toString() : ''}`);
+    };
+
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
     };
 
     return (
@@ -39,7 +71,8 @@ const Search = () => {
                         height: '60px',
                         borderRadius: '20px',
                     }}
-                >                    <div className="col-8 mx-2">
+                >
+                    <div className="col-8 mx-2">
                         <input
                             type="text"
                             className={`form-control border-0 ${styles.inputCustom}`} // Sử dụng styles.inputCustom
@@ -47,6 +80,7 @@ const Search = () => {
                             style={{ borderRadius: '20px' }}
                             value={searchKeyword}
                             onChange={(e) => setSearchKeyword(e.target.value)}
+                            onKeyPress={handleKeyPress}
                         />
                     </div>
                     <div className="section d-flex align-items-center position-relative col-2">
@@ -62,9 +96,10 @@ const Search = () => {
                                 <span>{selectedCity || "Tất cả tỉnh/thành phố"}</span>
                                 <BsChevronDown />
                             </div>
+                            {loading && <div className={styles.loading}>Loading...</div>}
                             {isOpen && (
-                                <div className="dropdown-menu show" style={{ position: 'absolute', zIndex: '1', width: '100%' }}>
-                                    {['Hà Nội', 'Hồ Chí Minh', 'Bình Dương'].map((city, index) => (
+                                <div className={`${styles.dropdown_menu} dropdown-menu show`} style={{ position: 'absolute', zIndex: '1', width: '100%' }}>
+                                    {provinces.map((city, index) => (
                                         <div
                                             key={index}
                                             className="dropdown-item"
@@ -77,15 +112,11 @@ const Search = () => {
                                 </div>
                             )}
                         </div>
-                    </div>                    <button
+                    </div>
+                    <button
                         className={`btn btn-customer-gren ms-3 text-light ${styles.btnCustomerGren}`}
                         style={{ borderRadius: '20px' }}
-                        onClick={() => {
-                            const queryParams = new URLSearchParams();
-                            if (searchKeyword) queryParams.append('keyword', searchKeyword);
-                            if (selectedCity) queryParams.append('location', selectedCity);
-                            navigate(`/search-job${queryParams.toString() ? '?' + queryParams.toString() : ''}`);
-                        }}
+                        onClick={handleSearch}
                     >
                         <BsSearch />
                         Tìm kiếm

@@ -29,9 +29,14 @@ export const register = (data) =>
         .post('/api/auth/register', data)
         .then(res => res.data);
 
-export const getAllUsers = (page) =>
+export const getAllUsers = (page, search) =>
     axiosInstance
-        .get(`/api/auth/users?page=${page}&pageSize=5`)
+        .get(`/api/auth/users?page=${page}&pageSize=5${search ? `&search=${search}` : ''}`)
+        .then(res => res.data);
+
+export const getUserStats = () =>
+    axiosInstance
+        .get('/api/auth/user-stats')
         .then(res => res.data);
 
 export const deleteUser = (id) =>

@@ -17,7 +17,7 @@ public partial class User
 
     public string? GoogleId { get; set; }
 
-    public string? FacebookId { get; set; }
+    // public string? FacebookId { get; set; }
 
     public DateTime? CreatedAt { get; set; }
 

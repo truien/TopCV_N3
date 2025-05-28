@@ -98,7 +98,6 @@ function JobPostDetails() {
             try {
                 const jobs = await getCompanyJobs(jobPost.employerId);
                 setCompanyJobs(jobs);
-
                 const follow = await isFollowingEmployer(jobPost.employerId);
                 setIsFollowing(follow);
             } catch (err) {

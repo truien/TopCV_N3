@@ -24,7 +24,6 @@ function AppRoutes() {
             <Routes>
                 <Route path="/" element={<MainLayout />}>
                     <Route index element={<HomePage />} />
-                    <Route path="search-job" element={<SearchJob />} />
                 </Route>
                 <Route path='/admin' element={<AdminLayout />}>
                     <Route index element={<AccountMangnager />} />
@@ -42,6 +41,7 @@ function AppRoutes() {
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/company/:slug" element={<CompanyInfor />} />
+                <Route path="/search-job" element={<SearchJob />} />
                 <Route path="/confirm" element={<ConfirmPage />} />
                 <Route path="*" element={<NotFoundPage />} />
             </Routes>

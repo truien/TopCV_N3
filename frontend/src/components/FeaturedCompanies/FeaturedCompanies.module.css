@@ -1,0 +1,381 @@
+.container {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+    /* padding: 24px; */
+    max-width: 1100px;
+    margin: 32px auto;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+    background: url('https://cdn-new.topcv.vn/unsafe/https://static.topcv.vn/v4/image/topcv-pro/banner-top-company-v2.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100px;
+    border-radius: 16px;
+}
+
+.headerTitle {
+    color: #f2e7ac;
+    font-size: 24px;
+    margin: 0;
+}
+
+.headerContent {
+    padding: 24px;
+
+}
+
+.desc {
+    font-feature-settings: "liga" off, "clig" off;
+    color: #fff;
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    letter-spacing: -.14px;
+    line-height: 24px;
+}
+
+.proBtn {
+    background: #ffe6a1;
+    color: #bfa046;
+    border: none;
+    border-radius: 16px;
+    padding: 6px 18px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: 24px;
+}
+
+.filters {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+.filterBtn {
+    background: #f5f5f5;
+    border: none;
+    border-radius: 16px;
+    padding: 7px 18px;
+    color: #333;
+    cursor: pointer;
+    font-size: 15px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.filterBtn.active,
+.filterBtn:hover {
+    background: #ffe6a1;
+    color: #bfa046;
+}
+
+.listWrapper {
+    display: flex;
+    gap: 24px;
+    padding: 24px;
+}
+
+.featured {
+    flex: 1 0 260px;
+    max-width: 260px;
+    background: url('https://cdn-new.topcv.vn/unsafe/https://static.topcv.vn/v4/image/topcv-pro/bg-featured-company.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 400px;
+}
+
+.featuredCard {
+    border-radius: 16px;
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.logo {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+    margin-bottom: 12px;
+}
+
+.companyName {
+    font-feature-settings: "liga" off, "clig" off;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    color: #fff;
+    display: -webkit-box;
+    font-family: Inter;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 600;
+    letter-spacing: -.2px;
+    line-height: 30px;
+    margin: 0;
+    overflow: hidden;
+    text-align: center;
+    text-transform: uppercase;
+    text-decoration: none;
+}
+
+.industry {
+    font-feature-settings: "liga" off, "clig" off;
+    color: #fff;
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    letter-spacing: .175px;
+    line-height: 20px;
+}
+
+.jobs {
+    align-items: center;
+    background: rgba(0, 0, 0, .3);
+    border-radius: 40px;
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    padding: 4px 12px;
+}
+
+.jobs_title {
+    font-feature-settings: "liga" off, "clig" off;
+    color: #fff;
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    letter-spacing: -.14px;
+    line-height: 24px;
+}
+
+.proLabel {
+    font-feature-settings: "liga" off, "clig" off;
+    align-items: center;
+    background: linear-gradient(259deg, #ffb94b -3.83%, #ffe7bf 44.19%, #ffb94b 92.22%) padding-box, linear-gradient(90deg, #e88a1e, #ffe7bf) border-box;
+    border: 1.257px solid #e88a1e;
+    border-radius: 45.259px;
+    color: #591e00;
+    display: flex;
+    font-family: Inter;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    gap: 2px;
+    justify-content: center;
+    letter-spacing: .16px;
+    line-height: 100%;
+    padding: 8px 16px;
+}
+
+.followBtn {
+    font-feature-settings: "liga" off, "clig" off;
+    align-items: center;
+    background: #fff;
+    border-radius: 60px;
+    color: #263a4d;
+    display: flex;
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 600;
+    gap: 6px;
+    height: 32px;
+    justify-content: center;
+    letter-spacing: .175px;
+    line-height: 20px;
+    padding: 9px 16px 9px 12px;
+}
+
+.followBtn:hover,
+.followBtn:active {
+    background: #ffe6a1;
+    color: #bfa046;
+}
+
+.grid {
+    flex: 2;
+    display: grid;
+    gap: 16px;
+}
+
+.companyCard {
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    padding: 16px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.logoSmall {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    margin-bottom: 8px;
+}
+
+.companyNameSmall {
+    font-family: "liga" off, "clig" off;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    color: #263a4d;
+    display: -webkit-box;
+    font-family: Inter;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    letter-spacing: -.16px;
+    line-height: 24px;
+    margin: 0;
+    overflow: hidden;
+    text-transform: uppercase;
+    text-decoration: none;
+}
+
+.industrySmall {
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    -webkit-box-orient: vertical;
+    color: #263a4d;
+    display: -webkit-box;
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    letter-spacing: .175px;
+    line-height: 22px;
+    opacity: .7;
+    overflow: hidden;
+}
+
+.jobsSmall {
+    color: #333;
+    font-size: 13px;
+    margin-bottom: 6px;
+}
+
+.followBtnSmall {
+    background: #fff;
+    border: 1px solid #bfa046;
+    color: #bfa046;
+    border-radius: 16px;
+    padding: 4px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.followBtnSmall:hover,
+.followBtnSmall:active {
+    background: #ffe6a1;
+    color: #bfa046;
+}
+
+.noData {
+    color: #888;
+    font-size: 16px;
+    text-align: center;
+    width: 100%;
+    margin: 32px 0;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.pageBtn {
+    background: #f5f5f5;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+    color: #bfa046;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.pageBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pageInfo {
+    color: #bfa046;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.companyCardOutline {
+    background: #fff;
+    border: 1.5px solid #ffe6a1;
+    border-radius: 12px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 0;
+    box-shadow: none;
+    height: 124px;
+}
+
+.cardRow {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.infoCol {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-left: 12px;
+    flex: 1;
+}
+
+.companyNameSmall {
+    font-size: 15px;
+    font-weight: bold;
+    color: #222;
+    margin-bottom: 2px;
+    text-align: left;
+}
+
+.industrySmall {
+    color: #888;
+    font-size: 13px;
+    margin-bottom: 6px;
+    text-align: left;
+}
+
+.jobsSmall {
+    color: #333;
+    font-size: 13px;
+    text-align: left;
+}
+
+.logoSmall {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    margin-bottom: 0;
+}

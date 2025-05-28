@@ -4,6 +4,7 @@ using BACKEND.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.VisualBasic;
 using System.Security.Claims;
+using FuzzySharp;
 
 namespace BACKEND.Controllers
 {
@@ -51,26 +52,25 @@ namespace BACKEND.Controllers
                             DueDate = job.ApplyDeadline,
                             PostedDate = job.PostDate,
                             UserId = user.Id,
+                            description = job.Description,
+                            requirements = job.Requirements,
+                            interest = job.Interest
                         };
 
-            // Đảm bảo không có bản ghi trùng lặp
-            query = query.Distinct();            // Truy vấn riêng để lấy thông tin gói quảng cáo hiện tại
-            // Xử lý để tránh lỗi khi có nhiều promotion cho cùng một job post
+            query = query.Distinct();
             var promotionsData = await _context.JobPostPromotions
                 .Where(p => p.StartDate <= now && p.EndDate >= now)
                 .Select(p => new { p.JobPostId, p.Package.HighlightType, p.Package.PriorityLevel })
                 .ToListAsync();
-
-            // Group by job post ID and select the promotion with highest priority
             var activePromotions = promotionsData
                 .GroupBy(p => p.JobPostId)
                 .ToDictionary(
                     g => g.Key,
                     g => g.OrderByDescending(p => p.PriorityLevel)
-                         .ThenBy(p => p.HighlightType == "TopMax" ? 0 :
-                                      p.HighlightType == "TopPro" ? 1 : 2)
-                         .First().HighlightType
-                );
+                            .ThenBy(p => p.HighlightType == "TopMax" ? 0 :
+                                        p.HighlightType == "TopPro" ? 1 : 2)
+                            .First().HighlightType
+                    );
 
             // Truy vấn riêng để lấy JobFieldIds
             var jobFieldIds = await _context.JobPostFields
@@ -117,7 +117,10 @@ namespace BACKEND.Controllers
                 JobFieldIds = jobFieldIds.ContainsKey(job.Id) ? jobFieldIds[job.Id] : new List<int>(),
                 EmploymentTypeIds = employmentTypeIds.ContainsKey(job.Id) ? employmentTypeIds[job.Id] : new List<int>(),
                 HighlightType = activePromotions.ContainsKey(job.Id) ? activePromotions[job.Id] : null,
-                EmployerIsPro = proUsers.Contains(job.UserId)
+                EmployerIsPro = proUsers.Contains(job.UserId),
+                job.description,
+                job.requirements,
+                job.interest
             }).ToList();
 
             // Áp dụng các bộ lọc trong bộ nhớ cho tối ưu hóa
@@ -143,6 +146,10 @@ namespace BACKEND.Controllers
                 string keywordLower = keyword.ToLower();
                 filteredJobs = filteredJobs.Where(j =>
                     j.Title.ToLower().Contains(keywordLower) ||
+                    j.description != null && j.description.ToLower().Contains(keywordLower) ||
+                    j.requirements != null && j.requirements.ToLower().Contains(keywordLower) ||
+                    j.interest != null && j.interest.ToLower().Contains(keywordLower) ||
+                    j.Salary != null && j.Salary.ToLower().Contains(keywordLower) ||
                     j.CompanyName.ToLower().Contains(keywordLower) ||
                     (j.Location != null && j.Location.ToLower().Contains(keywordLower))
                 );
@@ -151,26 +158,64 @@ namespace BACKEND.Controllers
             // Lọc theo địa điểm
             if (!string.IsNullOrEmpty(location))
             {
-                filteredJobs = filteredJobs.Where(j => j.Location != null && j.Location.Contains(location));
+                string locationNoDiacritics = RemoveDiacritics(location).ToLower();
+                filteredJobs = filteredJobs.Where(j =>
+                    !string.IsNullOrEmpty(j.Location) &&
+                    Fuzz.Ratio(RemoveDiacritics(j.Location).ToLower(), locationNoDiacritics) > 80 // Ngưỡng 80 có thể điều chỉnh
+                );
             }
 
             // Lọc theo khoảng lương
-            if (!string.IsNullOrEmpty(minSalary) && decimal.TryParse(minSalary, out decimal minSalaryValue))
+            if (!string.IsNullOrEmpty(minSalary) && decimal.TryParse(minSalary, out decimal minSalaryValue)
+                && !string.IsNullOrEmpty(maxSalary) && decimal.TryParse(maxSalary, out decimal maxSalaryValue))
             {
-                filteredJobs = filteredJobs.Where(j => j.Salary != null && (
-                    j.Salary.Contains(minSalaryValue.ToString()) ||
-                    j.Salary.Contains("Thỏa thuận") ||
-                    j.Salary.Contains("Cạnh tranh")
-                ));
+#pragma warning disable CS8629 // Nullable value type may be null.
+                filteredJobs = filteredJobs.Where(j =>
+                    j.Salary != null &&
+                    (
+                        j.Salary.Contains("Thỏa thuận") ||
+                        j.Salary.Contains("Cạnh tranh") ||
+                        (
+                            ParseSalary(j.Salary).min.HasValue &&
+                            ParseSalary(j.Salary).max.HasValue &&
+                            ParseSalary(j.Salary).min.Value >= minSalaryValue &&
+                            ParseSalary(j.Salary).max.Value <= maxSalaryValue
+                        )
+                    )
+                );
+#pragma warning restore CS8629 // Nullable value type may be null.
             }
-
-            if (!string.IsNullOrEmpty(maxSalary) && decimal.TryParse(maxSalary, out decimal maxSalaryValue))
+            else if (!string.IsNullOrEmpty(minSalary) && decimal.TryParse(minSalary, out minSalaryValue))
             {
-                filteredJobs = filteredJobs.Where(j => j.Salary != null && (
-                    j.Salary.Contains(maxSalaryValue.ToString()) ||
-                    j.Salary.Contains("Thỏa thuận") ||
-                    j.Salary.Contains("Cạnh tranh")
-                ));
+#pragma warning disable CS8629 // Nullable value type may be null.
+                filteredJobs = filteredJobs.Where(j =>
+                    j.Salary != null &&
+                    (
+                        j.Salary.Contains("Thỏa thuận") ||
+                        j.Salary.Contains("Cạnh tranh") ||
+                        (
+                            ParseSalary(j.Salary).min.HasValue &&
+                            ParseSalary(j.Salary).min.Value >= minSalaryValue
+                        )
+                    )
+                );
+#pragma warning restore CS8629 // Nullable value type may be null.
+            }
+            else if (!string.IsNullOrEmpty(maxSalary) && decimal.TryParse(maxSalary, out maxSalaryValue))
+            {
+#pragma warning disable CS8629 // Nullable value type may be null.
+                filteredJobs = filteredJobs.Where(j =>
+                    j.Salary != null &&
+                    (
+                        j.Salary.Contains("Thỏa thuận") ||
+                        j.Salary.Contains("Cạnh tranh") ||
+                        (
+                            ParseSalary(j.Salary).max.HasValue &&
+                            ParseSalary(j.Salary).max.Value <= maxSalaryValue
+                        )
+                    )
+                );
+#pragma warning restore CS8629 // Nullable value type may be null.
             }
 
             // Áp dụng sắp xếp với ưu tiên gói quảng cáo và người dùng Pro
@@ -715,6 +760,36 @@ namespace BACKEND.Controllers
                 .ToListAsync();
 
             return Ok(jobs);
+        }
+
+        private (decimal? min, decimal? max) ParseSalary(string salaryStr)
+        {
+            if (string.IsNullOrEmpty(salaryStr)) return (null, null);
+            salaryStr = salaryStr.ToLower().Replace("triệu", "").Replace(" ", "");
+            var parts = salaryStr.Split('-');
+            if (parts.Length == 2 && decimal.TryParse(parts[0], out var min) && decimal.TryParse(parts[1], out var max))
+            {
+                // Nếu muốn tính theo đồng, nhân với 1_000_000
+                return (min * 1_000_000, max * 1_000_000);
+            }
+            return (null, null);
+        }
+
+        public static string RemoveDiacritics(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+            var normalizedString = text.Normalize(System.Text.NormalizationForm.FormD);
+            var stringBuilder = new System.Text.StringBuilder();
+
+            foreach (var c in normalizedString)
+            {
+                var unicodeCategory = System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c);
+                if (unicodeCategory != System.Globalization.UnicodeCategory.NonSpacingMark)
+                {
+                    stringBuilder.Append(c);
+                }
+            }
+            return stringBuilder.ToString().Normalize(System.Text.NormalizationForm.FormC);
         }
     }
 }
