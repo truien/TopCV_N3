@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import { debounce } from 'lodash';
+import * as XLSX from 'xlsx';
 import styles from './AdminJobPostsManager.module.css';
 import {
     getAdminJobPosts,
@@ -151,47 +152,52 @@ const AdminJobPostsManager = () => {
             console.error('Error updating status:', error);
             toast.error('Không thể cập nhật trạng thái');
         }
-    };
-
-    // Export to CSV
-    const exportToCSV = () => {
+    };    // Export to Excel
+    const exportToExcel = () => {
         if (jobPosts.length === 0) {
             toast.warning('Không có dữ liệu để xuất');
             return;
         }
 
-        const headers = [
-            'ID', 'Tiêu đề', 'Công ty', 'Trạng thái', 'Địa điểm',
-            'Mức lương', 'Ngày đăng', 'Hạn ứng tuyển', 'Lượt xem', 'Số ứng viên'
+        const exportData = jobPosts.map(post => ({
+            'ID': post.id,
+            'Tiêu đề': post.title,
+            'Công ty': post.companyName,
+            'Trạng thái': post.status,
+            'Địa điểm': post.location,
+            'Mức lương': post.salaryRange || 'Không có',
+            'Ngày đăng': new Date(post.postDate).toLocaleDateString('vi-VN'),
+            'Hạn ứng tuyển': post.applyDeadline ? new Date(post.applyDeadline).toLocaleDateString('vi-VN') : 'Không có',
+            'Lượt xem': post.viewCount || 0,
+            'Số ứng viên': post.applicationCount || 0
+        }));
+
+        const worksheet = XLSX.utils.json_to_sheet(exportData);
+        const workbook = XLSX.utils.book_new();
+
+        // Set column widths
+        const colWidths = [
+            { wch: 8 },   // ID
+            { wch: 30 },  // Tiêu đề
+            { wch: 20 },  // Công ty
+            { wch: 12 },  // Trạng thái
+            { wch: 15 },  // Địa điểm
+            { wch: 15 },  // Mức lương
+            { wch: 12 },  // Ngày đăng
+            { wch: 15 },  // Hạn ứng tuyển
+            { wch: 10 },  // Lượt xem
+            { wch: 12 }   // Số ứng viên
         ];
+        worksheet['!cols'] = colWidths;
 
-        const csvData = jobPosts.map(post => [
-            post.id,
-            post.title,
-            post.companyName,
-            post.status,
-            post.location,
-            post.salaryRange || 'Không có',
-            new Date(post.postDate).toLocaleDateString('vi-VN'),
-            post.applyDeadline ? new Date(post.applyDeadline).toLocaleDateString('vi-VN') : 'Không có',
-            post.viewCount || 0,
-            post.applicationCount || 0
-        ]);
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Bài viết tuyển dụng');
 
-        const csvContent = [headers, ...csvData]
-            .map(row => row.map(cell => `"${cell}"`).join(','))
-            .join('\n');
+        const fileName = `bai_viet_tuyen_dung_${new Date().toISOString().split('T')[0]}.xlsx`;
+        XLSX.writeFile(workbook, fileName);
 
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
-        link.setAttribute('href', url);
-        link.setAttribute('download', `job_posts_${new Date().toISOString().split('T')[0]}.csv`);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }; const getStatusBadgeClass = (status) => {
+        toast.success('Đã xuất file Excel thành công!');
+    };
+    const getStatusBadgeClass = (status) => {
         switch (status) {
             case 'open': return styles.statusOpen;
             case 'closed': return styles.statusClosed;
@@ -227,14 +233,13 @@ const AdminJobPostsManager = () => {
                     <div>
                         <h1 className={styles.title}>Quản lý bài viết tuyển dụng</h1>
                         <p className={styles.subtitle}>Quản lý, theo dõi và điều chỉnh các bài đăng tuyển dụng</p>
-                    </div>
-                    <button
+                    </div>                    <button
                         className={styles.exportButton}
-                        onClick={exportToCSV}
+                        onClick={exportToExcel}
                         disabled={jobPosts.length === 0}
                     >
-                        <i className="fas fa-download me-2"></i>
-                        Xuất CSV
+                        <i className="fas fa-file-excel me-2"></i>
+                        Xuất Excel
                     </button>
                 </div>
             </div>            {/* Statistics Cards */}
@@ -405,7 +410,7 @@ const AdminJobPostsManager = () => {
                             </tbody>
                         </table>
                     </div>
-                </div>                   
+                </div>
                 {totalPages > 1 && (
                     <div className={styles.pagination}>
                         <div className="d-flex justify-content-between align-items-center">

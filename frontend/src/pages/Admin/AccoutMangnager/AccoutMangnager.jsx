@@ -10,13 +10,14 @@ import {
     MdEdit,
     MdVisibility,
     MdFilterList,
-    MdFileDownload,
     MdRefresh,
     MdFirstPage,
     MdLastPage,
     MdChevronLeft,
     MdChevronRight
 } from "react-icons/md";
+import { FaFileExcel } from "react-icons/fa";
+import * as XLSX from 'xlsx';
 import { toast } from "react-toastify";
 import debounce from 'lodash.debounce';
 import styles from "./AccountManager.module.css";
@@ -121,16 +122,13 @@ function AccountManager() {
         }
 
         return errors;
-    };
-
-    // Export functionality
+    };    // Export functionality
     const exportUsers = async () => {
         setIsExporting(true);
         try {
             const allUsers = await getAllUsers(1, "", 1000);
-            const csvContent = generateCSV(allUsers.users);
-            downloadCSV(csvContent, 'users_export.csv');
-            toast.success("Xuất dữ liệu thành công!");
+            exportToExcel(allUsers.users);
+            toast.success("Xuất file Excel thành công!");
         } catch {
             toast.error("Lỗi khi xuất dữ liệu");
         } finally {
@@ -138,35 +136,54 @@ function AccountManager() {
         }
     };
 
-    const generateCSV = (data) => {
-        const headers = ['ID', 'Tên người dùng', 'Email', 'Vai trò', 'Ngày tạo'];
-        const rows = data.map(user => [
-            user.id,
-            user.username,
-            user.email,
-            user.role,
-            new Date(user.createdAt).toLocaleDateString('vi-VN')
-        ]);
-
-        const csvContent = [headers, ...rows]
-            .map(row => row.map(field => `"${field}"`).join(','))
-            .join('\n');
-
-        return csvContent;
-    };
-
-    const downloadCSV = (content, filename) => {
-        const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        if (link.download !== undefined) {
-            const url = URL.createObjectURL(blob);
-            link.setAttribute('href', url);
-            link.setAttribute('download', filename);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+    const exportToExcel = (data) => {
+        if (data.length === 0) {
+            toast.warning('Không có dữ liệu để xuất');
+            return;
         }
+
+        const exportData = data.map(user => ({
+            'ID': user.id,
+            'Tên người dùng': user.username,
+            'Email': user.email,
+            'Vai trò': user.role,
+            'Ngày tạo': new Date(user.createdAt).toLocaleDateString('vi-VN'),
+            'Trạng thái': user.isActive !== false ? 'Hoạt động' : 'Không hoạt động'
+        }));
+
+        // Thêm thống kê tổng quan
+        const summaryData = [
+            { 'Loại thống kê': 'Tổng số người dùng', 'Giá trị': stats?.totalUsers || 0 },
+            { 'Loại thống kê': 'Người dùng hoạt động', 'Giá trị': stats?.activeUsers || 0 },
+            { 'Loại thống kê': 'Admin', 'Giá trị': stats?.adminUsers || 0 },
+            { 'Loại thống kê': 'Người dùng thường', 'Giá trị': stats?.regularUsers || 0 },
+            { 'Loại thống kê': 'Đang hiển thị', 'Giá trị': data.length }
+        ];
+
+        const workbook = XLSX.utils.book_new();
+
+        // Tạo sheet thống kê tổng quan
+        const summarySheet = XLSX.utils.json_to_sheet(summaryData);
+        summarySheet['!cols'] = [
+            { wch: 25 }, // Loại thống kê
+            { wch: 15 }  // Giá trị
+        ];
+        XLSX.utils.book_append_sheet(workbook, summarySheet, 'Thống kê');
+
+        // Tạo sheet chi tiết người dùng
+        const detailSheet = XLSX.utils.json_to_sheet(exportData);
+        detailSheet['!cols'] = [
+            { wch: 8 },  // ID
+            { wch: 20 }, // Tên người dùng
+            { wch: 25 }, // Email
+            { wch: 15 }, // Vai trò
+            { wch: 15 }, // Ngày tạo
+            { wch: 15 }  // Trạng thái
+        ];
+        XLSX.utils.book_append_sheet(workbook, detailSheet, 'Danh sách người dùng');
+
+        const fileName = `nguoi_dung_${new Date().toISOString().split('T')[0]}.xlsx`;
+        XLSX.writeFile(workbook, fileName);
     }; const refreshData = async () => {
         setLoadingRefresh(true);
         try {
@@ -321,15 +338,13 @@ function AccountManager() {
                         >
                             <MdFilterList />
                             Lọc
-                        </button>
-
-                        <button
+                        </button>                        <button
                             className={styles.exportButton}
                             onClick={exportUsers}
                             disabled={isExporting}
-                            title="Xuất dữ liệu"
+                            title="Xuất file Excel"
                         >
-                            <MdFileDownload />
+                            <FaFileExcel />
                             {isExporting ? "Đang xuất..." : "Xuất Excel"}
                         </button>
 

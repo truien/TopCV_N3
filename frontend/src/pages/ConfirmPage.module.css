@@ -1,0 +1,261 @@
+/* ConfirmPage.module.css */
+.confirmPage {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.confirmContainer {
+    width: 100%;
+    max-width: 500px;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease-out;
+}
+
+.confirmContainer.loaded {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.confirmCard {
+    background: white;
+    border-radius: 20px;
+    padding: 40px 30px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: slideInUp 0.6s ease-out;
+}
+
+.confirmCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+}
+
+.confirmCard::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #28a745, #20c997);
+}
+
+.confirmCard.success::before {
+    background: linear-gradient(90deg, #28a745, #20c997);
+}
+
+.confirmCard.declined::before {
+    background: linear-gradient(90deg, #dc3545, #fd7e14);
+}
+
+.confirmCard.error::before {
+    background: linear-gradient(90deg, #ffc107, #fd7e14);
+}
+
+.iconContainer {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin: 0 auto 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: iconPulse 2s infinite;
+}
+
+.iconContainer.success {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+}
+
+.iconContainer.declined {
+    background: linear-gradient(135deg, #dc3545, #fd7e14);
+    color: white;
+}
+
+.iconContainer.error {
+    background: linear-gradient(135deg, #ffc107, #fd7e14);
+    color: white;
+}
+
+@keyframes iconPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.checkIcon,
+.xIcon,
+.warningIcon {
+    width: 40px;
+    height: 40px;
+    stroke-width: 3px;
+}
+
+.confirmTitle {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    line-height: 1.2;
+}
+
+.confirmMessage {
+    font-size: 16px;
+    color: #6c757d;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.confirmInfo {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 25px 0;
+    text-align: left;
+}
+
+.confirmInfo p {
+    margin: 8px 0;
+    color: #495057;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.btn {
+    display: inline-block;
+    padding: 12px 30px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    margin: 5px;
+}
+
+.btnPrimary {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+}
+
+.btnPrimary:hover {
+    background: linear-gradient(135deg, #0056b3, #004085);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3);
+}
+
+.btnSecondary {
+    background: linear-gradient(135deg, #6c757d, #5a6268);
+    color: white;
+}
+
+.btnSecondary:hover {
+    background: linear-gradient(135deg, #5a6268, #495057);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(108, 117, 125, 0.3);
+}
+
+.buttonGroup {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 25px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .confirmPage {
+        padding: 15px;
+    }
+
+    .confirmCard {
+        padding: 30px 20px;
+    }
+
+    .confirmTitle {
+        font-size: 24px;
+    }
+
+    .confirmMessage {
+        font-size: 15px;
+    }
+
+    .iconContainer {
+        width: 70px;
+        height: 70px;
+    }
+
+    .checkIcon,
+    .xIcon,
+    .warningIcon {
+        width: 35px;
+        height: 35px;
+    }
+
+    .buttonGroup {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .btn {
+        width: 100%;
+        max-width: 250px;
+    }
+}
+
+@media (max-width: 480px) {
+    .confirmCard {
+        padding: 25px 15px;
+        border-radius: 15px;
+    }
+
+    .confirmTitle {
+        font-size: 22px;
+    }
+
+    .confirmMessage {
+        font-size: 14px;
+    }
+}
+
+/* Animation for smooth entrance */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Loading state */
+.confirmContainer:not(.loaded) {
+    opacity: 0;
+    transform: translateY(30px);
+}

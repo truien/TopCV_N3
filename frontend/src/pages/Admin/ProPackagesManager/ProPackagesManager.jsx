@@ -14,10 +14,11 @@ import {
     FaClock,
     FaEye,
     FaFilter,
-    FaDownload,
+    FaFileExcel,
     FaSync,
     FaUpload
 } from "react-icons/fa";
+import * as XLSX from 'xlsx';
 import { toast } from "react-toastify";
 import { getAllProPackages, createProPackage, updateProPackage, deleteProPackage, getProPackageStatistics, importProPackages } from "@/api/packagesApi";
 
@@ -232,32 +233,55 @@ function ProPackagesManager() {
     const currentItems = filteredPackages.slice(indexOfFirstItem, indexOfLastItem);
     const totalPages = Math.ceil(filteredPackages.length / itemsPerPage);
 
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);    // Export to Excel
+    const exportToExcel = () => {
+        if (filteredPackages.length === 0) {
+            toast.warning('Không có dữ liệu để xuất');
+            return;
+        }
 
-    // Export to CSV
-    const exportToCSV = () => {
-        const headers = ['ID', 'Tên gói', 'Mô tả', 'Giá (VND)', 'Thời gian (ngày)'];
-        const csvContent = [
-            headers.join(','),
-            ...filteredPackages.map(pkg => [
-                pkg.id,
-                `"${pkg.name}"`,
-                `"${pkg.description || ''}"`,
-                pkg.price,
-                pkg.durationDays,
-            ].join(','))
-        ].join('\n');
+        const exportData = filteredPackages.map(pkg => ({
+            'ID': pkg.id,
+            'Tên gói': pkg.name,
+            'Mô tả': pkg.description || 'Không có mô tả',
+            'Giá (VND)': pkg.price,
+            'Thời gian (ngày)': pkg.durationDays
+        }));
 
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
-        link.setAttribute('href', url);
-        link.setAttribute('download', `pro_packages_${new Date().toISOString().split('T')[0]}.csv`);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        toast.success('Đã xuất file CSV thành công!');
+        // Thêm thống kê tổng quan
+        const summaryData = [
+            { 'Loại thống kê': 'Tổng số gói', 'Giá trị': packages.length },
+            { 'Loại thống kê': 'Đang hiển thị', 'Giá trị': filteredPackages.length },
+            { 'Loại thống kê': 'Tổng gói đã bán', 'Giá trị': statistics?.reduce((sum, stat) => sum + stat.totalSubscriptions, 0) || 0 },
+            { 'Loại thống kê': 'Gói còn hiệu lực', 'Giá trị': statistics?.reduce((sum, stat) => sum + stat.activeSubscriptions, 0) || 0 },
+            { 'Loại thống kê': 'Tổng doanh thu', 'Giá trị': statistics?.reduce((sum, stat) => sum + stat.totalRevenue, 0) || 0 }
+        ];
+
+        const workbook = XLSX.utils.book_new();
+
+        // Tạo sheet thống kê tổng quan
+        const summarySheet = XLSX.utils.json_to_sheet(summaryData);
+        summarySheet['!cols'] = [
+            { wch: 20 }, // Loại thống kê
+            { wch: 15 }  // Giá trị
+        ];
+        XLSX.utils.book_append_sheet(workbook, summarySheet, 'Thống kê');
+
+        // Tạo sheet chi tiết gói
+        const detailSheet = XLSX.utils.json_to_sheet(exportData);
+        detailSheet['!cols'] = [
+            { wch: 8 },  // ID
+            { wch: 20 }, // Tên gói
+            { wch: 30 }, // Mô tả
+            { wch: 12 }, // Giá
+            { wch: 15 }  // Thời gian
+        ];
+        XLSX.utils.book_append_sheet(workbook, detailSheet, 'Danh sách gói Pro');
+
+        const fileName = `goi_pro_${new Date().toISOString().split('T')[0]}.xlsx`;
+        XLSX.writeFile(workbook, fileName);
+
+        toast.success('Đã xuất file Excel thành công!');
     };
 
     const refreshData = async () => {
@@ -357,26 +381,24 @@ function ProPackagesManager() {
                             title="Làm mới dữ liệu"
                         >
                             <FaSync />
-                        </button>
-                        <button
-                            onClick={exportToCSV}
+                        </button>                        <button
+                            onClick={exportToExcel}
                             className={styles.exportBtn}
-                            title="Xuất file CSV"
+                            title="Xuất file Excel"
                         >
-                            <FaDownload />
+                            <FaFileExcel /> Xuất Excel
                         </button>
                         <button
                             onClick={() => openModal()}
                             className={styles.addBtn}
                         >
                             <FaPlus /> Thêm gói mới
-                        </button>
-                        <button
+                        </button>                        <button
                             onClick={handleImportClick}
                             className={styles.importBtn}
                             title="Nhập từ file"
                         >
-                            {importLoading ? <FaSync className={styles.loadingIcon} /> : <FaDownload />} Nhập từ file
+                            {importLoading ? <FaSync className={styles.loadingIcon} /> : <FaUpload />} Nhập từ file
                         </button>
                         <input
                             type="file"

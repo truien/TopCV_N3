@@ -14,9 +14,10 @@ import {
     FaClock,
     FaEye,
     FaFilter,
-    FaDownload,
+    FaFileExcel,
     FaSync
 } from "react-icons/fa";
+import * as XLSX from 'xlsx';
 import {
     getAllPackages,
     getPackageStatistics,
@@ -194,35 +195,60 @@ function PackagesManager() {
     const currentItems = filteredPackages.slice(indexOfFirstItem, indexOfLastItem);
     const totalPages = Math.ceil(filteredPackages.length / itemsPerPage);
 
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);    // Export to Excel
+    const exportToExcel = () => {
+        if (filteredPackages.length === 0) {
+            toast.warning('Không có dữ liệu để xuất');
+            return;
+        }
 
-    // Export to CSV
-    const exportToCSV = () => {
-        const headers = ['ID', 'Tên gói', 'Mô tả', 'Giá (VND)', 'Thời gian (ngày)', 'Loại highlight', 'Mức ưu tiên', 'Auto Boost'];
-        const csvContent = [
-            headers.join(','),
-            ...filteredPackages.map(pkg => [
-                pkg.id,
-                `"${pkg.name}"`,
-                `"${pkg.description || ''}"`,
-                pkg.price,
-                pkg.durationDays,
-                `"${pkg.highlightType || ''}"`,
-                pkg.priorityLevel || '',
-                pkg.autoBoostDaily ? 'Có' : 'Không'
-            ].join(','))
-        ].join('\n');
+        const exportData = filteredPackages.map(pkg => ({
+            'ID': pkg.id,
+            'Tên gói': pkg.name,
+            'Mô tả': pkg.description || 'Không có mô tả',
+            'Giá (VND)': pkg.price,
+            'Thời gian (ngày)': pkg.durationDays,
+            'Loại highlight': pkg.highlightType || 'Không có',
+            'Mức ưu tiên': pkg.priorityLevel || 'Không có',
+            'Auto Boost': pkg.autoBoostDaily ? 'Có' : 'Không'
+        }));
 
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
-        link.setAttribute('href', url);
-        link.setAttribute('download', `packages_${new Date().toISOString().split('T')[0]}.csv`);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        toast.success('Đã xuất file CSV thành công!');
+        // Thêm thống kê tổng quan
+        const summaryData = [
+            { 'Loại thống kê': 'Tổng số gói', 'Giá trị': packages.length },
+            { 'Loại thống kê': 'Đang hiển thị', 'Giá trị': filteredPackages.length },
+            { 'Loại thống kê': 'Tổng gói đã bán', 'Giá trị': statistics?.totalSold || 0 },
+            { 'Loại thống kê': 'Gói còn hiệu lực', 'Giá trị': statistics?.activeSubscriptions || 0 }
+        ];
+
+        const workbook = XLSX.utils.book_new();
+
+        // Tạo sheet thống kê tổng quan
+        const summarySheet = XLSX.utils.json_to_sheet(summaryData);
+        summarySheet['!cols'] = [
+            { wch: 20 }, // Loại thống kê
+            { wch: 15 }  // Giá trị
+        ];
+        XLSX.utils.book_append_sheet(workbook, summarySheet, 'Thống kê');
+
+        // Tạo sheet chi tiết gói
+        const detailSheet = XLSX.utils.json_to_sheet(exportData);
+        detailSheet['!cols'] = [
+            { wch: 8 },  // ID
+            { wch: 20 }, // Tên gói
+            { wch: 30 }, // Mô tả
+            { wch: 12 }, // Giá
+            { wch: 15 }, // Thời gian
+            { wch: 15 }, // Loại highlight
+            { wch: 12 }, // Mức ưu tiên
+            { wch: 12 }  // Auto Boost
+        ];
+        XLSX.utils.book_append_sheet(workbook, detailSheet, 'Danh sách gói');
+
+        const fileName = `goi_dich_vu_${new Date().toISOString().split('T')[0]}.xlsx`;
+        XLSX.writeFile(workbook, fileName);
+
+        toast.success('Đã xuất file Excel thành công!');
     };
 
     // Refresh data
@@ -241,14 +267,14 @@ function PackagesManager() {
                 {statistics ? (
                     <div className={styles.statGrid}>
                         <div className={styles.statBox}>
-                        <div className={styles.statIcon}>
-                            <FaBox />
+                            <div className={styles.statIcon}>
+                                <FaBox />
+                            </div>
+                            <div className={styles.statContent}>
+                                <h4>{statistics.totalSold}</h4>
+                                <span>Tổng gói đã bán</span>
+                            </div>
                         </div>
-                        <div className={styles.statContent}>
-                            <h4>{statistics.totalSold}</h4>
-                            <span>Tổng gói đã bán</span>
-                        </div>
-                    </div>
                         <div className={styles.statBox}>
                             <div className={styles.statIcon}>
                                 <FaClock />
@@ -313,13 +339,12 @@ function PackagesManager() {
                             title="Làm mới dữ liệu"
                         >
                             <FaSync />
-                        </button>
-                        <button
-                            onClick={exportToCSV}
+                        </button>                        <button
+                            onClick={exportToExcel}
                             className={styles.exportBtn}
-                            title="Xuất file CSV"
+                            title="Xuất file Excel"
                         >
-                            <FaDownload />
+                            <FaFileExcel /> Xuất Excel
                         </button>
                         <button
                             onClick={() => openModal()}
@@ -341,10 +366,10 @@ function PackagesManager() {
                 {/* Package Table */}
                 <div className={styles.card}>
                     <div className={styles.cardHeader}>
-                    <div className={styles.cardTitle}>
-                        <FaBox /> Danh sách Gói Bài Viết
+                        <div className={styles.cardTitle}>
+                            <FaBox /> Danh sách Gói Bài Viết
+                        </div>
                     </div>
-                </div>
 
                     {loading ? (
                         <div className={styles.loadingContainer}>
