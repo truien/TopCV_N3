@@ -161,3 +161,7 @@ C:\Users\ADMIN\TopCV_N3\BACKEND\obj\Debug\net8.0\BACKEND.pdb
 C:\Users\ADMIN\TopCV_N3\BACKEND\obj\Debug\net8.0\BACKEND.genruntimeconfig.cache
 C:\Users\ADMIN\TopCV_N3\BACKEND\obj\Debug\net8.0\ref\BACKEND.dll
 C:\Users\ADMIN\TopCV_N3\BACKEND\bin\Debug\net8.0\FuzzySharp.dll
+C:\Users\ADMIN\TopCV_N3\BACKEND\bin\Debug\net8.0\ExcelDataReader.dll
+C:\Users\ADMIN\TopCV_N3\BACKEND\bin\Debug\net8.0\ExcelDataReader.DataSet.dll
+C:\Users\ADMIN\TopCV_N3\BACKEND\bin\Debug\net8.0\System.Text.Encoding.CodePages.dll
+C:\Users\ADMIN\TopCV_N3\BACKEND\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Text.Encoding.CodePages.dll

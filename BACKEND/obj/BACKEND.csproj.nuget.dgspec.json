@@ -51,6 +51,14 @@
               "target": "Package",
               "version": "[3.1.1, )"
             },
+            "ExcelDataReader": {
+              "target": "Package",
+              "version": "[3.7.0, )"
+            },
+            "ExcelDataReader.DataSet": {
+              "target": "Package",
+              "version": "[3.7.0, )"
+            },
             "FuzzySharp": {
               "target": "Package",
               "version": "[2.0.2, )"
@@ -100,6 +108,10 @@
             "System.IdentityModel.Tokens.Jwt": {
               "target": "Package",
               "version": "[8.6.1, )"
+            },
+            "System.Text.Encoding.CodePages": {
+              "target": "Package",
+              "version": "[9.0.5, )"
             },
             "VNPAY.NET": {
               "target": "Package",

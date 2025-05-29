@@ -257,10 +257,9 @@ public partial class TopcvBeContext : DbContext
                 .HasColumnName("requirements");
             entity.Property(e => e.SalaryRange)
                 .HasMaxLength(50)
-                .HasColumnName("salary_range");
-            entity.Property(e => e.Status)
+                .HasColumnName("salary_range"); entity.Property(e => e.Status)
                 .HasDefaultValueSql("'open'")
-                .HasColumnType("enum('open','closed')")
+                .HasColumnType("enum('open','closed','pending','suspended')")
                 .HasColumnName("status");
             entity.Property(e => e.Title)
                 .HasMaxLength(100)

@@ -6,6 +6,9 @@ import AccountMangnager from "../pages/Admin/AccoutMangnager/AccoutMangnager.jsx
 import ForgotPassword from "../components/ForgotPassword/ForgotPassword.jsx"
 import ResetPassword from "../components/ResetPassword/ResetPassword.jsx"
 import PackagesManager from "../pages/Admin/PackagesManager/PackagesManager.jsx";
+import ProPackagesManager from "../pages/Admin/ProPackagesManager/ProPackagesManager.jsx";
+import AdminJobPostsManager from "../pages/Admin/AdminJobPostsManager/AdminJobPostsManager.jsx";
+import RevenueManager from "../pages/Admin/RevenueManager/RevenueManager.jsx";
 import NotFoundPage from "../components/NotFoundPage/NotFoundPage.jsx";
 import MainLayout from "../layouts/MainLayoutts.jsx";
 import HomePage from "../pages/Main/Home/Home.jsx";
@@ -24,10 +27,12 @@ function AppRoutes() {
             <Routes>
                 <Route path="/" element={<MainLayout />}>
                     <Route index element={<HomePage />} />
-                </Route>
-                <Route path='/admin' element={<AdminLayout />}>
+                </Route>                <Route path='/admin' element={<AdminLayout />}>
                     <Route index element={<AccountMangnager />} />
                     <Route path='job-post-pakage' element={<PackagesManager />} />
+                    <Route path='job-posts' element={<AdminJobPostsManager />} />
+                    <Route path='pro-packages' element={<ProPackagesManager />} />
+                    <Route path='revenue' element={<RevenueManager />} />
                 </Route>
                 <Route path='/employer' element={<EmployerLayouts />}>
                     <Route index element={< JobPostManager />} />

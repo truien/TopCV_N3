@@ -57,37 +57,47 @@ const AdminHeaderSidebar = () => {
                         <span className="link-text fw-bolder">Quản lý tài khoản</span>
                     </Link>
                     <Link
+                        to="/admin/job-posts"
+                        className={`nav-link ${activeLink === '/admin/job-posts' ? 'active' : ''}`}
+                        onClick={() => handleLinkClick('/admin/job-posts')}
+                    >
+                        <FaBriefcase className="icon" />
+                        <span className="link-text fw-bolder">Quản lý bài viết</span>
+                    </Link>
+                    <Link
                         to="/admin/job-post-pakage"
                         className={`nav-link ${activeLink === '/admin/job-post-pakage' ? 'active' : ''}`}
                         onClick={() => handleLinkClick('/admin/job-post-pakage')}
                     >
                         <FaBriefcase className="icon" />
                         <span className="link-text fw-bolder">Quản lý gói bài viết</span>
-                    </Link>
-                    <Link
-                        to="/admin/company-pakage"
-                        className={`nav-link ${activeLink === '/admin/company-pakage' ? 'active' : ''}`}
-                        onClick={() => handleLinkClick('/admin/company-pakage')}
+                    </Link>                    <Link
+                        to="/admin/pro-packages"
+                        className={`nav-link ${activeLink === '/admin/pro-packages' ? 'active' : ''}`}
+                        onClick={() => handleLinkClick('/admin/pro-packages')}
                     >
                         <FaBriefcase className="icon" />
-                        <span className="link-text fw-bolder">Quản lý gói công ty</span>
+                        <span className="link-text fw-bolder">Quản lý gói Pro</span>
                     </Link>
                     <Link
-                        to="/admin/managecatery"
-                        className="nav-link"
-                        onClick={() => handleLinkClick('/admin/managecatery')}
+                        to="/admin/revenue"
+                        className={`nav-link ${activeLink === '/admin/revenue' ? 'active' : ''}`}
+                        onClick={() => handleLinkClick('/admin/revenue')}
                     >
-                        <FaBriefcase className="icon" />
-                        <span className="link-text fw-bolder">Quản lý danh mục</span>
+                        <FaMoneyBillWave className="icon" />
+                        <span className="link-text fw-bolder">Quản lý doanh thu</span>
                     </Link>
-                    
                     <Link
-                        to="/"
-                        className="nav-link"
-                        onClick={() => handleLinkClick('/')}
+                        to="/settings"
+                        className={`nav-link ${activeLink === '/settings' ? 'active' : ''}`}
+                        onClick={() => handleLinkClick('/settings')}
                     >
+                        <FaCog className="icon" />
+                        <span className="link-text fw-bolder">Cài đặt</span>
+                    </Link>
+                    <Link to="/" className="nav-link">
                         <FaHome className="icon" />
-                        <span className="link-text fw-bolder">Xem bảng tin</span>
+                        <span className="link-text fw-bolder">Về trang chủ</span>
                     </Link>
                 </nav>
             </aside>
