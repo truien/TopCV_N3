@@ -14,6 +14,7 @@ import { format } from 'date-fns';
 import { Form, DatePicker } from 'antd';
 import { getRevenueSummary, getRevenueChartData, getRevenueDetails } from '../../../api/revenueApi';
 import styles from './RevenueManager.module.css';
+import dayjs from 'dayjs';
 
 // Register ChartJS components
 ChartJS.register(
@@ -35,7 +36,11 @@ const RevenueManager = () => {
     const [chartData, setChartData] = useState(null);
     const [selectedPeriod, setSelectedPeriod] = useState('monthly');
     const [orderDetails, setOrderDetails] = useState([]);
-    const [dateRange, setDateRange] = useState([null, null]);
+    const [dateRange, setDateRange] = useState([
+        dayjs().subtract(1, 'month'),
+        dayjs()
+    ]);
+
     const [loading, setLoading] = useState({
         summary: true,
         chart: true,
@@ -88,12 +93,19 @@ const RevenueManager = () => {
             const fetchDetails = async () => {
                 setLoading(prev => ({ ...prev, details: true }));
                 try {
-                    const startDate = format(dateRange[0], 'yyyy-MM-dd');
-                    const endDate = format(dateRange[1], 'yyyy-MM-dd');
-                    const data = await getRevenueDetails(startDate, endDate);
+                    // Ensure we have valid Date objects
+                    const startDate = dateRange[0].toDate();
+                    const endDate = dateRange[1].toDate();
+
+                    // Format dates using date-fns
+                    const formattedStartDate = format(startDate, 'yyyy-MM-dd');
+                    const formattedEndDate = format(endDate, 'yyyy-MM-dd');
+
+                    const data = await getRevenueDetails(formattedStartDate, formattedEndDate);
                     setOrderDetails(data);
                 } catch (error) {
                     console.error('Error fetching order details:', error);
+                    setOrderDetails([]); // Reset order details on error
                 } finally {
                     setLoading(prev => ({ ...prev, details: false }));
                 }
@@ -201,15 +213,14 @@ const RevenueManager = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {orderDetails.map(order => (
-                                <tr key={order.id}>
-                                    <td>{order.orderCode}</td>
-                                    <td>{format(new Date(order.createdDate), 'dd/MM/yyyy HH:mm')}</td>
-                                    <td>{order.customerName}</td>
-                                    <td>{order.packageName}</td>
-                                    <td>{formatCurrency(order.amount)}</td>
-                                    <td>{order.status}</td>
-                                </tr>
+                            {orderDetails.map(order => (<tr key={order.id}>
+                                <td>{order.orderCode}</td>
+                                <td>{format(new Date(order.createdAt), 'dd/MM/yyyy HH:mm')}</td>
+                                <td>{order.customerName}</td>
+                                <td>{order.packageName}</td>
+                                <td>{formatCurrency(order.amount)}</td>
+                                <td>{order.status}</td>
+                            </tr>
                             ))}
                         </tbody>
                     </table>

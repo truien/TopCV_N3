@@ -57,7 +57,7 @@ public class InterviewController : ControllerBase
         await _context.SaveChangesAsync();
 
         // Lấy URL API từ config
-        var apiBase = _config["BackEndApiUrl"];  // ví dụ "https://api.yoursite.com"
+        var apiBase = _config["BackEndApiUrl"];  
 
         // Tạo link đến API confirm
         var acceptLink = $"{apiBase}/api/interview/confirm/{token}/accepted";

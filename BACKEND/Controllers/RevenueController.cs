@@ -10,7 +10,6 @@ namespace BACKEND.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "admin")]
     public class RevenueController : ControllerBase
     {
         private readonly TopcvBeContext _context;
@@ -45,7 +44,7 @@ namespace BACKEND.Controllers
         {
             _context = context;
         }
-
+        [Authorize(Roles = "admin")]
         [HttpGet("summary")]
         public async Task<ActionResult<RevenueSummaryDto>> GetRevenueSummary()
         {
@@ -73,80 +72,106 @@ namespace BACKEND.Controllers
 
             return Ok(summary);
         }
-
+        [Authorize(Roles = "admin")]
         [HttpGet("chart-data")]
         public async Task<ActionResult<RevenueChartDataDto>> GetRevenueChartData([FromQuery] string period = "monthly")
         {
             var today = DateTime.Today;
 
-            switch (period.ToLower())
+            if (period.Equals("daily", StringComparison.OrdinalIgnoreCase))
             {
-                case "daily":
-                    var last30Days = Enumerable.Range(0, 30)
-                        .Select(i => today.AddDays(-i))
-                        .Reverse()
-                        .ToList();
+                var last30Days = Enumerable.Range(0, 30)
+                    .Select(i => today.AddDays(-i))
+                    .Reverse()
+                    .ToList();
 
-                    var dailyData = await Task.WhenAll(last30Days.Select(async date =>
-                        await _context.Orders
-                            .Where(o => o.CreatedAt.HasValue && o.CreatedAt.Value.Date == date)
-                            .SumAsync(o => o.Amount)));
+                var dailyData = new List<decimal>();
 
-                    return Ok(new RevenueChartDataDto
-                    {
-                        Labels = last30Days.Select(d => d.ToString("dd/MM")).ToArray(),
-                        Values = dailyData
-                    });
+                foreach (var date in last30Days)
+                {
+                    var sum = await _context.Orders
+                        .Where(o => o.CreatedAt.HasValue && o.CreatedAt.Value.Date == date
+                        && o.Status == "paid")
+                        .SumAsync(o => o.Amount);
 
-                case "monthly":
-                    var last12Months = Enumerable.Range(0, 12)
-                        .Select(i => today.AddMonths(-i))
-                        .Reverse()
-                        .ToList();
+                    dailyData.Add(sum);
+                }
 
-                    var monthlyData = await Task.WhenAll(last12Months.Select(async date =>
-                        await _context.Orders
-                            .Where(o => o.CreatedAt.HasValue &&
-                                   o.CreatedAt.Value.Year == date.Year &&
-                                   o.CreatedAt.Value.Month == date.Month)
-                            .SumAsync(o => o.Amount)));
-
-                    return Ok(new RevenueChartDataDto
-                    {
-                        Labels = last12Months.Select(d => d.ToString("MM/yyyy")).ToArray(),
-                        Values = monthlyData
-                    });
-
-                case "yearly":
-                    var last5Years = Enumerable.Range(0, 5)
-                        .Select(i => today.AddYears(-i))
-                        .Reverse()
-                        .ToList();
-
-                    var yearlyData = await Task.WhenAll(last5Years.Select(async date =>
-                        await _context.Orders
-                            .Where(o => o.CreatedAt.HasValue && o.CreatedAt.Value.Year == date.Year)
-                            .SumAsync(o => o.Amount)));
-
-                    return Ok(new RevenueChartDataDto
-                    {
-                        Labels = last5Years.Select(d => d.Year.ToString()).ToArray(),
-                        Values = yearlyData
-                    });
-
-                default:
-                    return BadRequest("Invalid period specified. Use 'daily', 'monthly', or 'yearly'.");
+                return Ok(new RevenueChartDataDto
+                {
+                    Labels = last30Days.Select(d => d.ToString("dd/MM")).ToArray(),
+                    Values = dailyData.ToArray()
+                });
             }
+
+            if (period.Equals("monthly", StringComparison.OrdinalIgnoreCase))
+            {
+                var last12Months = Enumerable.Range(0, 12)
+                    .Select(i => today.AddMonths(-i))
+                    .Reverse()
+                    .ToList();
+
+                var monthlyData = new List<decimal>();
+
+                foreach (var date in last12Months)
+                {
+                    var sum = await _context.Orders
+                        .Where(o => o.CreatedAt.HasValue &&
+                                    o.CreatedAt.Value.Year == date.Year &&
+                                    o.CreatedAt.Value.Month == date.Month
+                                    && o.Status == "paid")
+                        .SumAsync(o => o.Amount);
+
+                    monthlyData.Add(sum);
+                }
+
+                return Ok(new RevenueChartDataDto
+                {
+                    Labels = last12Months.Select(d => d.ToString("MM/yyyy")).ToArray(),
+                    Values = monthlyData.ToArray()
+                });
+            }
+
+            if (period.Equals("yearly", StringComparison.OrdinalIgnoreCase))
+            {
+                var last5Years = Enumerable.Range(0, 5)
+                    .Select(i => today.AddYears(-i))
+                    .Reverse()
+                    .ToList();
+
+                var yearlyData = new List<decimal>();
+
+                foreach (var date in last5Years)
+                {
+                    var sum = await _context.Orders
+                        .Where(o => o.CreatedAt.HasValue && o.CreatedAt.Value.Year == date.Year
+                                    && o.Status == "paid")
+                        .SumAsync(o => o.Amount);
+
+                    yearlyData.Add(sum);
+                }
+
+                return Ok(new RevenueChartDataDto
+                {
+                    Labels = last5Years.Select(d => d.Year.ToString()).ToArray(),
+                    Values = yearlyData.ToArray()
+                });
+            }
+
+            return BadRequest("Invalid period specified. Use 'daily', 'monthly', or 'yearly'.");
         }
 
+        [Authorize(Roles = "admin")]
         [HttpGet("details")]
         public async Task<ActionResult<List<OrderDetailDto>>> GetRevenueDetails(
-            [FromQuery] DateTime? startDate,
-            [FromQuery] DateTime? endDate)
+        [FromQuery] DateTime? startDate,
+        [FromQuery] DateTime? endDate)
         {
             var query = _context.Orders
                 .Include(o => o.User)
                 .Include(o => o.Package)
+                .Include(o => o.Orderdetails)
+                    .ThenInclude(od => od.Package)
                 .AsQueryable();
 
             if (startDate.HasValue)
@@ -168,7 +193,11 @@ namespace BACKEND.Controllers
                     OrderCode = o.TransactionId.HasValue ? o.TransactionId.Value.ToString() : "N/A",
                     CreatedAt = o.CreatedAt ?? DateTime.MinValue,
                     CustomerName = o.User.Username,
-                    PackageName = o.Package != null ? o.Package.Name : "N/A",
+                    PackageName = o.PackageId != null
+                        ? (o.PackageId != null ? o.Package.Name : "N/A")
+                        : (o.Orderdetails.FirstOrDefault() != null && o.Orderdetails.First().Package != null
+                            ? o.Orderdetails.First().Package.Name
+                            : "N/A"),
                     Amount = o.Amount,
                     Status = o.Status ?? "N/A"
                 })
@@ -176,5 +205,6 @@ namespace BACKEND.Controllers
 
             return Ok(orders);
         }
+
     }
 }

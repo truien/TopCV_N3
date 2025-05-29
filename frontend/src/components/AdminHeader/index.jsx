@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaBars, FaBell, FaUser, FaChartLine, FaBriefcase, FaCog, FaHome } from 'react-icons/fa';
+import { FaBars, FaBell, FaUser, FaChartLine, FaBriefcase, FaCog, FaHome, FaMoneyBillWave } from 'react-icons/fa';
 import logo from '../../assets/images/logo-birthday-10.09ebdc6.png';
 import './styles.css';
 

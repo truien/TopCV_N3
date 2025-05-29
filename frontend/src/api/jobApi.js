@@ -25,5 +25,5 @@ export const getJobPostsWithPackage = async () => {
     const res = await axiosInstance.get('/api/jobposts/employer-with-package');
     return res.data;
 };
-export const getUrgentJobs = (limit = 0) => axiosInstance.get('/api/JobPosts/urgent', { params: { limit } }).then(res => res.data);
+export const getUrgentJobs = (limit = 4) => axiosInstance.get('/api/JobPosts/urgent', { params: { limit } }).then(res => res.data);
 

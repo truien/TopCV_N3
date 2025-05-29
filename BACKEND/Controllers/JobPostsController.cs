@@ -395,7 +395,7 @@ namespace BACKEND.Controllers
             });
         }
         [HttpGet("urgent")]
-        public async Task<IActionResult> GetUrgentJobs([FromQuery] int limit = 0)
+        public async Task<IActionResult> GetUrgentJobs([FromQuery] int limit = 4)
         {
             var now = DateTime.UtcNow;
             var baseUrl = $"{Request.Scheme}://{Request.Host}/";
@@ -678,6 +678,9 @@ namespace BACKEND.Controllers
 
             var jobPost = await _context.JobPosts.FindAsync(id);
             if (jobPost == null) return NotFound();
+
+            if (jobPost.Status != "open" && jobPost.Status != "closed")
+                return BadRequest($"Không thể thay đổi trạng thái vì trạng thái hiện tại là {jobPost.Status}");
 
             var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (jobPost.EmployerId.ToString() != userIdStr)
