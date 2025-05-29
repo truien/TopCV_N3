@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaBars, FaBell, FaUser, FaChartLine, FaBriefcase, FaCog, FaHome, FaMoneyBillWave } from 'react-icons/fa';
+import { FaBars, FaBell, FaUser, FaChartLine, FaBriefcase, FaCog, FaHome, FaMoneyBillWave, FaExclamationTriangle } from 'react-icons/fa';
 import logo from '../../assets/images/logo-birthday-10.09ebdc6.png';
 import './styles.css';
 
@@ -78,14 +78,21 @@ const AdminHeaderSidebar = () => {
                     >
                         <FaBriefcase className="icon" />
                         <span className="link-text fw-bolder">Quản lý gói Pro</span>
-                    </Link>
-                    <Link
+                    </Link>                    <Link
                         to="/admin/revenue"
                         className={`nav-link ${activeLink === '/admin/revenue' ? 'active' : ''}`}
                         onClick={() => handleLinkClick('/admin/revenue')}
                     >
                         <FaMoneyBillWave className="icon" />
                         <span className="link-text fw-bolder">Quản lý doanh thu</span>
+                    </Link>
+                    <Link
+                        to="/admin/reports"
+                        className={`nav-link ${activeLink === '/admin/reports' ? 'active' : ''}`}
+                        onClick={() => handleLinkClick('/admin/reports')}
+                    >
+                        <FaExclamationTriangle className="icon" />
+                        <span className="link-text fw-bolder">Quản lý báo cáo</span>
                     </Link>
                     <Link
                         to="/settings"

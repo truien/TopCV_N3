@@ -9,6 +9,7 @@ import PackagesManager from "../pages/Admin/PackagesManager/PackagesManager.jsx"
 import ProPackagesManager from "../pages/Admin/ProPackagesManager/ProPackagesManager.jsx";
 import AdminJobPostsManager from "../pages/Admin/AdminJobPostsManager/AdminJobPostsManager.jsx";
 import RevenueManager from "../pages/Admin/RevenueManager/RevenueManager.jsx";
+import ReportManager from "../pages/Admin/ReportManager/ReportManager.jsx";
 import NotFoundPage from "../components/NotFoundPage/NotFoundPage.jsx";
 import MainLayout from "../layouts/MainLayoutts.jsx";
 import HomePage from "../pages/Main/Home/Home.jsx";
@@ -33,6 +34,7 @@ function AppRoutes() {
                     <Route path='job-posts' element={<AdminJobPostsManager />} />
                     <Route path='pro-packages' element={<ProPackagesManager />} />
                     <Route path='revenue' element={<RevenueManager />} />
+                    <Route path='reports' element={<ReportManager />} />
                 </Route>
                 <Route path='/employer' element={<EmployerLayouts />}>
                     <Route index element={< JobPostManager />} />

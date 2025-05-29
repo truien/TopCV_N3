@@ -1082,17 +1082,17 @@ function JobPostDetails() {
                 </Modal.Header>
                 <Modal.Body>
                     <div className="mb-3">
-                        <label>Lý do</label>
-                        <select
+                        <label>Lý do</label>                        <select
                             className="form-select"
                             value={reportReason}
                             onChange={(e) => setReportReason(e.target.value)}
                         >
                             <option value=''>-- Chọn lý do --</option>
-                            <option value='Sai thông tin'>Sai thông tin</option>
-                            <option value='Giả mạo'>Giả mạo</option>
-                            <option value='Spam'>Spam</option>
-                            <option value='Khác'>Khác</option>
+                            <option value='inappropriate_content'>Nội dung không phù hợp</option>
+                            <option value='fake_job'>Việc làm giả</option>
+                            <option value='spam'>Spam</option>
+                            <option value='discrimination'>Phân biệt đối xử</option>
+                            <option value='other'>Khác</option>
                         </select>
                     </div>
                     <div className="mb-3">
