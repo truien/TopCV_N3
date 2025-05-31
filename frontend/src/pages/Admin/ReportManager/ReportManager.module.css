@@ -359,7 +359,8 @@
 }
 
 .actionButton,
-.deleteButton {
+.deleteButton,
+.notificationButton {
     padding: 8px 12px;
     border: none;
     border-radius: 8px;
@@ -378,6 +379,22 @@
 .actionButton:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.notificationButton {
+    background: linear-gradient(135deg, #48bb78, #38a169);
+    color: white;
+}
+
+.notificationButton:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
+}
+
+.notificationButton:disabled {
+    background: linear-gradient(135deg, #a0aec0, #718096);
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
 .deleteButton {

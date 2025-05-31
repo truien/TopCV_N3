@@ -9,10 +9,12 @@ using System.Security.Claims;
 public class FollowController : ControllerBase
 {
     private readonly TopcvBeContext _context;
+    private readonly NotificationService _notificationService;
 
-    public FollowController(TopcvBeContext context)
+    public FollowController(TopcvBeContext context, NotificationService notificationService)
     {
         _context = context;
+        _notificationService = notificationService;
     }
 
     [Authorize]
@@ -31,15 +33,14 @@ public class FollowController : ControllerBase
 
         if (existingFollow)
             return BadRequest(new { message = "Bạn đã theo dõi công ty này rồi." });
-
         var follow = new UserFollow
         {
             UserId = userId,
             EmployerId = employerId
-        };
-
-        _context.UserFollows.Add(follow);
+        }; _context.UserFollows.Add(follow);
         await _context.SaveChangesAsync();
+        // Gửi thông báo cho công ty 
+        await _notificationService.CreateFollowNotificationAsync(userId, employerId);
 
         return Ok(new { message = "Theo dõi công ty thành công." });
     }

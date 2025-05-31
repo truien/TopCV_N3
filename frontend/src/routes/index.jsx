@@ -22,6 +22,7 @@ import JobPostManager from '../pages/Employer/JobPostManager/JobPostManager.jsx'
 import CompanyInfor from "../pages/Main/CompanyInfor/CompanyInfor.jsx";
 import ConfirmPage from "../pages/ConfirmPage.jsx";
 import SearchJob from "../pages/SearchJob/SearchJob.jsx";
+import NotificationPage from "../pages/NotificationPage.jsx";
 function AppRoutes() {
     return (
         <Router>
@@ -47,9 +48,9 @@ function AppRoutes() {
                 <Route path="/sign" element={<SignPage />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/company/:slug" element={<CompanyInfor />} />
-                <Route path="/search-job" element={<SearchJob />} />
+                <Route path="/company/:slug" element={<CompanyInfor />} />                <Route path="/search-job" element={<SearchJob />} />
                 <Route path="/confirm" element={<ConfirmPage />} />
+                <Route path="/notifications" element={<NotificationPage />} />
                 <Route path="*" element={<NotFoundPage />} />
             </Routes>
         </Router>

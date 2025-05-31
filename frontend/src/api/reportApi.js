@@ -24,3 +24,6 @@ export const updateReportStatus = (id, status) =>
 export const deleteReport = (id) => axiosInstance.delete(`/api/Report/admin/${id}`);
 
 export const getReportDetail = (id) => axiosInstance.get(`/api/Report/admin/${id}`);
+
+export const sendNotificationToEmployer = (reportId) =>
+    axiosInstance.post(`/api/Report/admin/${reportId}/notify-employer`);

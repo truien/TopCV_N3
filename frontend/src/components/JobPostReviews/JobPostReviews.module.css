@@ -1,0 +1,211 @@
+.reviewsContainer {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.statsContainer {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 25px;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.averageRating {
+    text-align: center;
+    min-width: 150px;
+}
+
+.ratingNumber {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #ffc107;
+    line-height: 1;
+}
+
+.starsContainer {
+    margin: 5px 0;
+}
+
+.totalReviews {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.ratingBars {
+    flex: 1;
+}
+
+.ratingBar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.ratingBar span:first-child {
+    min-width: 50px;
+}
+
+.ratingBar span:last-child {
+    min-width: 30px;
+    color: #6c757d;
+}
+
+.barContainer {
+    flex: 1;
+    height: 8px;
+    background: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.bar {
+    height: 100%;
+    background: #ffc107;
+    transition: width 0.3s ease;
+}
+
+.addReviewBtn {
+    background: #007bff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: 500;
+}
+
+.addReviewBtn:hover {
+    background: #0056b3;
+}
+
+.addReviewForm {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    margin-bottom: 20px;
+}
+
+.ratingInput {
+    margin: 10px 0;
+}
+
+.formActions {
+    display: flex;
+    gap: 10px;
+}
+
+.reviewsList {
+    space-y: 15px;
+}
+
+.reviewItem {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    margin-bottom: 15px;
+}
+
+.reviewHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.userInfo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.userAvatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.defaultAvatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+}
+
+.userName {
+    font-weight: 600;
+    color: #333;
+}
+
+.reviewDate {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+.reviewActions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.actionButtons {
+    display: flex;
+    gap: 5px;
+}
+
+.actionBtn {
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.reviewComment {
+    margin-top: 10px;
+    line-height: 1.6;
+    color: #495057;
+}
+
+.star {
+    margin-right: 2px;
+    cursor: default;
+}
+
+.starLarge {
+    font-size: 1.2rem;
+}
+
+.starInteractive {
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.starInteractive:hover {
+    transform: scale(1.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .statsContainer {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .reviewHeader {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .reviewActions {
+        align-self: flex-start;
+    }
+}

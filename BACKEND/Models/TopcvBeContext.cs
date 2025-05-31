@@ -40,6 +40,8 @@ public partial class TopcvBeContext : DbContext
 
     public virtual DbSet<JobPostReview> JobPostReviews { get; set; }
 
+    public virtual DbSet<Notification> Notifications { get; set; }
+
     public virtual DbSet<Order> Orders { get; set; }
 
     public virtual DbSet<Orderdetail> Orderdetails { get; set; }
@@ -57,11 +59,6 @@ public partial class TopcvBeContext : DbContext
     public virtual DbSet<UserFollow> UserFollows { get; set; }
 
     public virtual DbSet<UserRole> UserRoles { get; set; }
-
-    public virtual DbSet<Warning> Warnings { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseMySql("server=localhost;database=topcv_be;uid=root;pwd=admin", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.40-mysql"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -257,7 +254,8 @@ public partial class TopcvBeContext : DbContext
                 .HasColumnName("requirements");
             entity.Property(e => e.SalaryRange)
                 .HasMaxLength(50)
-                .HasColumnName("salary_range"); entity.Property(e => e.Status)
+                .HasColumnName("salary_range");
+            entity.Property(e => e.Status)
                 .HasDefaultValueSql("'open'")
                 .HasColumnType("enum('open','closed','pending','suspended')")
                 .HasColumnName("status");
@@ -424,6 +422,72 @@ public partial class TopcvBeContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.JobPostReviews)
                 .HasForeignKey(d => d.UserId)
                 .HasConstraintName("job_post_reviews_ibfk_2");
+        });
+
+        modelBuilder.Entity<Notification>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("notifications");
+
+            entity.HasIndex(e => e.SenderId, "fk_notifications_sender");
+
+            entity.HasIndex(e => e.CreatedAt, "idx_created_at");
+
+            entity.HasIndex(e => e.IsRead, "idx_is_read");
+
+            entity.HasIndex(e => new { e.RecipientId, e.RecipientType }, "idx_recipient");
+
+            entity.HasIndex(e => e.Type, "idx_type");
+
+            entity.HasIndex(e => new { e.RecipientId, e.RecipientType, e.IsRead }, "idx_unread_recipient");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("created_at");
+            entity.Property(e => e.Data)
+                .HasColumnType("json")
+                .HasColumnName("data");
+            entity.Property(e => e.IsRead)
+                .HasDefaultValueSql("'0'")
+                .HasColumnName("is_read");
+            entity.Property(e => e.Message)
+                .HasColumnType("text")
+                .HasColumnName("message");
+            entity.Property(e => e.ReadAt)
+                .HasColumnType("timestamp")
+                .HasColumnName("read_at");
+            entity.Property(e => e.RecipientId).HasColumnName("recipient_id");
+            entity.Property(e => e.RecipientType)
+                .HasColumnType("enum('candidate','employer','admin')")
+                .HasColumnName("recipient_type");
+            entity.Property(e => e.SenderId).HasColumnName("sender_id");
+            entity.Property(e => e.SenderType)
+                .HasDefaultValueSql("'system'")
+                .HasColumnType("enum('candidate','employer','admin','system')")
+                .HasColumnName("sender_type");
+            entity.Property(e => e.Title)
+                .HasMaxLength(255)
+                .HasColumnName("title");
+            entity.Property(e => e.Type)
+                .HasMaxLength(50)
+                .HasColumnName("type");
+            entity.Property(e => e.UpdatedAt)
+                .ValueGeneratedOnAddOrUpdate()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("updated_at");
+
+            entity.HasOne(d => d.Recipient).WithMany(p => p.NotificationRecipients)
+                .HasForeignKey(d => d.RecipientId)
+                .HasConstraintName("fk_notifications_recipient");
+
+            entity.HasOne(d => d.Sender).WithMany(p => p.NotificationSenders)
+                .HasForeignKey(d => d.SenderId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("fk_notifications_sender");
         });
 
         modelBuilder.Entity<Order>(entity =>
@@ -606,8 +670,6 @@ public partial class TopcvBeContext : DbContext
 
             entity.HasIndex(e => e.Email, "email").IsUnique();
 
-            // entity.HasIndex(e => e.FacebookId, "facebook_id").IsUnique();
-
             entity.HasIndex(e => e.RoleId, "fk_users_role");
 
             entity.HasIndex(e => e.GoogleId, "google_id").IsUnique();
@@ -621,7 +683,6 @@ public partial class TopcvBeContext : DbContext
                 .HasColumnType("timestamp")
                 .HasColumnName("created_at");
             entity.Property(e => e.Email).HasColumnName("email");
-            // entity.Property(e => e.FacebookId).HasColumnName("facebook_id");
             entity.Property(e => e.GoogleId).HasColumnName("google_id");
             entity.Property(e => e.Password)
                 .HasMaxLength(255)
@@ -675,36 +736,6 @@ public partial class TopcvBeContext : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
                 .HasColumnName("name");
-        });
-
-        modelBuilder.Entity<Warning>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PRIMARY");
-
-            entity.ToTable("warnings");
-
-            entity.HasIndex(e => e.EmployerId, "employer_id");
-
-            entity.HasIndex(e => e.JobPostId, "job_post_id");
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP")
-                .HasColumnType("timestamp")
-                .HasColumnName("created_at");
-            entity.Property(e => e.EmployerId).HasColumnName("employer_id");
-            entity.Property(e => e.JobPostId).HasColumnName("job_post_id");
-            entity.Property(e => e.WarningMessage)
-                .HasColumnType("text")
-                .HasColumnName("warning_message");
-
-            entity.HasOne(d => d.Employer).WithMany(p => p.Warnings)
-                .HasForeignKey(d => d.EmployerId)
-                .HasConstraintName("warnings_ibfk_1");
-
-            entity.HasOne(d => d.JobPost).WithMany(p => p.Warnings)
-                .HasForeignKey(d => d.JobPostId)
-                .HasConstraintName("warnings_ibfk_2");
         });
 
         OnModelCreatingPartial(modelBuilder);

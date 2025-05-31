@@ -18,7 +18,7 @@ public partial class JobPostReport
     public DateTime? CreatedAt { get; set; }
 
     public string? Description { get; set; }
-
+    
     public virtual JobPost JobPost { get; set; } = null!;
 
     public virtual User ReportedByNavigation { get; set; } = null!;

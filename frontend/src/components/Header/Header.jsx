@@ -1,4 +1,3 @@
-// ✅ Header.jsx — dùng API để lấy avatar và tên người dùng
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../assets/images/topcv-logo-10-year.png';
 import avatarDefault from '../../assets/images/avatar-default.jpg';
@@ -6,6 +5,9 @@ import { useState, useEffect, useRef } from 'react';
 import styles from './Header.module.css';
 import { getUserProfile } from '../../api/userApi';
 import { logout } from '../../api/authApi';
+import NotificationDropdown from '../NotificationDropdown';
+// eslint-disable-next-line no-unused-vars
+import { useNotificationContext } from '../../contexts/notification-context.js';
 
 const Header = () => {
     const navigate = useNavigate();
@@ -105,33 +107,40 @@ const Header = () => {
                             </li>
                         )}
                     </ul>
-
                     <div className="d-none d-lg-flex align-items-center gap-3 position-relative">
                         {userInfo ? (
-                            <div className={`dropdown ${styles.userDropdown}`} ref={dropdownRef}>
-                                <button
-                                    className="btn btn-light dropdown-toggle d-flex align-items-center gap-2"
-                                    type="button"
-                                    onClick={toggleDropdown}
-                                >
-                                    <span>{userInfo.fullName || userInfo.username}</span>
-                                    <img
-                                        src={userInfo.avatar || avatarDefault}
-                                        alt="Avatar"
-                                        className={styles.avatar}
-                                    />
-                                </button>
-                                {showDropdown && (
-                                    <div className={`dropdown-menu show ${styles.dropdownMenu}`}>
-                                        <Link to="/account-settings" className="dropdown-item">
-                                            Cài đặt tài khoản
-                                        </Link>
-                                        <button onClick={handleLogout} className="dropdown-item">
-                                            Đăng xuất
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
+                            <>
+                                {/* Thêm Notification Dropdown */}
+                                <NotificationDropdown />
+
+                                <div className={`dropdown ${styles.userDropdown}`} ref={dropdownRef}>
+                                    <button
+                                        className="btn btn-light dropdown-toggle d-flex align-items-center gap-2"
+                                        type="button"
+                                        onClick={toggleDropdown}
+                                    >
+                                        <span>{userInfo.fullName || userInfo.username}</span>
+                                        <img
+                                            src={userInfo.avatar || avatarDefault}
+                                            alt="Avatar"
+                                            className={styles.avatar}
+                                        />
+                                    </button>
+                                    {showDropdown && (
+                                        <div className={`dropdown-menu show ${styles.dropdownMenu}`}>
+                                            <Link to="/account-settings" className="dropdown-item">
+                                                Cài đặt tài khoản
+                                            </Link>
+                                            <Link to="/notifications" className="dropdown-item">
+                                                Thông báo
+                                            </Link>
+                                            <button onClick={handleLogout} className="dropdown-item">
+                                                Đăng xuất
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            </>
                         ) : (
                             <>
                                 <button onClick={handleLogin} className={`btn btn-outline-custom me-2 ${styles.btnOutlineCustom}`}>

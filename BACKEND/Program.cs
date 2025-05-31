@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using VNPAY.NET;
+using BACKEND.Hubs;
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<EmailService>();
@@ -26,8 +28,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     {
         options.Cookie.Name = "topcv_auth";
         options.Cookie.HttpOnly = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        // Luôn cho phép gửi cookie trên HTTPS lẫn HTTP (phù hợp development và production)
+        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
         options.ExpireTimeSpan = TimeSpan.FromHours(1);
+        // Luôn đặt SameSite=None để cookie được gửi kèm khi gọi AJAX từ React/Vite
         options.Cookie.SameSite = SameSiteMode.None;
         options.Events = new CookieAuthenticationEvents
         {
@@ -43,6 +47,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             }
         };
     });
+
 
 
 builder.Services.AddSwaggerGen(options =>
@@ -78,9 +83,9 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy.WithOrigins(
-           "http://localhost:5173",
-           "top-cv-n3-5zs5gnzq4-truiens-projects-27a8e364.vercel.app",
-           "https://top-cv-n3.vercel.app"
+            "http://localhost:5173",
+            "top-cv-n3-5zs5gnzq4-truiens-projects-27a8e364.vercel.app",
+            "https://top-cv-n3.vercel.app"
        )
              .AllowAnyHeader()
              .AllowAnyMethod()
@@ -99,6 +104,8 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 });
 builder.Services.AddHostedService<TopMaxPostDateUpdaterService>();
 builder.Services.AddScoped<IVnpay, Vnpay>();
+builder.Services.AddScoped<NotificationService>();
+builder.Services.AddSignalR();
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -121,4 +128,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<NotificationHub>("/hubs/notifications");
 app.Run();

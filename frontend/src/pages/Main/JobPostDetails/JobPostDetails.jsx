@@ -25,6 +25,7 @@ import {
     isFollowingEmployer
 } from '@/api/followApi';
 import { saveJob } from '@/api/saveJobApi';
+import JobPostReviews from '../../../components/JobPostReviews/JobPostReviews';
 
 
 
@@ -43,11 +44,11 @@ function JobPostDetails() {
     const { id } = useParams();
     const [jobPost, setJobPost] = useState(null);
     const [relatedJobs, setRelatedJobs] = useState(null);
-    const [companyJobs, setCompanyJobs] = useState(null);
-    const [activeSection, setActiveSection] = useState('');
+    const [companyJobs, setCompanyJobs] = useState(null); const [activeSection, setActiveSection] = useState('');
     const detailsRef = useRef(null);
     const companyJobsRef = useRef(null);
     const relatedJobsRef = useRef(null);
+    const reviewsRef = useRef(null);
     const JobDetailCache = {};
     const [showReportModal, setShowReportModal] = useState(false);
     const [reportReason, setReportReason] = useState('');
@@ -70,14 +71,13 @@ function JobPostDetails() {
         };
         if (id) fetchJob();
     }, [id]);
-
-
     useEffect(() => {
         const handleScroll = () => {
             const sectionRefs = [
                 { id: 'details', ref: detailsRef },
                 { id: 'companyJobs', ref: companyJobsRef },
                 { id: 'relatedJobs', ref: relatedJobsRef },
+                { id: 'reviews', ref: reviewsRef },
             ];
 
             for (const section of sectionRefs) {
@@ -398,15 +398,23 @@ function JobPostDetails() {
                                     }`}
                             >
                                 Việc làm khác của công ty
-                            </div>
-                            <div
+                            </div>                            <div
                                 onClick={() => scrollToSection(relatedJobsRef)}
-                                className={`btn fw-bold ${activeSection === 'relatedJobs'
+                                className={`btn fw-bold me-3 ${activeSection === 'relatedJobs'
                                     ? styles['activite']
                                     : ''
                                     }`}
                             >
                                 Việc làm liên quan
+                            </div>
+                            <div
+                                onClick={() => scrollToSection(reviewsRef)}
+                                className={`btn fw-bold ${activeSection === 'reviews'
+                                    ? styles['activite']
+                                    : ''
+                                    }`}
+                            >
+                                Đánh giá
                             </div>
                         </div>
                     </nav>
@@ -608,10 +616,21 @@ function JobPostDetails() {
                                             fetchJobDetail={prefetchJobDetail}
                                             JobDetailCache={JobDetailCache}
                                         />
-                                    ))
-                                ) : (
+                                    ))) : (
                                     <div>Đang tải dữ liệu</div>
                                 )}
+                            </section>
+
+                            {/* Reviews Section */}
+                            <section
+                                ref={reviewsRef}
+                                className={
+                                    styles['boder_custum'] + ' section mt-3 p-3'
+                                }
+                            >                                <JobPostReviews
+                                    jobPostId={jobPost?.id}
+                                    currentUserId={1} // Temporary hardcoded for testing
+                                />
                             </section>
                         </div>
                         <div className='col-4 mt-3'>

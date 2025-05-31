@@ -12,11 +12,13 @@ public class ReportController : ControllerBase
 {
     private readonly TopcvBeContext _context;
     private readonly IHttpContextAccessor _http;
+    private readonly NotificationService _notificationService;
 
-    public ReportController(TopcvBeContext context, IHttpContextAccessor http)
+    public ReportController(TopcvBeContext context, IHttpContextAccessor http, NotificationService notificationService)
     {
         _context = context;
         _http = http;
+        _notificationService = notificationService;
     }
 
     [Authorize]
@@ -50,7 +52,12 @@ public class ReportController : ControllerBase
 #pragma warning restore CS8601
 
         _context.JobPostReports.Add(report);
-        await _context.SaveChangesAsync(); return Ok(new { message = "Đã gửi báo cáo bài viết." });
+        await _context.SaveChangesAsync();
+
+        // Send notification to admins about new report
+        await _notificationService.CreateReportNotificationAsync(report.Id, userId);
+
+        return Ok(new { message = "Đã gửi báo cáo bài viết." });
     }
 
     // Admin APIs
@@ -214,5 +221,38 @@ public class ReportController : ControllerBase
             return NotFound("Không tìm thấy báo cáo.");
 
         return Ok(report);
+    }
+
+    [Authorize(Roles = "admin")]
+    [HttpPost("admin/{id}/notify-employer")]
+    public async Task<IActionResult> SendNotificationToEmployer(int id)
+    {
+        var report = await _context.JobPostReports
+            .Include(r => r.JobPost)
+                .ThenInclude(jp => jp.Employer)
+            .FirstOrDefaultAsync(r => r.Id == id);
+
+        if (report == null)
+            return NotFound("Không tìm thấy báo cáo.");
+
+        if (report.JobPost?.Employer == null)
+            return BadRequest("Không tìm thấy thông tin nhà tuyển dụng.");
+
+        try
+        {
+            // Send notification to employer about the report
+            await _notificationService.CreateJobReportNotificationAsync(
+                report.Id,
+                report.JobPost.Employer.Id,
+                report.JobPost.Title,
+                report.Reason
+            );
+
+            return Ok(new { message = "Đã gửi thông báo cho nhà tuyển dụng thành công." });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "Có lỗi xảy ra khi gửi thông báo.", error = ex.Message });
+        }
     }
 }

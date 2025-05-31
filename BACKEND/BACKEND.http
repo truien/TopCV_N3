@@ -4,3 +4,30 @@ GET {{BACKEND_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+// JobPostReviews API Tests
+
+// Get reviews for a job post
+GET {{BACKEND_HostAddress}}/api/jobpostreviews/jobpost/1
+Accept: application/json
+
+###
+
+// Get review statistics for a job post
+GET {{BACKEND_HostAddress}}/api/jobpostreviews/jobpost/1/stats
+Accept: application/json
+
+###
+
+// Create a new review (requires authentication)
+POST {{BACKEND_HostAddress}}/api/jobpostreviews
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN
+
+{
+  "jobPostId": 1,
+  "rating": 5,
+  "comment": "Great job opportunity with excellent benefits!"
+}
+
+###

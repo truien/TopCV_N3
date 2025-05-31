@@ -184,6 +184,7 @@ namespace BACKEND.Controllers
                 query = query.Where(o => o.CreatedAt.HasValue && o.CreatedAt.Value.Date <= endDate.Value.Date);
             }
 
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
             var orders = await query
                 .OrderByDescending(o => o.CreatedAt)
                 .Select(o => new OrderDetailDto
@@ -202,6 +203,7 @@ namespace BACKEND.Controllers
                     Status = o.Status ?? "N/A"
                 })
                 .ToListAsync();
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
 
             return Ok(orders);
         }

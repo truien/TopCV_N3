@@ -195,7 +195,6 @@ namespace BACKEND.Controllers
                     .Include(j => j.JobPostFields).ThenInclude(jpf => jpf.Field)
                     .Include(j => j.JobPostEmploymentTypes).ThenInclude(jpet => jpet.EmploymentType)
                     .Include(j => j.JobPostReports)
-                    .Include(j => j.Warnings)
                     .Where(j => j.Id == id)
                     .Select(j => new
                     {
@@ -243,7 +242,6 @@ namespace BACKEND.Controllers
                         }).ToList(),
                         ApplicationCount = j.Applications.Count(),
                         ReportCount = j.JobPostReports.Count(),
-                        WarningCount = j.Warnings.Count()
                     })
                     .FirstOrDefaultAsync();
 
@@ -320,7 +318,6 @@ namespace BACKEND.Controllers
                     .Include(j => j.JobPostPromotions)
                     .Include(j => j.JobPostReports)
                     .Include(j => j.JobPostReviews)
-                    .Include(j => j.Warnings)
                     .Include(j => j.Orderdetails)
                     .FirstOrDefaultAsync(j => j.Id == id);
 
@@ -337,7 +334,6 @@ namespace BACKEND.Controllers
                 _context.JobPostPromotions.RemoveRange(jobPost.JobPostPromotions);
                 _context.JobPostReports.RemoveRange(jobPost.JobPostReports);
                 _context.JobPostReviews.RemoveRange(jobPost.JobPostReviews);
-                _context.Warnings.RemoveRange(jobPost.Warnings);
                 _context.Orderdetails.RemoveRange(jobPost.Orderdetails);
 
                 // Remove job post

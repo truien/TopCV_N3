@@ -17,8 +17,6 @@ public partial class User
 
     public string? GoogleId { get; set; }
 
-    // public string? FacebookId { get; set; }
-
     public DateTime? CreatedAt { get; set; }
 
     public int RoleId { get; set; }
@@ -35,6 +33,10 @@ public partial class User
 
     public virtual ICollection<JobPost> JobPosts { get; set; } = new List<JobPost>();
 
+    public virtual ICollection<Notification> NotificationRecipients { get; set; } = new List<Notification>();
+
+    public virtual ICollection<Notification> NotificationSenders { get; set; } = new List<Notification>();
+
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 
     public virtual ICollection<ProSubscription> ProSubscriptions { get; set; } = new List<ProSubscription>();
@@ -46,6 +48,4 @@ public partial class User
     public virtual ICollection<UserFollow> UserFollowEmployers { get; set; } = new List<UserFollow>();
 
     public virtual ICollection<UserFollow> UserFollowUsers { get; set; } = new List<UserFollow>();
-
-    public virtual ICollection<Warning> Warnings { get; set; } = new List<Warning>();
 }

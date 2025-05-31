@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { FaSearch, FaFilter, FaEdit, FaTrash, FaEye, FaDownload, FaExclamationTriangle, FaCheck, FaTimes, FaClock } from 'react-icons/fa';
+import { FaSearch, FaFilter, FaEdit, FaTrash, FaEye, FaDownload, FaExclamationTriangle, FaCheck, FaTimes, FaClock, FaBell } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-import { getAllReports, getReportStatistics, updateReportStatus, deleteReport, getReportDetail } from '../../../api/reportApi';
+import { getAllReports, getReportStatistics, updateReportStatus, deleteReport, getReportDetail, sendNotificationToEmployer } from '../../../api/reportApi';
 import styles from './ReportManager.module.css';
 
 const ReportManager = () => {
@@ -160,6 +160,17 @@ const ReportManager = () => {
         } catch (error) {
             console.error('Lỗi khi xóa báo cáo:', error);
             toast.error('Không thể xóa báo cáo');
+        }
+    };
+
+    const handleSendNotification = async (reportId) => {
+        try {
+            await sendNotificationToEmployer(reportId);
+            toast.success('Đã gửi thông báo cho nhà tuyển dụng');
+            fetchReports(); // Refresh để cập nhật trạng thái
+        } catch (error) {
+            console.error('Lỗi khi gửi thông báo:', error);
+            toast.error('Không thể gửi thông báo cho nhà tuyển dụng');
         }
     };
 
@@ -356,8 +367,7 @@ const ReportManager = () => {
                                             </select>
                                         </div>
                                     </td>
-                                    <td>{new Date(report.createdAt).toLocaleDateString('vi-VN')}</td>
-                                    <td>
+                                    <td>{new Date(report.createdAt).toLocaleDateString('vi-VN')}</td>                                    <td>
                                         <div className={styles.actions}>
                                             <button
                                                 onClick={() => handleViewDetail(report.id)}
@@ -365,6 +375,14 @@ const ReportManager = () => {
                                                 title="Xem chi tiết"
                                             >
                                                 <FaEye />
+                                            </button>
+                                            <button
+                                                onClick={() => handleSendNotification(report.id)}
+                                                className={styles.notificationButton}
+                                                title="Gửi thông báo cho nhà tuyển dụng"
+                                                disabled={report.notificationSent}
+                                            >
+                                                <FaBell />
                                             </button>
                                             <button
                                                 onClick={() => {

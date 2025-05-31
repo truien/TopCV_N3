@@ -13,12 +13,14 @@ public class ApplicationsController : ControllerBase
     private readonly TopcvBeContext _context;
     private readonly IWebHostEnvironment _env;
     private readonly IHttpContextAccessor _http;
+    private readonly NotificationService _notificationService;
 
-    public ApplicationsController(TopcvBeContext context, IWebHostEnvironment env, IHttpContextAccessor http)
+    public ApplicationsController(TopcvBeContext context, IWebHostEnvironment env, IHttpContextAccessor http, NotificationService notificationService)
     {
         _context = context;
         _env = env;
         _http = http;
+        _notificationService = notificationService;
     }
 
     [Authorize(Roles = "candidate")]
@@ -49,9 +51,7 @@ public class ApplicationsController : ControllerBase
 
             using var stream = new FileStream(filePath, FileMode.Create);
             await request.CvFile.CopyToAsync(stream);
-        }
-
-        var app = new Application
+        }        var app = new Application
         {
             JobId = request.JobId,
             UserId = userId,
@@ -61,7 +61,8 @@ public class ApplicationsController : ControllerBase
         };
 
         _context.Applications.Add(app);
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync();        // Send notification to employer
+        await _notificationService.CreateApplicationNotificationAsync(app.JobId, userId);
 
         return Ok(new { message = "Ứng tuyển thành công!" });
     }
@@ -76,20 +77,30 @@ public class ApplicationsController : ControllerBase
             .ToListAsync();
 
         return Ok(applications);
-    }
-
-    [Authorize(Roles = "employer")]
+    }    [Authorize(Roles = "employer")]
     [HttpPut("{id}/status")]
     public async Task<IActionResult> UpdateApplicationStatus(int id, [FromBody] UpdateStatusRequest request)
     {
-        var app = await _context.Applications.FindAsync(id);
+        var app = await _context.Applications
+            .Include(a => a.Job)
+            .Include(a => a.User)
+            .FirstOrDefaultAsync(a => a.Id == id);
+        
         if (app == null) return NotFound("Không tìm thấy hồ sơ.");
+        
+        var oldStatus = (ApplicationStatus)app.Status;
         app.Status = (int)request.Status;
+        
         if (request.Status == ApplicationStatus.Rejected && !string.IsNullOrEmpty(request.RejectReason))
         {
             app.RejectReason = request.RejectReason;
         }
-        await _context.SaveChangesAsync();
+        
+        await _context.SaveChangesAsync();        // Send notification to applicant about status change
+        if (oldStatus != request.Status)
+        {
+            await _notificationService.CreateApplicationStatusNotificationAsync(app.Id, request.Status.ToString());
+        }
 
         return Ok(new { message = "Cập nhật trạng thái thành công!" });
     }
@@ -109,7 +120,7 @@ public class ApplicationsController : ControllerBase
         return Ok(app);
     }
 
-    [Authorize(Roles = "jobseeker")]
+    [Authorize(Roles = "candidate")]
     [HttpGet("has-applied/{jobId}")]
     public async Task<IActionResult> HasApplied(int jobId)
     {

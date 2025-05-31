@@ -12,13 +12,15 @@ public class InterviewController : ControllerBase
     private readonly IHttpContextAccessor _http;
     private readonly IConfiguration _config;
     private readonly EmailService _emailService;
+    private readonly NotificationService _notificationService;
 
-    public InterviewController(TopcvBeContext context, IHttpContextAccessor http, IConfiguration config, EmailService emailService)
+    public InterviewController(TopcvBeContext context, IHttpContextAccessor http, IConfiguration config, EmailService emailService, NotificationService notificationService)
     {
         _context = context;
         _http = http;
         _config = config;
         _emailService = emailService;
+        _notificationService = notificationService;
     }
 
 
@@ -48,13 +50,15 @@ public class InterviewController : ControllerBase
             CreatedAt = dto.InterviewDate,
             SecureToken = token,
             Status = "pending"
-        };
-        _context.Interviews.Add(interview);
+        };        _context.Interviews.Add(interview);
 
         // 4. Cập nhật trạng thái application
         application.Status = (int)ApplicationStatus.InvitedToInterview;
 
         await _context.SaveChangesAsync();
+
+        // Send notification to candidate about interview invitation
+        await _notificationService.CreateInterviewNotificationAsync(interview.Id, application.UserId);
 
         // Lấy URL API từ config
         var apiBase = _config["BackEndApiUrl"];  
