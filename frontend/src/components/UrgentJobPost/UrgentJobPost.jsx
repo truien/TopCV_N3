@@ -3,6 +3,8 @@ import { getUrgentJobs } from '@/api/jobApi';
 import styles from './UrgentJobPost.module.css';
 import gap from '../../assets/images/icon-flash.webp';
 import { Tooltip } from 'bootstrap';
+import { Link } from 'react-router-dom';
+
 
 
 export default function UrgentJobPost() {
@@ -94,7 +96,7 @@ export default function UrgentJobPost() {
                 <div className={`${styles.right}` + ' col-3'} >
                     <div className={styles.jobList}>
                         {displayJobs.map(job => (
-                            <div key={job.id} className={styles.jobCard}>
+                            <Link to={`jobposts/${job.id}`} key={job.id} className={styles.jobCard}>
                                 <div className={styles.logo}>
                                     <img src={job.avatar} className={styles.companylogo} style={{
                                         width: '46px',
@@ -120,7 +122,7 @@ export default function UrgentJobPost() {
                                     <div className={styles.companyName}>{job.companyName}</div>
                                     <div className={styles.location}>{job.location}</div>
                                 </div>
-                            </div>
+                            </Link>
                         ))}
                     </div>
 

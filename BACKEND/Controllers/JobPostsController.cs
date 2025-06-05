@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.VisualBasic;
 using System.Security.Claims;
 using FuzzySharp;
+using BACKEND.DTOs;
 
 namespace BACKEND.Controllers
 {
@@ -26,7 +27,7 @@ namespace BACKEND.Controllers
           string? location = null,
           string? minSalary = null,
           string? maxSalary = null,
-          string? sortBy = "1",
+          string? sortBy = "1", // 1: mới nhất, 2: hạn nộp, 3: theo follow, 4: theo rating
           int page = 1,
           int pageSize = 10)
         {
@@ -92,19 +93,27 @@ namespace BACKEND.Controllers
                     JobPostId = g.Key,
                     TypeIds = g.Select(jpt => jpt.EmploymentTypeId).ToList()
                 })
-                .ToDictionaryAsync(g => g.JobPostId, g => g.TypeIds);
-
-            // Lấy thông tin về Pro subscriptions - tối ưu bằng cách lấy cả UserId và Status trong một truy vấn
+                .ToDictionaryAsync(g => g.JobPostId, g => g.TypeIds);            // Lấy thông tin về Pro subscriptions - tối ưu bằng cách lấy cả UserId và Status trong một truy vấn
             var proUsers = await _context.ProSubscriptions
                 .Where(p => p.StartDate <= now && p.EndDate >= now)
                 .Select(p => p.UserId)
                 .Distinct()
                 .ToListAsync();
 
-            // Kết hợp các dữ liệu để tạo đối tượng kết quả trong bộ nhớ
-            var jobResults = await query.ToListAsync();
+            // Lấy số lượng followers cho mỗi employer
+            var followersCount = await _context.UserFollows
+                .GroupBy(f => f.EmployerId)
+                .Select(g => new { EmployerId = g.Key, FollowerCount = g.Count() })
+                .ToDictionaryAsync(g => g.EmployerId, g => g.FollowerCount);
 
-            var enrichedJobs = jobResults.Select(job => new
+            // Lấy rating trung bình cho mỗi job post
+            var averageRatings = await _context.JobPostReviews
+                .GroupBy(r => r.JobPostId)
+                .Select(g => new { JobPostId = g.Key, AverageRating = g.Average(r => (double)r.Rating) })
+                .ToDictionaryAsync(g => g.JobPostId, g => g.AverageRating);
+
+            // Kết hợp các dữ liệu để tạo đối tượng kết quả trong bộ nhớ
+            var jobResults = await query.ToListAsync(); var enrichedJobs = jobResults.Select(job => new
             {
                 job.Id,
                 job.CompanyLogo,
@@ -118,6 +127,8 @@ namespace BACKEND.Controllers
                 EmploymentTypeIds = employmentTypeIds.ContainsKey(job.Id) ? employmentTypeIds[job.Id] : new List<int>(),
                 HighlightType = activePromotions.ContainsKey(job.Id) ? activePromotions[job.Id] : null,
                 EmployerIsPro = proUsers.Contains(job.UserId),
+                FollowerCount = followersCount.ContainsKey(job.UserId) ? followersCount[job.UserId] : 0,
+                AverageRating = averageRatings.ContainsKey(job.Id) ? averageRatings[job.Id] : 0.0,
                 job.description,
                 job.requirements,
                 job.interest
@@ -216,9 +227,7 @@ namespace BACKEND.Controllers
                     )
                 );
 #pragma warning restore CS8629 // Nullable value type may be null.
-            }
-
-            // Áp dụng sắp xếp với ưu tiên gói quảng cáo và người dùng Pro
+            }            // Áp dụng sắp xếp với ưu tiên gói quảng cáo và người dùng Pro
             IOrderedEnumerable<dynamic> orderedJobs;
 
             switch (sortBy)
@@ -229,6 +238,22 @@ namespace BACKEND.Controllers
                         .ThenByDescending(j => j.HighlightType == "TopPro")
                         .ThenByDescending(j => j.EmployerIsPro)
                         .ThenBy(j => j.DueDate);
+                    break;
+                case "3": // Sắp xếp theo số lượng follow của công ty
+                    orderedJobs = filteredJobs
+                        .OrderByDescending(j => j.HighlightType == "TopMax")
+                        .ThenByDescending(j => j.HighlightType == "TopPro")
+                        .ThenByDescending(j => j.EmployerIsPro)
+                        .ThenByDescending(j => j.FollowerCount)
+                        .ThenByDescending(j => j.PostedDate);
+                    break;
+                case "4": // Sắp xếp theo rating trung bình
+                    orderedJobs = filteredJobs
+                        .OrderByDescending(j => j.HighlightType == "TopMax")
+                        .ThenByDescending(j => j.HighlightType == "TopPro")
+                        .ThenByDescending(j => j.EmployerIsPro)
+                        .ThenByDescending(j => j.AverageRating)
+                        .ThenByDescending(j => j.PostedDate);
                     break;
                 case "1":
                 case "all":
@@ -243,9 +268,7 @@ namespace BACKEND.Controllers
             }
 
             // Đếm tổng số bản ghi phù hợp với điều kiện lọc
-            var totalCount = orderedJobs.Count();
-
-            // Phân trang
+            var totalCount = orderedJobs.Count();            // Phân trang
             var paginatedJobs = orderedJobs
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -260,7 +283,9 @@ namespace BACKEND.Controllers
                     j.DueDate,
                     j.HighlightType,
                     j.EmployerIsPro,
-                    j.PostedDate
+                    j.PostedDate,
+                    j.FollowerCount,
+                    j.AverageRating
                 })
                 .ToList();
 
@@ -274,7 +299,7 @@ namespace BACKEND.Controllers
             });
         }
         [HttpGet("promoted")]
-        public async Task<IActionResult> GetPromotedJobs(int page = 1, int pageSize = 12, string location = "")
+        public async Task<IActionResult> GetPromotedJobs(int page = 1, int pageSize = 12, string location = "", string sortBy = "1") // 1: mặc định, 3: theo follow, 4: theo rating
         {
             var now = DateTime.UtcNow;
             int skip = (page - 1) * pageSize;
@@ -320,14 +345,24 @@ namespace BACKEND.Controllers
                          .ThenBy(p => p.HighlightType == "TopMax" ? 0 :
                                       p.HighlightType == "TopPro" ? 1 : 2)
                          .First().HighlightType
-                );
-
-            // Lấy thông tin về Pro subscriptions
+                );            // Lấy thông tin về Pro subscriptions
             var proUsers = await _context.ProSubscriptions
                 .Where(p => p.StartDate <= now && p.EndDate >= now)
                 .Select(p => p.UserId)
                 .Distinct()
                 .ToListAsync();
+
+            // Lấy số lượng followers cho mỗi employer
+            var followersCount = await _context.UserFollows
+                .GroupBy(f => f.EmployerId)
+                .Select(g => new { EmployerId = g.Key, FollowerCount = g.Count() })
+                .ToDictionaryAsync(g => g.EmployerId, g => g.FollowerCount);
+
+            // Lấy rating trung bình cho mỗi job post
+            var averageRatings = await _context.JobPostReviews
+                .GroupBy(r => r.JobPostId)
+                .Select(g => new { JobPostId = g.Key, AverageRating = g.Average(r => (double)r.Rating) })
+                .ToDictionaryAsync(g => g.JobPostId, g => g.AverageRating);
 
             // Kết hợp dữ liệu trong bộ nhớ
             var enrichedJobs = jobResults.Select(job => new
@@ -340,10 +375,11 @@ namespace BACKEND.Controllers
                 job.Location,
                 HighlightType = activePromotions.ContainsKey(job.Id) ? activePromotions[job.Id] : null,
                 EmployerIsPro = proUsers.Contains(job.UserId),
+                FollowerCount = followersCount.ContainsKey(job.UserId) ? followersCount[job.UserId] : 0,
+                AverageRating = averageRatings.ContainsKey(job.Id) ? averageRatings[job.Id] : 0.0,
                 job.Slug
             }).ToList();
 
-            // Lọc theo địa điểm trong bộ nhớ (in-memory)
             var filteredJobs = enrichedJobs.AsEnumerable();
 
             if (!string.IsNullOrEmpty(location))
@@ -371,19 +407,55 @@ namespace BACKEND.Controllers
             }
 
             // Đếm tổng số bản ghi phù hợp với điều kiện lọc
-            var totalJobs = filteredJobs.Count();
-
-            // Sắp xếp với ưu tiên gói quảng cáo và người dùng Pro
-            var orderedJobs = filteredJobs
-                .OrderByDescending(x => x.HighlightType == "TopMax")
-                .ThenByDescending(x => x.HighlightType == "TopPro")
-                .ThenByDescending(x => x.EmployerIsPro)
-                .ThenByDescending(x => x.Id);
+            var totalJobs = filteredJobs.Count();            
+            IOrderedEnumerable<dynamic> orderedJobs; switch (sortBy)
+            {
+                case "3": // Sắp xếp theo số lượng follow của công ty
+                    orderedJobs = filteredJobs
+                        .OrderByDescending(x => x.HighlightType == "TopMax")
+                        .ThenByDescending(x => x.HighlightType == "TopPro")
+                        .ThenByDescending(x => x.EmployerIsPro)
+                        .ThenByDescending(x => x.FollowerCount)
+                        .ThenByDescending(x => x.Id);
+                    break;
+                case "4": // Sắp xếp theo rating trung bình
+                    orderedJobs = filteredJobs
+                        .OrderByDescending(x => x.HighlightType == "TopMax")
+                        .ThenByDescending(x => x.HighlightType == "TopPro")
+                        .ThenByDescending(x => x.EmployerIsPro)
+                        .ThenByDescending(x => x.AverageRating)
+                        .ThenByDescending(x => x.Id);
+                    break;
+                case "1":
+                default:
+                    // Sắp xếp mặc định theo ngày đăng để đồng nhất với SearchJobPosts
+                    orderedJobs = filteredJobs
+                        .OrderByDescending(x => x.HighlightType == "TopMax")
+                        .ThenByDescending(x => x.HighlightType == "TopPro")
+                        .ThenByDescending(x => x.EmployerIsPro)
+                        // .ThenByDescending(x => x.PostedDate); // Thiếu thuộc tính này trong GetPromotedJobs
+                        .ThenByDescending(x => x.Id); // Dùng ID để thay thế PostedDate
+                    break;
+            }
 
             // Phân trang trong bộ nhớ
             var paginatedJobs = orderedJobs
                 .Skip(skip)
                 .Take(pageSize)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.Avatar,
+                    x.Company,
+                    x.JobTitle,
+                    x.Salary,
+                    x.Location,
+                    x.HighlightType,
+                    x.EmployerIsPro,
+                    x.FollowerCount,
+                    x.AverageRating,
+                    x.Slug
+                })
                 .ToList();
 
             return Ok(new
@@ -793,6 +865,115 @@ namespace BACKEND.Controllers
                 }
             }
             return stringBuilder.ToString().Normalize(System.Text.NormalizationForm.FormC);
+        }
+
+        [HttpPut("{id}")]
+        [Authorize(Roles = "employer")]
+        public async Task<IActionResult> UpdateJobPost(int id, [FromBody] UpdateJobPostDto updateDto)
+        {
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdStr, out int userId)) return Unauthorized();
+
+            var jobPost = await _context.JobPosts
+                .Include(jp => jp.JobPostFields)
+                .Include(jp => jp.JobPostEmploymentTypes)
+                .FirstOrDefaultAsync(jp => jp.Id == id);
+
+            if (jobPost == null) return NotFound("Bài viết không tồn tại");
+
+            if (jobPost.EmployerId != userId)
+                return Forbid("Bạn không có quyền sửa bài viết này");
+
+            // Update basic info
+            jobPost.Title = updateDto.Title;
+            jobPost.Description = updateDto.Description;
+            jobPost.Requirements = updateDto.Requirements;
+            jobPost.Interest = updateDto.Interest;
+            jobPost.SalaryRange = updateDto.SalaryRange;
+            jobPost.Location = updateDto.Location;
+            jobPost.ApplyDeadline = updateDto.ApplyDeadline;
+            jobPost.JobOpeningCount = updateDto.JobOpeningCount;
+
+            // Update job fields if provided
+            if (updateDto.JobFieldIds != null && updateDto.JobFieldIds.Any())
+            {
+                // Remove existing fields
+                _context.JobPostFields.RemoveRange(jobPost.JobPostFields);
+
+                // Add new fields
+                foreach (var fieldId in updateDto.JobFieldIds)
+                {
+                    _context.JobPostFields.Add(new JobPostField
+                    {
+                        JobPostId = jobPost.Id,
+                        FieldId = fieldId
+                    });
+                }
+            }
+
+            // Update employment types if provided
+            if (updateDto.EmploymentTypeIds != null && updateDto.EmploymentTypeIds.Any())
+            {
+                // Remove existing employment types
+                _context.JobPostEmploymentTypes.RemoveRange(jobPost.JobPostEmploymentTypes);
+
+                // Add new employment types
+                foreach (var typeId in updateDto.EmploymentTypeIds)
+                {
+                    _context.JobPostEmploymentTypes.Add(new JobPostEmploymentType
+                    {
+                        JobPostId = jobPost.Id,
+                        EmploymentTypeId = typeId
+                    });
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok("Cập nhật bài viết thành công");
+        }
+
+        [HttpGet("edit/{id}")]
+        [Authorize(Roles = "employer")]
+        public async Task<IActionResult> GetJobPostForEdit(int id)
+        {
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdStr, out int userId)) return Unauthorized();
+
+            var jobPost = await _context.JobPosts
+                .Include(jp => jp.JobPostFields)
+                    .ThenInclude(jpf => jpf.Field)
+                .Include(jp => jp.JobPostEmploymentTypes)
+                    .ThenInclude(jpet => jpet.EmploymentType)
+                .Where(jp => jp.Id == id && jp.EmployerId == userId)
+                .Select(jp => new
+                {
+                    jp.Id,
+                    jp.Title,
+                    jp.Description,
+                    jp.Requirements,
+                    jp.Interest,
+                    jp.SalaryRange,
+                    jp.Location,
+                    jp.ApplyDeadline,
+                    jp.JobOpeningCount,
+                    jp.Status,
+                    JobFields = jp.JobPostFields.Select(jpf => new
+                    {
+                        jpf.Field.Id,
+                        jpf.Field.Name
+                    }).ToList(),
+                    EmploymentTypes = jp.JobPostEmploymentTypes.Select(jpet => new
+                    {
+                        jpet.EmploymentType.Id,
+                        jpet.EmploymentType.Name
+                    }).ToList()
+                })
+                .FirstOrDefaultAsync();
+
+            if (jobPost == null)
+                return NotFound("Bài viết không tồn tại hoặc bạn không có quyền truy cập");
+
+            return Ok(jobPost);
         }
     }
 }

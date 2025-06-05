@@ -35,6 +35,8 @@ const SearchJob = () => {
         { value: 'all', label: 'Đề xuất của AI' },
         { value: '1', label: 'Ngày đăng' },
         { value: '2', label: 'Ngày nộp hồ sơ' },
+        { value: '3', label: 'Theo follow công ty' },
+        { value: '4', label: 'Theo rating cao nhất' },
     ];
 
     // Các khoảng lương
@@ -150,6 +152,9 @@ const SearchJob = () => {
                     // Đảm bảo trường highlightType và employerIsPro luôn có (dù viết hoa hay viết thường)
                     highlightType: job.highlightType || job.HighlightType || null,
                     employerIsPro: job.employerIsPro || job.EmployerIsPro || false,
+                    // Thêm rating trung bình và follower count
+                    averageRating: job.averageRating || job.AverageRating || 0,
+                    followerCount: job.followerCount || job.FollowerCount || 0,
                 }));
 
                 setJobPosts(processedJobs);
@@ -1357,7 +1362,7 @@ const SearchJob = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="d-flex align-items-center">
+                                    <div className="d-flex align-items-center" >
                                         <div className="bg-light rounded-pill d-flex align-items-center px-3 py-1 me-2 d-none d-md-flex"
                                             style={{
                                                 border: '1px solid #eee',
@@ -1372,8 +1377,9 @@ const SearchJob = () => {
                                             className="sort-select"
                                             isSearchable={false}
                                             classNamePrefix="select-filter"
-                                            menuPlacement="auto"
+                                            menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
                                             menuPosition="fixed"
+                                            menuPlacement="auto"
                                             styles={{
                                                 control: (provided, state) => ({
                                                     ...provided,
@@ -1411,6 +1417,10 @@ const SearchJob = () => {
                                                     borderRadius: '10px',
                                                     boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
                                                     overflow: 'hidden'
+                                                }),
+                                                menuPortal: (provided) => ({
+                                                    ...provided,
+                                                    zIndex: 9999
                                                 }),
                                                 indicatorSeparator: () => ({
                                                     display: 'none'
@@ -1525,6 +1535,26 @@ const SearchJob = () => {
                                                                         <span className={`${styles['company-name']}`} style={{ fontSize: '1rem', fontWeight: '500', color: '#0b7ed0' }}>
                                                                             {job.companyName}
                                                                         </span>
+
+                                                                        {/* Hiển thị thông tin rating và follow ngay bên cạnh tên công ty */}
+                                                                        {(job.averageRating > 0 || job.followerCount > 0) && (
+                                                                            <div className="ms-2 d-flex align-items-center gap-2">
+                                                                                {job.averageRating > 0 && (
+                                                                                    <span className="badge bg-warning bg-opacity-10 text-warning px-2 py-1 rounded-pill"
+                                                                                        style={{ fontSize: '12px', fontWeight: '500' }}>
+                                                                                        <i className="bi bi-star-fill me-1"></i>
+                                                                                        {job.averageRating.toFixed(1)}
+                                                                                    </span>
+                                                                                )}
+                                                                                {job.followerCount > 0 && (
+                                                                                    <span className="badge bg-success bg-opacity-10 text-success px-2 py-1 rounded-pill"
+                                                                                        style={{ fontSize: '12px', fontWeight: '500' }}>
+                                                                                        <i className="bi bi-people-fill me-1"></i>
+                                                                                        {job.followerCount}
+                                                                                    </span>
+                                                                                )}
+                                                                            </div>
+                                                                        )}
                                                                     </div>
                                                                 </div>
                                                                 <div className="ms-md-3 mb-2">{job.highlightType === "TopMax" && (

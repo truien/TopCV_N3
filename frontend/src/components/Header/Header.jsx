@@ -105,7 +105,16 @@ const Header = () => {
                                     Quản lý
                                 </Link>
                             </li>
-                        )}
+                        )
+                        }
+                        {userInfo?.role === 'employer' && (
+                            <li className="nav-item">
+                                <Link to="/employer" className={`nav-link ${styles.navLinkCustom} ${styles.customText}`}>
+                                    Quản lý
+                                </Link>
+                            </li>
+                        )
+                        }
                     </ul>
                     <div className="d-none d-lg-flex align-items-center gap-3 position-relative">
                         {userInfo ? (

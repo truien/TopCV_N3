@@ -114,6 +114,7 @@
     align-items: center;
     backdrop-filter: blur(6px);
     min-width: 252px;
+    text-decoration: none;
 }
 
 .flashIcon {
