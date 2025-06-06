@@ -11,7 +11,6 @@
     --transition-speed: 0.3s;
 }
 
-/* Animations & Effects */
 @keyframes pulse {
     0% {
         box-shadow: 0 0 0 0 rgba(0, 177, 79, 0.4);

@@ -3,14 +3,13 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Form, Button, Alert, Spinner, Badge, Modal, Tabs, Tab } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import {
-    FaBuilding, FaEnvelope, FaMapMarkerAlt, FaGlobe, FaFileAlt,
+    FaBuilding, FaEnvelope, FaPhone, FaMapMarkerAlt, FaGlobe, FaFileAlt,
     FaLock, FaEye, FaEyeSlash, FaSave, FaUpload, FaCamera, FaEdit,
     FaCrown, FaChartBar, FaCog, FaBell
 } from 'react-icons/fa';
 import styles from './EmployerSettings.module.css';
 import { useAuth } from '../../../contexts/AuthContext';
 import axiosInstance from '../../../api/axiosInstance';
-import RichTextEditor from '../../../components/RichTextEditor/RichTextEditor';
 
 const EmployerSettings = () => {
     const { user } = useAuth();
@@ -21,12 +20,15 @@ const EmployerSettings = () => {
         current: false,
         new: false,
         confirm: false
-    });    // Company profile data
+    });
+
+    // Company profile data
     const [companyData, setCompanyData] = useState({
         companyName: '',
         description: '',
         website: '',
         location: '',
+        phone: '',
         email: '',
         username: ''
     });
@@ -242,8 +244,28 @@ const EmployerSettings = () => {
                                                         </Form.Text>
                                                     </Form.Group>
                                                 </Col>
-                                            </Row>                                            <Row>
-                                                <Col md={12}>
+                                            </Row>
+
+                                            <Row>
+                                                <Col md={6}>
+                                                    <Form.Group className="mb-3">
+                                                        <Form.Label className={styles.formLabel}>
+                                                            <FaPhone className="me-2" />
+                                                            Số điện thoại
+                                                        </Form.Label>
+                                                        <Form.Control
+                                                            type="tel"
+                                                            value={companyData.phone || ''}
+                                                            onChange={(e) => setCompanyData({
+                                                                ...companyData,
+                                                                phone: e.target.value
+                                                            })}
+                                                            className={styles.formControl}
+                                                            placeholder="Nhập số điện thoại"
+                                                        />
+                                                    </Form.Group>
+                                                </Col>
+                                                <Col md={6}>
                                                     <Form.Group className="mb-3">
                                                         <Form.Label className={styles.formLabel}>
                                                             <FaGlobe className="me-2" />
@@ -278,17 +300,23 @@ const EmployerSettings = () => {
                                                     className={styles.formControl}
                                                     placeholder="Nhập địa chỉ công ty"
                                                 />
-                                            </Form.Group>                                            <Form.Group className="mb-4">
+                                            </Form.Group>
+
+                                            <Form.Group className="mb-4">
                                                 <Form.Label className={styles.formLabel}>
                                                     <FaFileAlt className="me-2" />
                                                     Mô tả công ty
                                                 </Form.Label>
-                                                <RichTextEditor
+                                                <Form.Control
+                                                    as="textarea"
+                                                    rows={5}
                                                     value={companyData.description || ''}
-                                                    onChange={(value) => setCompanyData({
+                                                    onChange={(e) => setCompanyData({
                                                         ...companyData,
-                                                        description: value
+                                                        description: e.target.value
                                                     })}
+                                                    className={styles.formControl}
+                                                    placeholder="Nhập mô tả về công ty của bạn..."
                                                 />
                                             </Form.Group>
 

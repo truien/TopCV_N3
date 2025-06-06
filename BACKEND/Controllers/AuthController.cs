@@ -246,7 +246,8 @@ public class AuthController : ControllerBase
                 Role = _context.UserRoles.Where(r => r.Id == u.RoleId).Select(r => r.Name).FirstOrDefault(),
                 Avatar = string.IsNullOrEmpty(u.Avatar)
                     ? null
-                    : (u.Avatar.StartsWith("https") ? u.Avatar : baseUrl + "uploads/avatars/" + u.Avatar)
+                    : (u.Avatar.StartsWith("https") ? u.Avatar : baseUrl + "uploads/avatars/" + u.Avatar),
+                u.CreatedAt,
             })
             .ToListAsync();
 
