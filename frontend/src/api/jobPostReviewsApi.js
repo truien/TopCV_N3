@@ -76,3 +76,38 @@ export const checkUserReviewed = async (jobPostId) => {
         throw error;
     }
 };
+
+// === EMPLOYER APIs ===
+
+// Lấy tất cả đánh giá của employer
+export const getEmployerReviews = async (page = 1, pageSize = 10) => {
+    try {
+        const response = await axiosInstance.get(`/api/JobPostReviews/employer/reviews?page=${page}&pageSize=${pageSize}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching employer reviews:', error);
+        throw error;
+    }
+};
+
+// Lấy đánh giá cho bài viết cụ thể của employer
+export const getEmployerJobPostReviews = async (jobPostId, page = 1, pageSize = 10) => {
+    try {
+        const response = await axiosInstance.get(`/api/JobPostReviews/employer/jobpost/${jobPostId}/reviews?page=${page}&pageSize=${pageSize}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching employer job post reviews:', error);
+        throw error;
+    }
+};
+
+// Lấy thống kê tổng quan đánh giá của employer
+export const getEmployerReviewsStats = async () => {
+    try {
+        const response = await axiosInstance.get('/api/JobPostReviews/employer/stats');
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching employer reviews stats:', error);
+        throw error;
+    }
+};

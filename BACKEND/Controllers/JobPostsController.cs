@@ -45,7 +45,7 @@ namespace BACKEND.Controllers
                             Id = job.Id,
                             CompanyLogo = string.IsNullOrEmpty(user.Avatar)
                                 ? null
-                                : (user.Avatar.StartsWith("http") ? user.Avatar : baseUrl + "avatar/" + user.Avatar),
+                                : (user.Avatar.StartsWith("http") ? user.Avatar : baseUrl + "uploads/avatars/" + user.Avatar),
                             CompanyName = cp != null ? cp.CompanyName : user.Username,
                             Title = job.Title,
                             Salary = job.SalaryRange,
@@ -316,7 +316,7 @@ namespace BACKEND.Controllers
                             Id = job.Id,
                             Avatar = string.IsNullOrEmpty(user.Avatar)
                                   ? null
-                                  : (user.Avatar.StartsWith("http") ? user.Avatar : baseUrl + "avatar/" + user.Avatar),
+                                  : (user.Avatar.StartsWith("http") ? user.Avatar : baseUrl + "uploads/avatars/" + user.Avatar),
                             Company = cp != null ? cp.CompanyName : user.Username,
                             JobTitle = job.Title,
                             Salary = job.SalaryRange,
@@ -407,7 +407,7 @@ namespace BACKEND.Controllers
             }
 
             // Đếm tổng số bản ghi phù hợp với điều kiện lọc
-            var totalJobs = filteredJobs.Count();            
+            var totalJobs = filteredJobs.Count();
             IOrderedEnumerable<dynamic> orderedJobs; switch (sortBy)
             {
                 case "3": // Sắp xếp theo số lượng follow của công ty
@@ -500,7 +500,7 @@ namespace BACKEND.Controllers
                             PostDate = job.PostDate,
                             Avatar = string.IsNullOrEmpty(user.Avatar)
                                 ? null
-                                : (user.Avatar.StartsWith("http") ? user.Avatar : baseUrl + "avatar/" + user.Avatar)
+                                : (user.Avatar.StartsWith("http") ? user.Avatar : baseUrl + "uploads/avatars/" + user.Avatar)
                         };
 
             // Sắp xếp theo ngày đăng (mới nhất)
@@ -599,7 +599,7 @@ namespace BACKEND.Controllers
                              companyName = companyProfile.CompanyName,
                              avatar = string.IsNullOrEmpty(user.Avatar)
                                      ? null
-                                     : (user.Avatar.StartsWith("http") ? user.Avatar : baseUrl + "/avatar/" + user.Avatar),
+                                     : (user.Avatar.StartsWith("http") ? user.Avatar : baseUrl + "/uploads/avatars/" + user.Avatar),
                              location = job.Location,
                              applyDeadline = job.ApplyDeadline,
                              postDate = job.PostDate,
@@ -648,7 +648,7 @@ namespace BACKEND.Controllers
                     j.SalaryRange,
                     CompanyName = j.Employer.CompanyProfiles.FirstOrDefault()!.CompanyName,
                     Avatar = string.IsNullOrEmpty(j.Employer.Avatar) ? null :
-                            (j.Employer.Avatar.StartsWith("http") ? j.Employer.Avatar : baseUrl + "/avatar/" + j.Employer.Avatar),
+                            (j.Employer.Avatar.StartsWith("http") ? j.Employer.Avatar : baseUrl + "/uploads/avatars/" + j.Employer.Avatar),
                     Score =
                         (j.JobPostFields.Any(f => f.Field!.Name == fiels) ? 1 : 0) +
                         (j.JobPostEmploymentTypes.Any(em => em.EmploymentType!.Name == employment) ? 1 : 0) +

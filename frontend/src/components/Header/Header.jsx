@@ -134,12 +134,23 @@ const Header = () => {
                                             alt="Avatar"
                                             className={styles.avatar}
                                         />
-                                    </button>
-                                    {showDropdown && (
+                                    </button>                                    {showDropdown && (
                                         <div className={`dropdown-menu show ${styles.dropdownMenu}`}>
-                                            <Link to="/account-settings" className="dropdown-item">
-                                                Cài đặt tài khoản
-                                            </Link>
+                                            {userInfo.role === 'candidate' && (
+                                                <Link to="/candidate/settings" className="dropdown-item">
+                                                    Cài đặt tài khoản
+                                                </Link>
+                                            )}
+                                            {userInfo.role === 'employer' && (
+                                                <Link to="/employer/settings" className="dropdown-item">
+                                                    Cài đặt tài khoản
+                                                </Link>
+                                            )}
+                                            {(userInfo.role === 'user' || !userInfo.role) && (
+                                                <Link to="/user/settings" className="dropdown-item">
+                                                    Cài đặt tài khoản
+                                                </Link>
+                                            )}
                                             <Link to="/notifications" className="dropdown-item">
                                                 Thông báo
                                             </Link>

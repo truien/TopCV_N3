@@ -64,7 +64,7 @@ namespace BACKEND.Controllers
                                 CompanyName = cp != null ? cp.CompanyName : user.Username,
                                 CompanyLogo = string.IsNullOrEmpty(user.Avatar)
                                     ? null
-                                    : (user.Avatar.StartsWith("http") ? user.Avatar : baseUrl + "avatar/" + user.Avatar),
+                                    : (user.Avatar.StartsWith("http") ? user.Avatar : baseUrl + "uploads/avatars/" + user.Avatar),
                                 ApplicationCount = job.Applications.Count()
                             };
 

@@ -8,6 +8,8 @@ import {
     FaBriefcase,
     FaCog,
     FaHome,
+    FaStar,
+    FaCogs,
 } from 'react-icons/fa';
 import { Outlet } from 'react-router-dom';
 import { Link } from 'react-router-dom';
@@ -71,6 +73,14 @@ const EmployerLayout = () => {
                         {!isSidebarCollapsed && <span className={styles.linkText}>Quản lý bài tuyển dụng</span>}
                     </Link>
                     <Link
+                        to='/employer/reviews'
+                        className={`nav-link d-flex align-items-center ${styles.navLink} ${activeLink === '/employer/reviews' ? styles.navLinkActive : ''}`}
+                        onClick={() => handleLinkClick('/employer/reviews')}
+                    >
+                        <FaStar className={`me-2 ${styles.icon}`} />
+                        {!isSidebarCollapsed && <span className={styles.linkText}>Quản lý đánh giá</span>}
+                    </Link>
+                    <Link
                         to='/employer/applicantmanagement'
                         className={`nav-link d-flex align-items-center ${styles.navLink} ${activeLink === '/employer/applicantmanagement' ? styles.navLinkActive : ''}`}
                         onClick={() => handleLinkClick('/employer/applicantmanagement')}
@@ -85,14 +95,20 @@ const EmployerLayout = () => {
                     >
                         <FaBriefcase className={`me-2 ${styles.icon}`} />
                         {!isSidebarCollapsed && <span className={styles.linkText}>Quản lý lịch phỏng vấn</span>}
-                    </Link>
-                    <Link
+                    </Link>                    <Link
                         to='/employer/createjobpost'
                         className={`nav-link d-flex align-items-center ${styles.navLink} ${activeLink === '/employer/createjobpost' ? styles.navLinkActive : ''}`}
                         onClick={() => handleLinkClick('/employer/createjobpost')}
                     >
                         <FaCog className={`me-2 ${styles.icon}`} />
                         {!isSidebarCollapsed && <span className={styles.linkText}>Đăng bài tuyển dụng</span>}
+                    </Link>                    <Link
+                        to='/employer/settings'
+                        className={`nav-link d-flex align-items-center ${styles.navLink} ${activeLink === '/employer/settings' ? styles.navLinkActive : ''}`}
+                        onClick={() => handleLinkClick('/employer/settings')}
+                    >
+                        <FaCogs className={`me-2 ${styles.icon}`} />
+                        {!isSidebarCollapsed && <span className={styles.linkText}>Cài đặt tài khoản</span>}
                     </Link>
                     <Link
                         to='/'

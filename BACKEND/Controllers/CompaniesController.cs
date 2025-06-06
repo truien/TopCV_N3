@@ -26,7 +26,7 @@ namespace BACKEND.Controllers
                     c.Location,
                     c.Website,
                     Avatar = c.User.Avatar != null
-                        ? (c.User.Avatar.StartsWith("http") ? c.User.Avatar : $"{Request.Scheme}://{Request.Host}/avatar/{c.User.Avatar}")
+                        ? (c.User.Avatar.StartsWith("http") ? c.User.Avatar : $"{Request.Scheme}://{Request.Host}/uploads/avatars/{c.User.Avatar}")
                         : null
                 })
                 .FirstOrDefaultAsync();
@@ -48,7 +48,7 @@ namespace BACKEND.Controllers
                     c.Location,
                     c.Website,
                     Avatar = c.User.Avatar != null
-                        ? (c.User.Avatar.StartsWith("http") ? c.User.Avatar : $"{Request.Scheme}://{Request.Host}/avatar/{c.User.Avatar}")
+                        ? (c.User.Avatar.StartsWith("http") ? c.User.Avatar : $"{Request.Scheme}://{Request.Host}/uploads/avatars/{c.User.Avatar}")
                         : null,
                     ApplicationCount = _context.Applications
                         .Where(a => a.Job.EmployerId == c.UserId)
@@ -79,7 +79,7 @@ namespace BACKEND.Controllers
                         .Select(f => f.Name)
                         .FirstOrDefault(),
                     Avatar = c.User.Avatar != null
-                        ? (c.User.Avatar.StartsWith("http") ? c.User.Avatar : $"{Request.Scheme}://{Request.Host}/avatar/{c.User.Avatar}")
+                        ? (c.User.Avatar.StartsWith("http") ? c.User.Avatar : $"{Request.Scheme}://{Request.Host}/uploads/avatars/{c.User.Avatar}")
                         : null,
                     JobCount = _context.JobPosts.Count(j => j.EmployerId == c.UserId && j.Status == "open"),
                     IsPro = _context.ProSubscriptions.Any(p => p.UserId == c.UserId),

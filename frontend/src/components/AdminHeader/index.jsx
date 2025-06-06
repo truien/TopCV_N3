@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaBars, FaBell, FaUser, FaChartLine, FaBriefcase, FaCog, FaHome, FaMoneyBillWave, FaExclamationTriangle } from 'react-icons/fa';
+import { FaBars, FaBell, FaUser, FaChartLine, FaBriefcase, FaCog, FaHome, FaMoneyBillWave, FaExclamationTriangle, FaTags, FaClock } from 'react-icons/fa';
 import logo from '../../assets/images/logo-birthday-10.09ebdc6.png';
 import './styles.css';
 
@@ -85,14 +85,29 @@ const AdminHeaderSidebar = () => {
                     >
                         <FaMoneyBillWave className="icon" />
                         <span className="link-text fw-bolder">Quản lý doanh thu</span>
-                    </Link>
-                    <Link
+                    </Link>                    <Link
                         to="/admin/reports"
                         className={`nav-link ${activeLink === '/admin/reports' ? 'active' : ''}`}
                         onClick={() => handleLinkClick('/admin/reports')}
                     >
                         <FaExclamationTriangle className="icon" />
                         <span className="link-text fw-bolder">Quản lý báo cáo</span>
+                    </Link>
+                    <Link
+                        to="/admin/job-fields"
+                        className={`nav-link ${activeLink === '/admin/job-fields' ? 'active' : ''}`}
+                        onClick={() => handleLinkClick('/admin/job-fields')}
+                    >
+                        <FaTags className="icon" />
+                        <span className="link-text fw-bolder">Quản lý lĩnh vực</span>
+                    </Link>
+                    <Link
+                        to="/admin/employment-types"
+                        className={`nav-link ${activeLink === '/admin/employment-types' ? 'active' : ''}`}
+                        onClick={() => handleLinkClick('/admin/employment-types')}
+                    >
+                        <FaClock className="icon" />
+                        <span className="link-text fw-bolder">Quản lý hình thức làm việc</span>
                     </Link>
                     <Link
                         to="/settings"

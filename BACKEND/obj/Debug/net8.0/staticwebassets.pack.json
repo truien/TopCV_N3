@@ -41,6 +41,26 @@
       "PackagePath": "staticwebassets\\cv\\18_4_638810689263898337.pdf"
     },
     {
+      "Id": "C:\\Users\\ADMIN\\TopCV_N3\\BACKEND\\wwwroot\\uploads\\avatars\\61fea96c-1388-43fe-b3bd-9c831f42ace4.jpg",
+      "PackagePath": "staticwebassets\\uploads\\avatars\\61fea96c-1388-43fe-b3bd-9c831f42ace4.jpg"
+    },
+    {
+      "Id": "C:\\Users\\ADMIN\\TopCV_N3\\BACKEND\\wwwroot\\uploads\\avatars\\90a50b4b-db02-4c72-a612-47b59cf9d5e6.jpg",
+      "PackagePath": "staticwebassets\\uploads\\avatars\\90a50b4b-db02-4c72-a612-47b59cf9d5e6.jpg"
+    },
+    {
+      "Id": "C:\\Users\\ADMIN\\TopCV_N3\\BACKEND\\wwwroot\\uploads\\cvs\\b6aed87a-1ba7-440c-9a34-8977f6396ccc.pdf",
+      "PackagePath": "staticwebassets\\uploads\\cvs\\b6aed87a-1ba7-440c-9a34-8977f6396ccc.pdf"
+    },
+    {
+      "Id": "C:\\Users\\ADMIN\\TopCV_N3\\BACKEND\\wwwroot\\uploads\\cvs\\cac2d12b-e189-49b1-b818-01126591b8d1.pdf",
+      "PackagePath": "staticwebassets\\uploads\\cvs\\cac2d12b-e189-49b1-b818-01126591b8d1.pdf"
+    },
+    {
+      "Id": "C:\\Users\\ADMIN\\TopCV_N3\\BACKEND\\wwwroot\\uploads\\cvs\\f3eb0e9c-4018-4c5d-82d4-22774eae4171.pdf",
+      "PackagePath": "staticwebassets\\uploads\\cvs\\f3eb0e9c-4018-4c5d-82d4-22774eae4171.pdf"
+    },
+    {
       "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.BACKEND.Microsoft.AspNetCore.StaticWebAssets.props",
       "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
     },

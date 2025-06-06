@@ -6,7 +6,6 @@ namespace BACKEND.DTOs
         public sbyte Rating { get; set; } // Từ 1-5 sao
         public string? Comment { get; set; }
     }
-
     public class JobPostReviewResponseDto
     {
         public int Id { get; set; }
@@ -17,6 +16,7 @@ namespace BACKEND.DTOs
         public DateTime? CreatedAt { get; set; }
         public string UserName { get; set; } = string.Empty;
         public string? UserAvatar { get; set; }
+        public string? JobPostTitle { get; set; }
     }
 
     public class JobPostReviewsStatsDto

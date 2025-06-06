@@ -107,7 +107,7 @@
 .logo {
     width: 72px;
     height: 72px;
-    object-fit: contain;
+    object-fit: cover;
     margin-bottom: 12px;
 }
 

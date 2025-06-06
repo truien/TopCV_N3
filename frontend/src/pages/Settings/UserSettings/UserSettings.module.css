@@ -1,0 +1,418 @@
+/* UserSettings.module.css */
+
+.container {
+    padding: 2rem 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: white;
+}
+
+.title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 0;
+}
+
+.settingsCard {
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+    overflow: hidden;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+.settingsCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+}
+
+.cardHeader {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+}
+
+.settingsTabs {
+    border-bottom: 2px solid #f8f9fa;
+    margin-bottom: 0;
+}
+
+.settingsTabs .nav-link {
+    border: none;
+    border-radius: 0;
+    padding: 1rem 1.5rem;
+    color: #6c757d;
+    font-weight: 500;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.settingsTabs .nav-link:hover {
+    color: #667eea;
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.settingsTabs .nav-link.active {
+    color: #667eea;
+    background: rgba(102, 126, 234, 0.1);
+    border: none;
+    border-bottom: 3px solid #667eea;
+}
+
+.tabContent {
+    padding: 2rem;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.formLabel {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.formControl {
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+}
+
+.formControl:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    background: white;
+}
+
+.formControl:disabled {
+    background: #f8f9fa;
+    opacity: 0.7;
+}
+
+.saveButton {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 10px;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.saveButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+}
+
+.saveButton:active {
+    transform: translateY(0);
+}
+
+.switchControl {
+    margin-bottom: 1rem;
+}
+
+.switchControl .form-check-input {
+    background-color: #e9ecef;
+    border-color: #ced4da;
+    width: 3rem;
+    height: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.switchControl .form-check-input:checked {
+    background-color: #667eea;
+    border-color: #667eea;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.switchControl .form-check-label {
+    font-weight: 500;
+    color: #495057;
+    margin-left: 0.5rem;
+}
+
+.securityCard {
+    border: 2px solid #e9ecef;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    transition: all 0.3s ease;
+}
+
+.securityCard:hover {
+    border-color: #667eea;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+}
+
+.avatarContainer {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    margin-bottom: 1rem;
+}
+
+.avatarImage {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #667eea;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.avatarContainer:hover .avatarImage {
+    transform: scale(1.05);
+    box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+}
+
+.avatarOverlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(102, 126, 234, 0.9);
+    color: white;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.3s ease;
+    font-size: 1.2rem;
+}
+
+.avatarContainer:hover .avatarOverlay {
+    opacity: 1;
+}
+
+.avatarInput {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.passwordToggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: none;
+    color: #6c757d;
+    padding: 0;
+    height: auto;
+    width: auto;
+}
+
+.passwordToggle:hover {
+    color: #667eea;
+}
+
+.passwordToggle:focus {
+    box-shadow: none;
+}
+
+/* Quick Actions Buttons */
+.settingsCard .btn-outline-primary {
+    border-color: #667eea;
+    color: #667eea;
+    transition: all 0.3s ease;
+}
+
+.settingsCard .btn-outline-primary:hover {
+    background: #667eea;
+    border-color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.settingsCard .btn-outline-secondary {
+    border-color: #6c757d;
+    color: #6c757d;
+    transition: all 0.3s ease;
+}
+
+.settingsCard .btn-outline-secondary:hover {
+    background: #6c757d;
+    border-color: #6c757d;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+}
+
+.settingsCard .btn-outline-warning {
+    border-color: #ffc107;
+    color: #ffc107;
+    transition: all 0.3s ease;
+}
+
+.settingsCard .btn-outline-warning:hover {
+    background: #ffc107;
+    border-color: #ffc107;
+    color: #212529;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+}
+
+/* Status Badge */
+.badge {
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem 0;
+    }
+
+    .title {
+        font-size: 2rem;
+    }
+
+    .subtitle {
+        font-size: 1rem;
+    }
+
+    .tabContent {
+        padding: 1rem;
+    }
+
+    .settingsTabs .nav-link {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .avatarImage {
+        width: 100px;
+        height: 100px;
+    }
+
+    .saveButton {
+        width: 100%;
+        margin-top: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .settingsTabs {
+        flex-direction: column;
+    }
+
+    .settingsTabs .nav-link {
+        text-align: center;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .settingsTabs .nav-link.active {
+        border-bottom: 1px solid #667eea;
+        border-left: 3px solid #667eea;
+    }
+}
+
+/* Loading Animation */
+.spinner-border {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Form Validation */
+.form-control.is-invalid {
+    border-color: #dc3545;
+}
+
+.form-control.is-valid {
+    border-color: #28a745;
+}
+
+/* Alert Styling */
+.alert {
+    border-radius: 10px;
+    border: none;
+    padding: 1rem 1.5rem;
+}
+
+.alert-info {
+    background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+    color: #0c5460;
+}
+
+/* Modal Styling */
+.modal-content {
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+    border-bottom: 2px solid #f8f9fa;
+    border-radius: 15px 15px 0 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.modal-header .btn-close {
+    filter: invert(1);
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+}

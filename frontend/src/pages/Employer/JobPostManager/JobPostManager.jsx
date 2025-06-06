@@ -11,6 +11,7 @@ import { getAllEmploymentTypes } from '@/api/employmentTypesApi';
 import BuyPackageModal from '@/components/BuyPackageModal/BuyPackageModal';
 import BuyProModal from '@/components/BuyProModal/BuyProModal';
 import PackageDetailModal from '@/components/PackageDetailModal/PackageDetailModal';
+import EmployerReviewsManager from '@/components/EmployerReviewsManager/EmployerReviewsManager';
 import { toast } from 'react-toastify';
 import styles from './JobPostManager.module.css';
 import {
@@ -484,15 +485,14 @@ const JobPostManager = () => {
                         </Card>
                     </Col>
                 </Row>
-            )}
-
-            <Tabs activeKey={tab} onSelect={setTab} className="mb-3" fill>
+            )}            <Tabs activeKey={tab} onSelect={setTab} className="mb-3" fill>
                 <Tab eventKey="all" title={`Tất cả (${posts.length})`} />
                 <Tab eventKey="open" title={`Đang hoạt động (${posts.filter(p => p.status === 'open').length})`} />
                 <Tab eventKey="closed" title={`Đã đóng (${posts.filter(p => p.status === 'closed').length})`} />
-            </Tabs>
-
-            {loading ? (
+                <Tab eventKey="reviews" title="Quản lý đánh giá" />
+            </Tabs>            {tab === 'reviews' ? (
+                <EmployerReviewsManager />
+            ) : loading ? (
                 <div className="text-center"><Spinner animation="border" /></div>
             ) : filteredPosts.length === 0 ? (
                 <Alert variant="success">Không có bài viết nào</Alert>
