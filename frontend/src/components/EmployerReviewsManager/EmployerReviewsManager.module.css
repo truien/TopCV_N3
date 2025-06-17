@@ -19,6 +19,8 @@
   font-size: 24px;
   font-weight: 600;
   margin: 0;
+  display: flex;
+  align-items: center;
 }
 
 .refreshButton {
@@ -476,4 +478,265 @@
   .reviewActions {
     justify-content: center;
   }
+}
+
+.container {
+  padding: 20px 0;
+}
+
+.statsCard {
+  transition: all 0.3s ease;
+}
+
+.statsCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.statsNumber {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #2c3e50;
+}
+
+.statsLabel {
+  color: #6c757d;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.iconWrapper {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.reviewTable {
+  margin-bottom: 0;
+}
+
+.reviewTable th {
+  font-weight: 600;
+  color: #495057;
+}
+
+.reviewTable td {
+  vertical-align: middle;
+  padding: 15px;
+}
+
+.jobPostTitle {
+  font-weight: 500;
+  color: #495057;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.userAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.userAvatarLarge {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.defaultAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6c757d;
+}
+
+.defaultAvatarLarge {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6c757d;
+}
+
+.reviewComment {
+  color: #495057;
+  line-height: 1.5;
+}
+
+.star {
+  margin-right: 2px;
+}
+
+.starLarge {
+  font-size: 20px;
+}
+
+.ratingBar {
+  height: 8px;
+  background-color: #e9ecef;
+  border-radius: 4px;
+  width: 100px;
+  overflow: hidden;
+}
+
+.ratingBarFill {
+  height: 100%;
+  border-radius: 4px;
+}
+
+.ratingCount {
+  font-weight: 500;
+  min-width: 24px;
+  text-align: right;
+}
+
+.ratingDistribution {
+  margin-bottom: 8px;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+.reviewModal {
+  border-radius: 8px;
+}
+
+.reviewsList {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.reviewItem {
+  margin-bottom: 16px;
+  transition: transform 0.2s;
+}
+
+.reviewItem:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.08) !important;
+}
+
+@media (max-width: 768px) {
+  .statsNumber {
+    font-size: 24px;
+  }
+  
+  .iconWrapper {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .jobPostTitle {
+    max-width: 150px;
+  }
+}
+
+@media (max-width: 576px) {
+  .container {
+    padding: 10px;
+  }
+  
+  .statsNumber {
+    font-size: 20px;
+  }
+  
+  .reviewTable th, 
+  .reviewTable td {
+    padding: 10px;
+  }
+}
+
+.reviewTable tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.reviewTable tbody tr:hover {
+  background-color: rgba(0, 123, 255, 0.05);
+}
+
+.userAvatar, .defaultAvatar {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.userAvatarLarge, .defaultAvatarLarge {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.reviewComment {
+  line-height: 1.6;
+}
+
+.emptyState h5 {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  color: #495057;
+}
+
+.emptyState p {
+  color: #6c757d;
+}
+
+.reviewModal .modal-content {
+  border: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.iconWrapper {
+  transition: transform 0.3s ease;
+}
+
+.iconWrapper:hover {
+  transform: scale(1.1);
+}
+
+/* Animation for new items */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reviewItem {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.star {
+  transition: transform 0.2s ease;
+}
+
+.star:hover {
+  transform: scale(1.2);
+}
+
+.ratingDistribution:hover .ratingBar {
+  height: 10px;
 }

@@ -33,7 +33,6 @@ public class ApplicationsController : ControllerBase
 
         int userId = int.Parse(userIdClaim.Value);
 
-
         var job = await _context.JobPosts.FindAsync(request.JobId);
         if (job == null) return NotFound("Không tìm thấy bài tuyển dụng.");
 
@@ -41,9 +40,11 @@ public class ApplicationsController : ControllerBase
         if (existed) return BadRequest("Bạn đã ứng tuyển bài viết này rồi.");
 
         string? fileName = null;
+
+        // Kiểm tra nếu có file mới được tải lên
         if (request.CvFile != null && request.CvFile.Length > 0)
         {
-            var uploads = Path.Combine(_env.WebRootPath, "cv");
+            var uploads = Path.Combine(_env.WebRootPath, "/uploads/cvs");
             if (!Directory.Exists(uploads)) Directory.CreateDirectory(uploads);
 
             fileName = $"{userId}_{request.JobId}_{DateTime.UtcNow.Ticks}{Path.GetExtension(request.CvFile.FileName)}";
@@ -51,7 +52,20 @@ public class ApplicationsController : ControllerBase
 
             using var stream = new FileStream(filePath, FileMode.Create);
             await request.CvFile.CopyToAsync(stream);
-        }        var app = new Application
+        }
+        // Kiểm tra nếu người dùng gửi đường dẫn CV có sẵn
+        else if (!string.IsNullOrEmpty(request.CvFilePath))
+        {
+            // Lấy tên file từ đường dẫn và sử dụng cho ứng tuyển
+            fileName = Path.GetFileName(request.CvFilePath);
+        }
+        // Nếu không có file hoặc đường dẫn, báo lỗi
+        else
+        {
+            return BadRequest(new { message = "Cần cung cấp CV để ứng tuyển" });
+        }
+
+        var app = new Application
         {
             JobId = request.JobId,
             UserId = userId,
@@ -61,7 +75,8 @@ public class ApplicationsController : ControllerBase
         };
 
         _context.Applications.Add(app);
-        await _context.SaveChangesAsync();        // Send notification to employer
+        await _context.SaveChangesAsync();
+        // Send notification to employer
         await _notificationService.CreateApplicationNotificationAsync(app.JobId, userId);
 
         return Ok(new { message = "Ứng tuyển thành công!" });
@@ -77,7 +92,8 @@ public class ApplicationsController : ControllerBase
             .ToListAsync();
 
         return Ok(applications);
-    }    [Authorize(Roles = "employer")]
+    }
+    [Authorize(Roles = "employer")]
     [HttpPut("{id}/status")]
     public async Task<IActionResult> UpdateApplicationStatus(int id, [FromBody] UpdateStatusRequest request)
     {
@@ -85,17 +101,17 @@ public class ApplicationsController : ControllerBase
             .Include(a => a.Job)
             .Include(a => a.User)
             .FirstOrDefaultAsync(a => a.Id == id);
-        
+
         if (app == null) return NotFound("Không tìm thấy hồ sơ.");
-        
+
         var oldStatus = (ApplicationStatus)app.Status;
         app.Status = (int)request.Status;
-        
+
         if (request.Status == ApplicationStatus.Rejected && !string.IsNullOrEmpty(request.RejectReason))
         {
             app.RejectReason = request.RejectReason;
         }
-        
+
         await _context.SaveChangesAsync();        // Send notification to applicant about status change
         if (oldStatus != request.Status)
         {
@@ -163,7 +179,7 @@ public class ApplicationsController : ControllerBase
                 Email = a.User.Email,
                 a.AppliedAt,
                 JobTitle = a.Job.Title,
-                CvUrl = string.IsNullOrEmpty(a.CvFile) ? null : $"{Request.Scheme}://{Request.Host}/cv/{a.CvFile}",
+                CvUrl = string.IsNullOrEmpty(a.CvFile) ? null : $"{Request.Scheme}://{Request.Host}/uploads/cvs/{a.CvFile}",
                 Status = a.Status.ToString(),
                 a.RejectReason
             })

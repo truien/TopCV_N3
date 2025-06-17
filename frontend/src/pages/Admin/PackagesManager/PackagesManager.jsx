@@ -511,60 +511,64 @@ function PackagesManager() {
                             <button onClick={closeModal} className={styles.closeBtn}>×</button>
                         </div>
 
-                        <form onSubmit={handleSubmit} className={styles.modalForm}>
-                            <div className={styles.formRow}>
-                                <div className={styles.formGroup}>
-                                    <label>Tên gói *</label>
-                                    <input
-                                        type="text"
-                                        value={packageForm.name}
-                                        onChange={(e) => setPackageForm({ ...packageForm, name: e.target.value })}
-                                        required
-                                    />
-                                </div>
-                                <div className={styles.formGroup}>
-                                    <label>Giá (VND) *</label>
-                                    <input
-                                        type="number"
-                                        value={packageForm.price}
-                                        onChange={(e) => setPackageForm({ ...packageForm, price: e.target.value })}
-                                        required
-                                    />
-                                </div>
+                        <form onSubmit={handleSubmit} className={styles.modalForm}>                            <div className={styles.formRow}>
+                            <div className={styles.formGroup}>
+                                <label><FaBox /> Tên gói *</label>
+                                <input
+                                    type="text"
+                                    value={packageForm.name}
+                                    onChange={(e) => setPackageForm({ ...packageForm, name: e.target.value })}
+                                    placeholder="Nhập tên gói dịch vụ"
+                                    required
+                                />
                             </div>
+                            <div className={styles.formGroup}>
+                                <label><FaMoneyBillWave /> Giá (VND) *</label>
+                                <input
+                                    type="number"
+                                    value={packageForm.price}
+                                    onChange={(e) => setPackageForm({ ...packageForm, price: e.target.value })}
+                                    placeholder="Nhập giá gói"
+                                    required
+                                />
+                            </div>
+                        </div>
 
                             <div className={styles.formRow}>
                                 <div className={styles.formGroup}>
-                                    <label>Thời gian (ngày) *</label>
+                                    <label><FaClock /> Thời gian (ngày) *</label>
                                     <input
                                         type="number"
                                         value={packageForm.durationDays}
                                         onChange={(e) => setPackageForm({ ...packageForm, durationDays: e.target.value })}
+                                        placeholder="Nhập số ngày hiệu lực"
                                         required
                                     />
                                 </div>
                                 <div className={styles.formGroup}>
-                                    <label>Mức ưu tiên</label>
+                                    <label><FaSort /> Mức ưu tiên</label>
                                     <input
                                         type="number"
                                         value={packageForm.priorityLevel}
                                         onChange={(e) => setPackageForm({ ...packageForm, priorityLevel: e.target.value })}
+                                        placeholder="Mức ưu tiên (nếu có)"
                                     />
                                 </div>
                             </div>
 
                             <div className={styles.formGroup}>
-                                <label>Mô tả</label>
+                                <label><FaEdit /> Mô tả</label>
                                 <textarea
                                     value={packageForm.description}
                                     onChange={(e) => setPackageForm({ ...packageForm, description: e.target.value })}
                                     rows="3"
+                                    placeholder="Nhập mô tả chi tiết về gói dịch vụ"
                                 />
                             </div>
 
                             <div className={styles.formRow}>
                                 <div className={styles.formGroup}>
-                                    <label>Loại highlight</label>
+                                    <label><FaEye /> Loại highlight</label>
                                     <select
                                         value={packageForm.highlightType}
                                         onChange={(e) => setPackageForm({ ...packageForm, highlightType: e.target.value })}

@@ -21,6 +21,8 @@ public partial class Order
 
     public long? TransactionId { get; set; }
 
+    public string? PaymentOrderId { get; set; }
+
     public virtual ICollection<Orderdetail> Orderdetails { get; set; } = new List<Orderdetail>();
 
     public virtual ProPackage? Package { get; set; }

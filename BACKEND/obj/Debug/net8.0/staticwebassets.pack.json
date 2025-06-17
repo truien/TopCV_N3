@@ -1,44 +1,8 @@
 {
   "Files": [
     {
-      "Id": "C:\\Users\\ADMIN\\TopCV_N3\\BACKEND\\wwwroot\\cv\\14_12_638841224551343842.pdf",
-      "PackagePath": "staticwebassets\\cv\\14_12_638841224551343842.pdf"
-    },
-    {
-      "Id": "C:\\Users\\ADMIN\\TopCV_N3\\BACKEND\\wwwroot\\cv\\14_8_638843091693852817.docx",
-      "PackagePath": "staticwebassets\\cv\\14_8_638843091693852817.docx"
-    },
-    {
-      "Id": "C:\\Users\\ADMIN\\TopCV_N3\\BACKEND\\wwwroot\\cv\\14_9_638805228848281108.pdf",
-      "PackagePath": "staticwebassets\\cv\\14_9_638805228848281108.pdf"
-    },
-    {
-      "Id": "C:\\Users\\ADMIN\\TopCV_N3\\BACKEND\\wwwroot\\cv\\17_11_638805649265360621.pdf",
-      "PackagePath": "staticwebassets\\cv\\17_11_638805649265360621.pdf"
-    },
-    {
-      "Id": "C:\\Users\\ADMIN\\TopCV_N3\\BACKEND\\wwwroot\\cv\\17_4_638805635131125058.pdf",
-      "PackagePath": "staticwebassets\\cv\\17_4_638805635131125058.pdf"
-    },
-    {
-      "Id": "C:\\Users\\ADMIN\\TopCV_N3\\BACKEND\\wwwroot\\cv\\17_4_638805664947596551.pdf",
-      "PackagePath": "staticwebassets\\cv\\17_4_638805664947596551.pdf"
-    },
-    {
-      "Id": "C:\\Users\\ADMIN\\TopCV_N3\\BACKEND\\wwwroot\\cv\\17_6_638805228323831157.pdf",
-      "PackagePath": "staticwebassets\\cv\\17_6_638805228323831157.pdf"
-    },
-    {
-      "Id": "C:\\Users\\ADMIN\\TopCV_N3\\BACKEND\\wwwroot\\cv\\17_9_638805402025196013.pdf",
-      "PackagePath": "staticwebassets\\cv\\17_9_638805402025196013.pdf"
-    },
-    {
-      "Id": "C:\\Users\\ADMIN\\TopCV_N3\\BACKEND\\wwwroot\\cv\\18_11_638812268448502939.docx",
-      "PackagePath": "staticwebassets\\cv\\18_11_638812268448502939.docx"
-    },
-    {
-      "Id": "C:\\Users\\ADMIN\\TopCV_N3\\BACKEND\\wwwroot\\cv\\18_4_638810689263898337.pdf",
-      "PackagePath": "staticwebassets\\cv\\18_4_638810689263898337.pdf"
+      "Id": "C:\\Users\\ADMIN\\TopCV_N3\\BACKEND\\wwwroot\\uploads\\avatars\\35b65282-b417-4fda-abc2-0faf9eb98456.jpg",
+      "PackagePath": "staticwebassets\\uploads\\avatars\\35b65282-b417-4fda-abc2-0faf9eb98456.jpg"
     },
     {
       "Id": "C:\\Users\\ADMIN\\TopCV_N3\\BACKEND\\wwwroot\\uploads\\avatars\\61fea96c-1388-43fe-b3bd-9c831f42ace4.jpg",
@@ -47,6 +11,10 @@
     {
       "Id": "C:\\Users\\ADMIN\\TopCV_N3\\BACKEND\\wwwroot\\uploads\\avatars\\90a50b4b-db02-4c72-a612-47b59cf9d5e6.jpg",
       "PackagePath": "staticwebassets\\uploads\\avatars\\90a50b4b-db02-4c72-a612-47b59cf9d5e6.jpg"
+    },
+    {
+      "Id": "C:\\Users\\ADMIN\\TopCV_N3\\BACKEND\\wwwroot\\uploads\\cvs\\15c8c901-6b3c-48a6-be7e-f1fc7b523728.docx",
+      "PackagePath": "staticwebassets\\uploads\\cvs\\15c8c901-6b3c-48a6-be7e-f1fc7b523728.docx"
     },
     {
       "Id": "C:\\Users\\ADMIN\\TopCV_N3\\BACKEND\\wwwroot\\uploads\\cvs\\b6aed87a-1ba7-440c-9a34-8977f6396ccc.pdf",

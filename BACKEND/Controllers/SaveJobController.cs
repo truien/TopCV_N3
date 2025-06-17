@@ -71,10 +71,9 @@ public class SaveJobController : ControllerBase
 
         return Ok(new { message = "Bỏ lưu tin tuyển dụng thành công." });
     }
-
     [Authorize]
     [HttpGet("saved-jobs")]
-    public async Task<IActionResult> GetSavedJobs()
+    public async Task<IActionResult> GetSavedJobs([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
     {
         var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (string.IsNullOrEmpty(userIdStr))
@@ -82,25 +81,79 @@ public class SaveJobController : ControllerBase
 
         int userId = int.Parse(userIdStr);
 
+        // Đảm bảo page và pageSize hợp lệ
+        page = Math.Max(1, page);
+        pageSize = Math.Clamp(pageSize, 1, 50);
 
+        // Tính toán số lượng bỏ qua
+        int skip = (page - 1) * pageSize;
+
+        // Lấy tổng số lượng công việc đã lưu
+        int totalCount = await _context.Set<SavedJob>()
+            .Where(s => s.UserId == userId)
+            .CountAsync();
+
+        // Tính toán tổng số trang
+        int totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+        // Lấy danh sách công việc đã lưu với phân trang
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
         var savedJobs = await _context.Set<SavedJob>()
             .Include(s => s.JobPost)
                 .ThenInclude(j => j.Employer)
                     .ThenInclude(e => e.CompanyProfiles)
+            .Include(s => s.JobPost)
+                .ThenInclude(j => j.JobPostEmploymentTypes)
+                    .ThenInclude(jpe => jpe.EmploymentType).Include(s => s.JobPost)
+                .ThenInclude(j => j.JobPostFields)
+                    .ThenInclude(jpf => jpf.Field)
             .Where(s => s.UserId == userId)
+            .OrderByDescending(s => s.JobPost.PostDate)
+            .Skip(skip)
+            .Take(pageSize)
             .Select(s => new
             {
                 s.JobPost.Id,
                 s.JobPost.Title,
                 s.JobPost.Location,
                 s.JobPost.SalaryRange,
-                CompanyName = s.JobPost.Employer.CompanyProfiles.FirstOrDefault().CompanyName,
-                s.JobPost.ApplyDeadline
+                s.JobPost.PostDate,
+                s.JobPost.ApplyDeadline,
+                Employer = new
+                {
+                    CompanyName = s.JobPost.Employer.CompanyProfiles.FirstOrDefault().CompanyName,
+                    Avatar = s.JobPost.Employer.Avatar
+                },
+                Fields = s.JobPost.JobPostFields.Select(jpf => jpf.Field.Name).ToList(),
+                Employment = s.JobPost.JobPostEmploymentTypes.Select(jpe => jpe.EmploymentType.Name).ToList()
             })
             .ToListAsync();
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
 
-        return Ok(savedJobs);
+        // Trả về kết quả với thông tin phân trang
+        return Ok(new
+        {
+            Items = savedJobs,
+            TotalCount = totalCount,
+            TotalPages = totalPages,
+            CurrentPage = page,
+            PageSize = pageSize
+        });
+    }
+
+    [Authorize]
+    [HttpGet("check-saved/{jobPostId}")]
+    public async Task<IActionResult> CheckJobSaved(int jobPostId)
+    {
+        var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userIdStr))
+            return Unauthorized();
+
+        int userId = int.Parse(userIdStr);
+
+        var isSaved = await _context.Set<SavedJob>()
+            .AnyAsync(s => s.UserId == userId && s.JobPostId == jobPostId);
+
+        return Ok(new { isSaved });
     }
 }

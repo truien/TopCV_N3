@@ -90,7 +90,6 @@ namespace BACKEND.Controllers
                 query = query.Where(c => c.Industry == industry);
             }
 
-            // Ưu tiên Pro Company lên đầu, sau đó mới đến số lượng việc làm
             var total = await query.CountAsync();
             var companies = await query
                 .OrderByDescending(c => c.IsPro) // Ưu tiên Pro

@@ -169,3 +169,5 @@ C:\Users\ADMIN\TopCV_N3\BACKEND\bin\Debug\net8.0\Microsoft.Extensions.Diagnostic
 C:\Users\ADMIN\TopCV_N3\BACKEND\bin\Debug\net8.0\Microsoft.Extensions.Hosting.Abstractions.dll
 C:\Users\ADMIN\TopCV_N3\BACKEND\bin\Debug\net8.0\Microsoft.Extensions.ObjectPool.dll
 C:\Users\ADMIN\TopCV_N3\BACKEND\bin\Debug\net8.0\System.Net.WebSockets.WebSocketProtocol.dll
+C:\Users\ADMIN\TopCV_N3\BACKEND\bin\Debug\net8.0\PayPalCheckoutSdk.dll
+C:\Users\ADMIN\TopCV_N3\BACKEND\bin\Debug\net8.0\PayPalHttp-Dotnet.dll

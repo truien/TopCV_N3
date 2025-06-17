@@ -3,6 +3,7 @@ public class ApplyRequest
 {
     public int JobId { get; set; }
 
-    [Required]
     public IFormFile? CvFile { get; set; }
+
+    public string? CvFilePath { get; set; }
 }

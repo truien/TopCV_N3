@@ -568,7 +568,7 @@ namespace BACKEND.Controllers
                             ? null
                             : (job.Employer.Avatar.StartsWith("http")
                             ? job.Employer.Avatar
-                            : baseUrl + job.Employer.Avatar),
+                            : baseUrl + "uploads/avatars/" + job.Employer.Avatar),
                     Follower = followerCount
                 },
                 Fields = fields,

@@ -190,3 +190,78 @@
         font-size: 13px;
     }
 }
+
+/* Pro status alert styles */
+.proAlert {
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin-bottom: 24px;
+    border: none;
+}
+
+.proSuccessAlert {
+    background: linear-gradient(135deg, #00b14f 0%, #019247 100%);
+    color: white;
+    border-left: 6px solid #007e38;
+}
+
+.proWarningAlert {
+    background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+    color: white;
+    border-left: 6px solid #d39e00;
+}
+
+.proAlertContent {
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.proAlertIcon {
+    font-size: 22px;
+    margin-right: 12px;
+}
+
+.proAlertHighlight {
+    font-weight: 700;
+    margin: 0 4px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.proButton {
+    font-weight: 600;
+    border-radius: 6px;
+    padding: 6px 16px;
+    transition: all 0.2s ease;
+    border: 2px solid white;
+}
+
+.proButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.proSuccessButton {
+    background-color: white;
+    color: #00b14f;
+    border-color: white;
+}
+
+.proSuccessButton:hover {
+    background-color: #f8f9fa;
+    color: #00b14f;
+}
+
+.proWarningButton {
+    background-color: white;
+    color: #fd7e14;
+    border-color: white;
+}
+
+.proWarningButton:hover {
+    background-color: #f8f9fa;
+    color: #fd7e14;
+}

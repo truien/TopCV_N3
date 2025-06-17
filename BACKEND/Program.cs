@@ -6,7 +6,6 @@ using BACKEND.Models;
 using Microsoft.EntityFrameworkCore;
 using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using VNPAY.NET;
 using BACKEND.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -103,7 +102,7 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
     });
 });
 builder.Services.AddHostedService<TopMaxPostDateUpdaterService>();
-builder.Services.AddScoped<IVnpay, Vnpay>();
+builder.Services.AddSingleton<PayPalClient>();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddSignalR();
 builder.Services.AddAuthorization();

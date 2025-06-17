@@ -1,3 +1,4 @@
+// filepath: c:\Users\ADMIN\TopCV_N3\frontend\src\pages\Admin\ProPackagesManager\ProPackagesManager.jsx
 import { useEffect, useState, useRef } from "react";
 import styles from "./ProPackagesManager.module.css";
 import {
@@ -26,7 +27,8 @@ function ProPackagesManager() {
     const [packages, setPackages] = useState([]);
     const [filteredPackages, setFilteredPackages] = useState([]);
     const [statistics, setStatistics] = useState(null);
-    const [loading, setLoading] = useState(true); const [searchTerm, setSearchTerm] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState("");
     const [sortField, setSortField] = useState("id");
     const [sortDirection, setSortDirection] = useState("asc");
     const [currentPage, setCurrentPage] = useState(1);
@@ -47,7 +49,9 @@ function ProPackagesManager() {
     useEffect(() => {
         fetchPackages();
         fetchStatistics();
-    }, []); useEffect(() => {
+    }, []);
+
+    useEffect(() => {
         let filtered = packages;
 
         // Apply search filter
@@ -105,7 +109,9 @@ function ProPackagesManager() {
         } finally {
             setLoading(false);
         }
-    }; const fetchStatistics = async () => {
+    };
+
+    const fetchStatistics = async () => {
         try {
             const data = await getProPackageStatistics();
             setStatistics(data);
@@ -213,7 +219,8 @@ function ProPackagesManager() {
         const formData = new FormData();
         formData.append('file', file);
 
-        setImportLoading(true); try {
+        setImportLoading(true);
+        try {
             await importProPackages(formData);
             toast.success('Import dữ liệu thành công!');
             await fetchPackages();
@@ -233,7 +240,9 @@ function ProPackagesManager() {
     const currentItems = filteredPackages.slice(indexOfFirstItem, indexOfLastItem);
     const totalPages = Math.ceil(filteredPackages.length / itemsPerPage);
 
-    const paginate = (pageNumber) => setCurrentPage(pageNumber);    // Export to Excel
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+    // Export to Excel
     const exportToExcel = () => {
         if (filteredPackages.length === 0) {
             toast.warning('Không có dữ liệu để xuất');
@@ -381,7 +390,8 @@ function ProPackagesManager() {
                             title="Làm mới dữ liệu"
                         >
                             <FaSync />
-                        </button>                        <button
+                        </button>
+                        <button
                             onClick={exportToExcel}
                             className={styles.exportBtn}
                             title="Xuất file Excel"
@@ -393,10 +403,12 @@ function ProPackagesManager() {
                             className={styles.addBtn}
                         >
                             <FaPlus /> Thêm gói mới
-                        </button>                        <button
+                        </button>
+                        <button
                             onClick={handleImportClick}
                             className={styles.importBtn}
                             title="Nhập từ file"
+                            disabled={importLoading}
                         >
                             {importLoading ? <FaSync className={styles.loadingIcon} /> : <FaUpload />} Nhập từ file
                         </button>
@@ -410,7 +422,8 @@ function ProPackagesManager() {
                     </div>
                 </div>
 
-                {/* Filters */}                <div className={styles.filtersRow}>
+                {/* Filters */}
+                <div className={styles.filtersRow}>
                     <div className={styles.filterItem}>
                         <FaFilter />
                         <span>Hiển thị {filteredPackages.length} trên {packages.length} gói</span>
@@ -579,25 +592,31 @@ function ProPackagesManager() {
                 <div className={styles.modalOverlay} onClick={closeModal}>
                     <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                         <div className={styles.modalHeader}>
-                            <h3>{editingPackage ? 'Chỉnh sửa gói' : 'Thêm gói mới'}</h3>
+                            <h3>{editingPackage ? 'Chỉnh sửa gói Pro' : 'Thêm gói Pro mới'}</h3>
                             <button onClick={closeModal} className={styles.closeBtn}>×</button>
                         </div>
 
                         <form onSubmit={handleSubmit} className={styles.modalForm}>
                             <div className={styles.formRow}>
                                 <div className={styles.formGroup}>
-                                    <label>Tên gói *</label>
+                                    <label>
+                                        <FaBox /> Tên gói *
+                                    </label>
                                     <input
                                         type="text"
+                                        placeholder="Nhập tên gói Pro"
                                         value={packageForm.name}
                                         onChange={(e) => setPackageForm({ ...packageForm, name: e.target.value })}
                                         required
                                     />
                                 </div>
                                 <div className={styles.formGroup}>
-                                    <label>Giá (VND) *</label>
+                                    <label>
+                                        <FaMoneyBillWave /> Giá (VND) *
+                                    </label>
                                     <input
                                         type="number"
+                                        placeholder="Nhập giá gói Pro"
                                         value={packageForm.price}
                                         onChange={(e) => setPackageForm({ ...packageForm, price: e.target.value })}
                                         required
@@ -607,31 +626,53 @@ function ProPackagesManager() {
 
                             <div className={styles.formRow}>
                                 <div className={styles.formGroup}>
-                                    <label>Thời gian (ngày) *</label>
+                                    <label>
+                                        <FaClock /> Thời gian (ngày) *
+                                    </label>
                                     <input
                                         type="number"
+                                        placeholder="Nhập thời hạn gói Pro"
                                         value={packageForm.durationDays}
                                         onChange={(e) => setPackageForm({ ...packageForm, durationDays: e.target.value })}
                                         required
                                     />
                                 </div>
+                                <div className={styles.formGroup}>
+                                    <label>
+                                        <FaEye /> Trạng thái hiển thị
+                                    </label>
+                                    <div className={styles.checkboxLabel}>
+                                        <input
+                                            type="checkbox"
+                                            id="isVisible"
+                                            defaultChecked={true}
+                                        />
+                                        <span>Hiển thị cho người dùng</span>
+                                    </div>
+                                </div>
                             </div>
 
                             <div className={styles.formGroup}>
-                                <label>Mô tả</label>
+                                <label>
+                                    <FaFileExcel /> Mô tả
+                                </label>
                                 <textarea
+                                    placeholder="Nhập mô tả chi tiết về gói Pro"
                                     value={packageForm.description}
                                     onChange={(e) => setPackageForm({ ...packageForm, description: e.target.value })}
-                                    rows="3"
+                                    rows="4"
                                 />
                             </div>
 
                             <div className={styles.modalActions}>
                                 <button type="button" onClick={closeModal} className={styles.cancelBtn}>
-                                    Hủy
+                                    Hủy bỏ
                                 </button>
                                 <button type="submit" className={styles.submitBtn}>
-                                    {editingPackage ? 'Cập nhật' : 'Tạo mới'}
+                                    {editingPackage ?
+                                        <><FaEdit /> Cập nhật gói</> :
+                                        <><FaPlus /> Tạo gói mới</>
+                                    }
                                 </button>
                             </div>
                         </form>
