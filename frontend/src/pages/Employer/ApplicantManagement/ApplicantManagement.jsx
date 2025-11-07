@@ -684,7 +684,8 @@ const ApplicantManagement = () => {
                         placeholder="Nhập nội dung thư mời phỏng vấn..."
                     />
                 </Modal.Body>
-                <Modal.Footer>                    <Button variant="secondary" onClick={() => setShowInterviewModal(false)}>
+                <Modal.Footer>                    
+                    <Button variant="secondary" onClick={() => setShowInterviewModal(false)}>
                     <FaTimes className="me-1" />
                     Hủy
                 </Button>
@@ -696,7 +697,8 @@ const ApplicantManagement = () => {
                     >
                         <FaCheck className="me-1" />
                         Gửi thư mời
-                    </Button>                </Modal.Footer>
+                    </Button>                
+                    </Modal.Footer>
             </Modal>
 
             {/* Reject Modal */}

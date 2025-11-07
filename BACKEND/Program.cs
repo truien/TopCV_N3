@@ -27,7 +27,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     {
         options.Cookie.Name = "topcv_auth";
         options.Cookie.HttpOnly = true;
-        // Luôn cho phép gửi cookie trên HTTPS lẫn HTTP (phù hợp development và production)
         options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
         options.ExpireTimeSpan = TimeSpan.FromHours(1);
         // Luôn đặt SameSite=None để cookie được gửi kèm khi gọi AJAX từ React/Vite

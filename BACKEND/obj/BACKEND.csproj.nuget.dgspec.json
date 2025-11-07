@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\ADMIN\\TopCV_N3\\BACKEND\\BACKEND.csproj": {}
+    "C:\\Users\\Truyen\\TopCV_N3\\BACKEND\\BACKEND.csproj": {}
   },
   "projects": {
-    "C:\\Users\\ADMIN\\TopCV_N3\\BACKEND\\BACKEND.csproj": {
+    "C:\\Users\\Truyen\\TopCV_N3\\BACKEND\\BACKEND.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\ADMIN\\TopCV_N3\\BACKEND\\BACKEND.csproj",
+        "projectUniqueName": "C:\\Users\\Truyen\\TopCV_N3\\BACKEND\\BACKEND.csproj",
         "projectName": "BACKEND",
-        "projectPath": "C:\\Users\\ADMIN\\TopCV_N3\\BACKEND\\BACKEND.csproj",
-        "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\ADMIN\\TopCV_N3\\BACKEND\\obj\\",
+        "projectPath": "C:\\Users\\Truyen\\TopCV_N3\\BACKEND\\BACKEND.csproj",
+        "packagesPath": "C:\\Users\\Truyen\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Truyen\\TopCV_N3\\BACKEND\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\Truyen\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -145,7 +145,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.405/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.414/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

@@ -494,9 +494,9 @@ function AccountManager() {
                 </div>
 
                 {/* Stats Section */}
-                {stats && (
+                {/* {stats && (
                     <div className={styles.statsGrid}>
-                        <div className={`${styles.statCard} ${styles.primaryStat}`}>
+                        <div className={`${styles.statCard} ${styles.statCardprimaryStat}`}>
                             <div className={styles.statIcon}>
                                 <FaUsers />
                             </div>
@@ -513,7 +513,7 @@ function AccountManager() {
                             </div>
                         </div>
 
-                        <div className={`${styles.statCard} ${styles.successStat}`}>
+                        <div className={`${styles.statCard} ${styles.statCardsuccessStat}`}>
                             <div className={styles.statIcon}>
                                 <HiSparkles />
                             </div>
@@ -527,7 +527,7 @@ function AccountManager() {
                             </div>
                         </div>
 
-                        <div className={`${styles.statCard} ${styles.infoStat}`}>
+                        <div className={`${styles.statCard} ${styles.statCardinfoStat}`}>
                             <div className={styles.statIcon}>
                                 <FaChartLine />
                             </div>
@@ -541,7 +541,7 @@ function AccountManager() {
                             </div>
                         </div>
 
-                        <div className={`${styles.statCard} ${styles.roleCard}`}>
+                        <div className={`${styles.statCard} ${styles.statCardroleCard}`}>
                             <div className={styles.statIcon}>
                                 <HiShieldCheck />
                             </div>
@@ -573,7 +573,7 @@ function AccountManager() {
                             </div>
                         </div>
                     </div>
-                )}
+                )} */}
 
                 {/* Main Content */}
                 <div className={styles.mainContent}>

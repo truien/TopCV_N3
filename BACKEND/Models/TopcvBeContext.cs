@@ -672,8 +672,6 @@ public partial class TopcvBeContext : DbContext
 
             entity.HasIndex(e => e.RoleId, "fk_users_role");
 
-            entity.HasIndex(e => e.GoogleId, "google_id").IsUnique();
-
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Avatar)
                 .HasColumnType("text")
@@ -683,7 +681,6 @@ public partial class TopcvBeContext : DbContext
                 .HasColumnType("timestamp")
                 .HasColumnName("created_at");
             entity.Property(e => e.Email).HasColumnName("email");
-            entity.Property(e => e.GoogleId).HasColumnName("google_id");
             entity.Property(e => e.Password)
                 .HasMaxLength(255)
                 .HasColumnName("password");

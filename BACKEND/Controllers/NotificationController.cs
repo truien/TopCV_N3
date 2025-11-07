@@ -38,7 +38,6 @@ namespace BACKEND.Controllers
 
             try
             {
-                // Sử dụng NotificationService thay vì truy cập trực tiếp _context
                 var (notifications, totalCount) = await _notificationService.GetNotificationsWithPaginationAsync(
                     userId.Value, userType, page, pageSize, type, isRead);
 

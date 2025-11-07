@@ -51,7 +51,7 @@ namespace BACKEND.Controllers
             {
                 return StatusCode(500, new { message = "Lỗi server: " + ex.Message });
             }
-        }        // GET: api/JobPostReviews/jobpost/{jobPostId}/stats - Lấy thống kê đánh giá
+        }     
         [HttpGet("jobpost/{jobPostId}/stats")]
         public async Task<ActionResult<JobPostReviewsStatsDto>> GetJobPostReviewsStats(int jobPostId)
         {

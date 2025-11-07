@@ -185,11 +185,10 @@ public class UserController : ControllerBase
         if (user == null)
             return NotFound(new { message = "Không tìm thấy người dùng." });
 
-        // Update basic user info
         if (!string.IsNullOrEmpty(updateProfileDto.Username))
             user.Username = updateProfileDto.Username;
 
-        var userRole = user.Role?.Name?.ToLower() ?? "user";        // Update role-specific profile data
+        var userRole = user.Role?.Name?.ToLower() ?? "user";        
         if (userRole == "candidate")
         {
             var candidateProfile = user.CandidateProfiles.FirstOrDefault();
@@ -204,7 +203,7 @@ public class UserController : ControllerBase
                 if (!string.IsNullOrEmpty(updateProfileDto.DateOfBirth) && DateOnly.TryParse(updateProfileDto.DateOfBirth, out var dob))
                     candidateProfile.DateOfBirth = dob;
 
-                // Handle CV upload for candidates
+
                 if (cv != null)
                 {
                     var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "cvs");
@@ -330,9 +329,6 @@ public class UserController : ControllerBase
         if (user == null)
             return NotFound(new { message = "Không tìm thấy người dùng." });
 
-        // Store notification settings in user preferences (you might want to create a separate table for this)
-        // For now, we'll just return success as this would require additional database schema
-
         try
         {
             await _context.SaveChangesAsync();
@@ -358,9 +354,6 @@ public class UserController : ControllerBase
         if (user == null)
             return NotFound(new { message = "Không tìm thấy người dùng." });
 
-        // Store privacy settings (you might want to create a separate table for this)
-        // For now, we'll just return success
-
         try
         {
             await _context.SaveChangesAsync();
@@ -385,9 +378,6 @@ public class UserController : ControllerBase
         var user = await _context.Users.FindAsync(userId);
         if (user == null)
             return NotFound(new { message = "Không tìm thấy người dùng." });
-
-        // Store theme settings (you might want to create a separate table for this)
-        // For now, we'll just return success
 
         try
         {

@@ -317,7 +317,7 @@ public class AuthController : ControllerBase
     [HttpPost("google-login")]
     public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequest request)
     {
-        // 1. Validate token giống trước
+
         var settings = new GoogleJsonWebSignature.ValidationSettings
         {
             Audience = new List<string?> { _config["GoogleAuth:ClientId"] }
@@ -442,7 +442,6 @@ public class AuthController : ControllerBase
 
         return Ok(new { message = "OTP đã được gửi đến email của bạn." });
     }
-
 
     [HttpPost("reset-password")]
     public IActionResult ResetPassword([FromBody] ResetPasswordRequest request)
