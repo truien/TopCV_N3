@@ -194,7 +194,6 @@ C:\Users\Truyen\TopCV_N3\BACKEND\bin\Debug\net8.0\Microsoft.AspNetCore.Authentic
 C:\Users\Truyen\TopCV_N3\BACKEND\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 C:\Users\Truyen\TopCV_N3\BACKEND\bin\Debug\net8.0\Microsoft.AspNetCore.OpenApi.dll
 C:\Users\Truyen\TopCV_N3\BACKEND\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
-C:\Users\Truyen\TopCV_N3\BACKEND\bin\Debug\net8.0\Microsoft.Bcl.Memory.dll
 C:\Users\Truyen\TopCV_N3\BACKEND\bin\Debug\net8.0\Microsoft.CodeAnalysis.dll
 C:\Users\Truyen\TopCV_N3\BACKEND\bin\Debug\net8.0\Microsoft.CodeAnalysis.CSharp.dll
 C:\Users\Truyen\TopCV_N3\BACKEND\bin\Debug\net8.0\Microsoft.CodeAnalysis.CSharp.Workspaces.dll
@@ -343,3 +342,5 @@ C:\Users\Truyen\TopCV_N3\BACKEND\obj\Debug\net8.0\refint\BACKEND.dll
 C:\Users\Truyen\TopCV_N3\BACKEND\obj\Debug\net8.0\BACKEND.pdb
 C:\Users\Truyen\TopCV_N3\BACKEND\obj\Debug\net8.0\BACKEND.genruntimeconfig.cache
 C:\Users\Truyen\TopCV_N3\BACKEND\obj\Debug\net8.0\ref\BACKEND.dll
+C:\Users\Truyen\TopCV_N3\BACKEND\bin\Debug\net8.0\Pipelines.Sockets.Unofficial.dll
+C:\Users\Truyen\TopCV_N3\BACKEND\bin\Debug\net8.0\StackExchange.Redis.dll

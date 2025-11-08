@@ -212,7 +212,7 @@
           "Microsoft.AspNetCore.App"
         ]
       },
-      "Microsoft.AspNetCore.Authentication.JwtBearer/8.0.2": {
+      "Microsoft.AspNetCore.Authentication.JwtBearer/8.0.11": {
         "type": "package",
         "dependencies": {
           "Microsoft.IdentityModel.Protocols.OpenIdConnect": "7.1.2"
@@ -611,22 +611,6 @@
           "lib/netstandard2.1/Microsoft.Bcl.AsyncInterfaces.dll": {
             "related": ".xml"
           }
-        }
-      },
-      "Microsoft.Bcl.Memory/9.0.0": {
-        "type": "package",
-        "compile": {
-          "lib/net8.0/Microsoft.Bcl.Memory.dll": {
-            "related": ".xml"
-          }
-        },
-        "runtime": {
-          "lib/net8.0/Microsoft.Bcl.Memory.dll": {
-            "related": ".xml"
-          }
-        },
-        "build": {
-          "buildTransitive/net8.0/_._": {}
         }
       },
       "Microsoft.CodeAnalysis.Analyzers/3.3.3": {
@@ -1373,7 +1357,7 @@
           }
         }
       },
-      "Microsoft.IdentityModel.Abstractions/8.6.1": {
+      "Microsoft.IdentityModel.Abstractions/8.3.0": {
         "type": "package",
         "compile": {
           "lib/net8.0/Microsoft.IdentityModel.Abstractions.dll": {
@@ -1386,10 +1370,10 @@
           }
         }
       },
-      "Microsoft.IdentityModel.JsonWebTokens/8.6.1": {
+      "Microsoft.IdentityModel.JsonWebTokens/8.3.0": {
         "type": "package",
         "dependencies": {
-          "Microsoft.IdentityModel.Tokens": "8.6.1"
+          "Microsoft.IdentityModel.Tokens": "8.3.0"
         },
         "compile": {
           "lib/net8.0/Microsoft.IdentityModel.JsonWebTokens.dll": {
@@ -1402,10 +1386,10 @@
           }
         }
       },
-      "Microsoft.IdentityModel.Logging/8.6.1": {
+      "Microsoft.IdentityModel.Logging/8.3.0": {
         "type": "package",
         "dependencies": {
-          "Microsoft.IdentityModel.Abstractions": "8.6.1"
+          "Microsoft.IdentityModel.Abstractions": "8.3.0"
         },
         "compile": {
           "lib/net8.0/Microsoft.IdentityModel.Logging.dll": {
@@ -1452,12 +1436,10 @@
           }
         }
       },
-      "Microsoft.IdentityModel.Tokens/8.6.1": {
+      "Microsoft.IdentityModel.Tokens/8.3.0": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Bcl.Memory": "9.0.0",
-          "Microsoft.Extensions.Logging.Abstractions": "8.0.0",
-          "Microsoft.IdentityModel.Logging": "8.6.1"
+          "Microsoft.IdentityModel.Logging": "8.3.0"
         },
         "compile": {
           "lib/net8.0/Microsoft.IdentityModel.Tokens.dll": {
@@ -1677,6 +1659,22 @@
           "lib/netstandard2.0/PayPalHttp-Dotnet.dll": {}
         }
       },
+      "Pipelines.Sockets.Unofficial/2.2.8": {
+        "type": "package",
+        "dependencies": {
+          "System.IO.Pipelines": "5.0.1"
+        },
+        "compile": {
+          "lib/net5.0/Pipelines.Sockets.Unofficial.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net5.0/Pipelines.Sockets.Unofficial.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Pomelo.EntityFrameworkCore.MySql/8.0.3": {
         "type": "package",
         "dependencies": {
@@ -1881,6 +1879,23 @@
         },
         "runtime": {
           "lib/netstandard2.1/Sprache.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "StackExchange.Redis/2.9.32": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.Extensions.Logging.Abstractions": "8.0.0",
+          "Pipelines.Sockets.Unofficial": "2.2.8"
+        },
+        "compile": {
+          "lib/net8.0/StackExchange.Redis.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/StackExchange.Redis.dll": {
             "related": ".xml"
           }
         }
@@ -2354,11 +2369,11 @@
           }
         }
       },
-      "System.IdentityModel.Tokens.Jwt/8.6.1": {
+      "System.IdentityModel.Tokens.Jwt/8.3.0": {
         "type": "package",
         "dependencies": {
-          "Microsoft.IdentityModel.JsonWebTokens": "8.6.1",
-          "Microsoft.IdentityModel.Tokens": "8.6.1"
+          "Microsoft.IdentityModel.JsonWebTokens": "8.3.0",
+          "Microsoft.IdentityModel.Tokens": "8.3.0"
         },
         "compile": {
           "lib/net8.0/System.IdentityModel.Tokens.Jwt.dll": {
@@ -3807,10 +3822,10 @@
         "microsoft.aspnetcore.authentication.google.nuspec"
       ]
     },
-    "Microsoft.AspNetCore.Authentication.JwtBearer/8.0.2": {
-      "sha512": "7qJkk5k5jabATZZrMIQgpUB9yjDNAAApSqw+8d0FEyK1AJ4j+wv1qOMl2byUr837xbK+MjehtPnQ32yZ5Gtzlw==",
+    "Microsoft.AspNetCore.Authentication.JwtBearer/8.0.11": {
+      "sha512": "9KhRuywosM24BPf1R5erwsvIkpRUu1+btVyOPlM3JgrhFVP4pq5Fuzi3vjP01OHXfbCtNhWa+HGkZeqaWdcO5w==",
       "type": "package",
-      "path": "microsoft.aspnetcore.authentication.jwtbearer/8.0.2",
+      "path": "microsoft.aspnetcore.authentication.jwtbearer/8.0.11",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -3818,7 +3833,7 @@
         "THIRD-PARTY-NOTICES.TXT",
         "lib/net8.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll",
         "lib/net8.0/Microsoft.AspNetCore.Authentication.JwtBearer.xml",
-        "microsoft.aspnetcore.authentication.jwtbearer.8.0.2.nupkg.sha512",
+        "microsoft.aspnetcore.authentication.jwtbearer.8.0.11.nupkg.sha512",
         "microsoft.aspnetcore.authentication.jwtbearer.nuspec"
       ]
     },
@@ -4102,36 +4117,6 @@
         "lib/netstandard2.1/Microsoft.Bcl.AsyncInterfaces.xml",
         "microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512",
         "microsoft.bcl.asyncinterfaces.nuspec",
-        "useSharedDesignerContext.txt"
-      ]
-    },
-    "Microsoft.Bcl.Memory/9.0.0": {
-      "sha512": "bTUtGfpGyJnohQzjdXbtc7MqNzkv7CWUSRz54+ucNm0i32rZiIU0VdVPHDBShOl1qhVKRjW8mnEBz3d2vH93tQ==",
-      "type": "package",
-      "path": "microsoft.bcl.memory/9.0.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "Icon.png",
-        "LICENSE.TXT",
-        "PACKAGE.md",
-        "THIRD-PARTY-NOTICES.TXT",
-        "buildTransitive/net461/Microsoft.Bcl.Memory.targets",
-        "buildTransitive/net462/_._",
-        "buildTransitive/net8.0/_._",
-        "buildTransitive/netcoreapp2.0/Microsoft.Bcl.Memory.targets",
-        "lib/net462/Microsoft.Bcl.Memory.dll",
-        "lib/net462/Microsoft.Bcl.Memory.xml",
-        "lib/net8.0/Microsoft.Bcl.Memory.dll",
-        "lib/net8.0/Microsoft.Bcl.Memory.xml",
-        "lib/net9.0/Microsoft.Bcl.Memory.dll",
-        "lib/net9.0/Microsoft.Bcl.Memory.xml",
-        "lib/netstandard2.0/Microsoft.Bcl.Memory.dll",
-        "lib/netstandard2.0/Microsoft.Bcl.Memory.xml",
-        "lib/netstandard2.1/Microsoft.Bcl.Memory.dll",
-        "lib/netstandard2.1/Microsoft.Bcl.Memory.xml",
-        "microsoft.bcl.memory.9.0.0.nupkg.sha512",
-        "microsoft.bcl.memory.nuspec",
         "useSharedDesignerContext.txt"
       ]
     },
@@ -5516,10 +5501,10 @@
         "microsoft.identity.client.extensions.msal.nuspec"
       ]
     },
-    "Microsoft.IdentityModel.Abstractions/8.6.1": {
-      "sha512": "OwmvCXYTttrxV3qT7QKDkoQP4/DB4RWjTwEqV+dNfb2opHn29WGDzoF+r4BVFQVy+BDYMhRlhIp8g3jSyJd+4Q==",
+    "Microsoft.IdentityModel.Abstractions/8.3.0": {
+      "sha512": "jNin7yvWZu+K3U24q+6kD+LmGSRfbkHl9Px8hN1XrGwq6ZHgKGi/zuTm5m08G27fwqKfVXIWuIcUeq4Y1VQUOg==",
       "type": "package",
-      "path": "microsoft.identitymodel.abstractions/8.6.1",
+      "path": "microsoft.identitymodel.abstractions/8.3.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -5536,14 +5521,14 @@
         "lib/net9.0/Microsoft.IdentityModel.Abstractions.xml",
         "lib/netstandard2.0/Microsoft.IdentityModel.Abstractions.dll",
         "lib/netstandard2.0/Microsoft.IdentityModel.Abstractions.xml",
-        "microsoft.identitymodel.abstractions.8.6.1.nupkg.sha512",
+        "microsoft.identitymodel.abstractions.8.3.0.nupkg.sha512",
         "microsoft.identitymodel.abstractions.nuspec"
       ]
     },
-    "Microsoft.IdentityModel.JsonWebTokens/8.6.1": {
-      "sha512": "CAu9DWsPZVtnyE3bOJ83rlPWpahY37sP/0bIOdRlxS90W88zSI4V3FyoCDlXxV8+gloT+a247pwPXfSNjYyAxw==",
+    "Microsoft.IdentityModel.JsonWebTokens/8.3.0": {
+      "sha512": "4SVXLT8sDG7CrHiszEBrsDYi+aDW0W9d+fuWUGdZPBdan56aM6fGXJDjbI0TVGEDjJhXbACQd8F/BnC7a+m2RQ==",
       "type": "package",
-      "path": "microsoft.identitymodel.jsonwebtokens/8.6.1",
+      "path": "microsoft.identitymodel.jsonwebtokens/8.3.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -5560,14 +5545,14 @@
         "lib/net9.0/Microsoft.IdentityModel.JsonWebTokens.xml",
         "lib/netstandard2.0/Microsoft.IdentityModel.JsonWebTokens.dll",
         "lib/netstandard2.0/Microsoft.IdentityModel.JsonWebTokens.xml",
-        "microsoft.identitymodel.jsonwebtokens.8.6.1.nupkg.sha512",
+        "microsoft.identitymodel.jsonwebtokens.8.3.0.nupkg.sha512",
         "microsoft.identitymodel.jsonwebtokens.nuspec"
       ]
     },
-    "Microsoft.IdentityModel.Logging/8.6.1": {
-      "sha512": "BdWlVgJYdmcR9TMUOhaZ3vJyaRO7zr7xgK+cRT4R2q59Xl7JMmTB4ctb/VOsyDhxXb497jDNNvLwldp+2ZVBEg==",
+    "Microsoft.IdentityModel.Logging/8.3.0": {
+      "sha512": "4w4pSIGHhCCLTHqtVNR2Cc/zbDIUWIBHTZCu/9ZHm2SVwrXY3RJMcZ7EFGiKqmKZMQZJzA0bpwCZ6R8Yb7i5VQ==",
       "type": "package",
-      "path": "microsoft.identitymodel.logging/8.6.1",
+      "path": "microsoft.identitymodel.logging/8.3.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -5584,7 +5569,7 @@
         "lib/net9.0/Microsoft.IdentityModel.Logging.xml",
         "lib/netstandard2.0/Microsoft.IdentityModel.Logging.dll",
         "lib/netstandard2.0/Microsoft.IdentityModel.Logging.xml",
-        "microsoft.identitymodel.logging.8.6.1.nupkg.sha512",
+        "microsoft.identitymodel.logging.8.3.0.nupkg.sha512",
         "microsoft.identitymodel.logging.nuspec"
       ]
     },
@@ -5634,10 +5619,10 @@
         "microsoft.identitymodel.protocols.openidconnect.nuspec"
       ]
     },
-    "Microsoft.IdentityModel.Tokens/8.6.1": {
-      "sha512": "FvED2com8LIFl9yFXneiX0uxNf9fuf8jKDFcvxC93qXOAfFa8fdLkCiur1vWF+PvgQHhsHVBe6CtDZHzsN8nCQ==",
+    "Microsoft.IdentityModel.Tokens/8.3.0": {
+      "sha512": "yGzqmk+kInH50zeSEH/L1/J0G4/yqTQNq4YmdzOhpE7s/86tz37NS2YbbY2ievbyGjmeBI1mq26QH+yBR6AK3Q==",
       "type": "package",
-      "path": "microsoft.identitymodel.tokens/8.6.1",
+      "path": "microsoft.identitymodel.tokens/8.3.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -5654,7 +5639,7 @@
         "lib/net9.0/Microsoft.IdentityModel.Tokens.xml",
         "lib/netstandard2.0/Microsoft.IdentityModel.Tokens.dll",
         "lib/netstandard2.0/Microsoft.IdentityModel.Tokens.xml",
-        "microsoft.identitymodel.tokens.8.6.1.nupkg.sha512",
+        "microsoft.identitymodel.tokens.8.3.0.nupkg.sha512",
         "microsoft.identitymodel.tokens.nuspec"
       ]
     },
@@ -5908,6 +5893,29 @@
         "lib/netstandard2.0/PayPalHttp-Dotnet.dll",
         "paypalhttp.1.0.1.nupkg.sha512",
         "paypalhttp.nuspec"
+      ]
+    },
+    "Pipelines.Sockets.Unofficial/2.2.8": {
+      "sha512": "zG2FApP5zxSx6OcdJQLbZDk2AVlN2BNQD6MorwIfV6gVj0RRxWPEp2LXAxqDGZqeNV1Zp0BNPcNaey/GXmTdvQ==",
+      "type": "package",
+      "path": "pipelines.sockets.unofficial/2.2.8",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net461/Pipelines.Sockets.Unofficial.dll",
+        "lib/net461/Pipelines.Sockets.Unofficial.xml",
+        "lib/net472/Pipelines.Sockets.Unofficial.dll",
+        "lib/net472/Pipelines.Sockets.Unofficial.xml",
+        "lib/net5.0/Pipelines.Sockets.Unofficial.dll",
+        "lib/net5.0/Pipelines.Sockets.Unofficial.xml",
+        "lib/netcoreapp3.1/Pipelines.Sockets.Unofficial.dll",
+        "lib/netcoreapp3.1/Pipelines.Sockets.Unofficial.xml",
+        "lib/netstandard2.0/Pipelines.Sockets.Unofficial.dll",
+        "lib/netstandard2.0/Pipelines.Sockets.Unofficial.xml",
+        "lib/netstandard2.1/Pipelines.Sockets.Unofficial.dll",
+        "lib/netstandard2.1/Pipelines.Sockets.Unofficial.xml",
+        "pipelines.sockets.unofficial.2.2.8.nupkg.sha512",
+        "pipelines.sockets.unofficial.nuspec"
       ]
     },
     "Pomelo.EntityFrameworkCore.MySql/8.0.3": {
@@ -6172,6 +6180,30 @@
         "lib/sl5/Sprache.xml",
         "sprache.2.3.1.nupkg.sha512",
         "sprache.nuspec"
+      ]
+    },
+    "StackExchange.Redis/2.9.32": {
+      "sha512": "j5Rjbf7gWz5izrn0UWQy9RlQY4cQDPkwJfVqATnVsOa/+zzJrps12LOgacMsDl/Vit2f01cDiDkG/Rst8v2iGw==",
+      "type": "package",
+      "path": "stackexchange.redis/2.9.32",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "lib/net461/StackExchange.Redis.dll",
+        "lib/net461/StackExchange.Redis.xml",
+        "lib/net472/StackExchange.Redis.dll",
+        "lib/net472/StackExchange.Redis.xml",
+        "lib/net6.0/StackExchange.Redis.dll",
+        "lib/net6.0/StackExchange.Redis.xml",
+        "lib/net8.0/StackExchange.Redis.dll",
+        "lib/net8.0/StackExchange.Redis.xml",
+        "lib/netcoreapp3.1/StackExchange.Redis.dll",
+        "lib/netcoreapp3.1/StackExchange.Redis.xml",
+        "lib/netstandard2.0/StackExchange.Redis.dll",
+        "lib/netstandard2.0/StackExchange.Redis.xml",
+        "stackexchange.redis.2.9.32.nupkg.sha512",
+        "stackexchange.redis.nuspec"
       ]
     },
     "Swashbuckle.AspNetCore/6.6.2": {
@@ -7205,10 +7237,10 @@
         "system.globalization.extensions.nuspec"
       ]
     },
-    "System.IdentityModel.Tokens.Jwt/8.6.1": {
-      "sha512": "EXL1Tj+pizswtHHPiQyNumrTo8XOLX7SoTm7Bz00/DyiIoG2H/kQItoajSvr1MYtvDNXveqULsoWDoJFI3aHzQ==",
+    "System.IdentityModel.Tokens.Jwt/8.3.0": {
+      "sha512": "9GESpDG0Zb17HD5mBW/uEWi2yz/uKPmCthX2UhyLnk42moGH2FpMgXA2Y4l2Qc7P75eXSUTA6wb/c9D9GSVkzw==",
       "type": "package",
-      "path": "system.identitymodel.tokens.jwt/8.6.1",
+      "path": "system.identitymodel.tokens.jwt/8.3.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -7225,7 +7257,7 @@
         "lib/net9.0/System.IdentityModel.Tokens.Jwt.xml",
         "lib/netstandard2.0/System.IdentityModel.Tokens.Jwt.dll",
         "lib/netstandard2.0/System.IdentityModel.Tokens.Jwt.xml",
-        "system.identitymodel.tokens.jwt.8.6.1.nupkg.sha512",
+        "system.identitymodel.tokens.jwt.8.3.0.nupkg.sha512",
         "system.identitymodel.tokens.jwt.nuspec"
       ]
     },
@@ -10207,17 +10239,19 @@
       "FuzzySharp >= 2.0.2",
       "Google.Apis.Auth >= 1.69.0",
       "Microsoft.AspNetCore.Authentication.Google >= 8.0.2",
-      "Microsoft.AspNetCore.Authentication.JwtBearer >= 8.0.2",
+      "Microsoft.AspNetCore.Authentication.JwtBearer >= 8.0.11",
       "Microsoft.AspNetCore.OpenApi >= 8.0.12",
       "Microsoft.AspNetCore.SignalR >= 1.2.0",
       "Microsoft.EntityFrameworkCore >= 8.0.13",
       "Microsoft.EntityFrameworkCore.Relational >= 8.0.13",
       "Microsoft.EntityFrameworkCore.SqlServer >= 8.0.13",
       "Microsoft.EntityFrameworkCore.Tools >= 8.0.13",
+      "Microsoft.IdentityModel.Tokens >= 8.3.0",
       "PayPalCheckoutSdk >= 1.0.4",
       "Pomelo.EntityFrameworkCore.MySql >= 8.0.3",
+      "StackExchange.Redis >= 2.9.32",
       "Swashbuckle.AspNetCore >= 6.6.2",
-      "System.IdentityModel.Tokens.Jwt >= 8.6.1",
+      "System.IdentityModel.Tokens.Jwt >= 8.3.0",
       "System.Text.Encoding.CodePages >= 9.0.5",
       "VNPAY.NET >= 8.5.0"
     ]
@@ -10294,7 +10328,7 @@
           },
           "Microsoft.AspNetCore.Authentication.JwtBearer": {
             "target": "Package",
-            "version": "[8.0.2, )"
+            "version": "[8.0.11, )"
           },
           "Microsoft.AspNetCore.OpenApi": {
             "target": "Package",
@@ -10322,6 +10356,10 @@
             "target": "Package",
             "version": "[8.0.13, )"
           },
+          "Microsoft.IdentityModel.Tokens": {
+            "target": "Package",
+            "version": "[8.3.0, )"
+          },
           "PayPalCheckoutSdk": {
             "target": "Package",
             "version": "[1.0.4, )"
@@ -10330,13 +10368,17 @@
             "target": "Package",
             "version": "[8.0.3, )"
           },
+          "StackExchange.Redis": {
+            "target": "Package",
+            "version": "[2.9.32, )"
+          },
           "Swashbuckle.AspNetCore": {
             "target": "Package",
             "version": "[6.6.2, )"
           },
           "System.IdentityModel.Tokens.Jwt": {
             "target": "Package",
-            "version": "[8.6.1, )"
+            "version": "[8.3.0, )"
           },
           "System.Text.Encoding.CodePages": {
             "target": "Package",

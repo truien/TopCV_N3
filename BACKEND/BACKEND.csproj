@@ -15,19 +15,21 @@
     <PackageReference Include="FuzzySharp" Version="2.0.2" />
     <PackageReference Include="Google.Apis.Auth" Version="1.69.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.13">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.3.0" />
     <PackageReference Include="PayPalCheckoutSdk" Version="1.0.4" />
+    <PackageReference Include="StackExchange.Redis" Version="2.9.32" />
 
     <!-- Swagger -->
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
 
     <!-- Xử lý Token -->
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.6.1" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.3.0" />
 
     <!-- OpenAPI -->
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.12" />

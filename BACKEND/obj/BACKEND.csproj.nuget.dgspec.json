@@ -73,7 +73,7 @@
             },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",
-              "version": "[8.0.2, )"
+              "version": "[8.0.11, )"
             },
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
@@ -101,6 +101,10 @@
               "target": "Package",
               "version": "[8.0.13, )"
             },
+            "Microsoft.IdentityModel.Tokens": {
+              "target": "Package",
+              "version": "[8.3.0, )"
+            },
             "PayPalCheckoutSdk": {
               "target": "Package",
               "version": "[1.0.4, )"
@@ -109,13 +113,17 @@
               "target": "Package",
               "version": "[8.0.3, )"
             },
+            "StackExchange.Redis": {
+              "target": "Package",
+              "version": "[2.9.32, )"
+            },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.6.2, )"
             },
             "System.IdentityModel.Tokens.Jwt": {
               "target": "Package",
-              "version": "[8.6.1, )"
+              "version": "[8.3.0, )"
             },
             "System.Text.Encoding.CodePages": {
               "target": "Package",

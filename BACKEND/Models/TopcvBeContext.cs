@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BACKEND.Models.Auth;
 using Microsoft.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore.MySql.Scaffolding.Internal;
 
@@ -59,12 +60,31 @@ public partial class TopcvBeContext : DbContext
     public virtual DbSet<UserFollow> UserFollows { get; set; }
 
     public virtual DbSet<UserRole> UserRoles { get; set; }
-
+    public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder
             .UseCollation("utf8mb4_0900_ai_ci")
             .HasCharSet("utf8mb4");
+            modelBuilder.Entity<RefreshToken>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity
+                .ToTable("refresh_tokens")
+                .UseCollation("utf8mb4_unicode_ci");
+
+            entity.HasIndex(e => e.UserId, "IX_RefreshTokens_UserId");
+
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("datetime");
+            entity.Property(e => e.DeviceId).HasMaxLength(128);
+            entity.Property(e => e.ExpiresAt).HasColumnType("datetime");
+            entity.Property(e => e.ReplacedByTokenHash).HasMaxLength(128);
+            entity.Property(e => e.RevokedAt).HasColumnType("datetime");
+            entity.Property(e => e.TokenHash).HasMaxLength(128);
+        });
 
         modelBuilder.Entity<Application>(entity =>
         {

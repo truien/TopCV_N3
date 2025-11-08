@@ -69,5 +69,9 @@ public class RegisterGoogleRequest
     public string? FullName { get; set; }
     public string? CompanyName { get; set; }
 }
-
+public class RefreshRequest
+    {
+        public int UserId { get; set; }
+        public string RefreshToken { get; set; } = string.Empty;
+    }
 

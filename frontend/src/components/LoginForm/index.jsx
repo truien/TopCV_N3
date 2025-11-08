@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { Link, useNavigate } from 'react-router-dom';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import SplitText from '../SplitText/SplitText';
-import { login, googleLogin } from '@/api/authApi';
+import { login, googleLogin,getCurrentUser } from '@/api/authApi';
 
 
 function SignInForm() {
@@ -31,9 +31,10 @@ function SignInForm() {
         }
 
         try {
-            const data = await login({ UserName: email, Password: password });
+            await login({ Username: email, Password: password });
             toast.success("Đăng nhập thành công!", { position: "top-right" });
-            redirectByRole(data.user.role);
+            const user = await getCurrentUser();
+            redirectByRole(user.role);
         } catch (error) {
             toast.error(error.message || "Đăng nhập thất bại.", { position: "top-right" });
             console.error("Login Error:", error);
@@ -50,14 +51,8 @@ function SignInForm() {
                 setShowRoleSelection(true);
             } else {
                 toast.success("Đăng nhập Google thành công!", { position: "top-right" });
-
-                if (data.user.role === "admin") {
-                    navigate("/admin");
-                } else if (data.user.role === "candidate") {
-                    navigate("/");
-                } else {
-                    navigate("/employer");
-                }
+                const user = await getCurrentUser();
+                redirectByRole(user.role);
             }
         } catch (error) {
             toast.error(error.message || "Đăng nhập Google thất bại.", { position: "top-right" });

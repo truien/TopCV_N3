@@ -23,7 +23,11 @@ export const googleLogin = ({ token, roleId, fullName, companyName }) =>
         .post('/api/auth/google-login', { token, roleId, fullName, companyName })
         .then(res => res.data);
 
-
+export const getCurrentUser = () =>
+    axiosInstance
+        .get('/api/auth/me')
+        .then(res => res.data);
+        
 export const register = (data) =>
     axiosInstance
         .post('/api/auth/register', data)

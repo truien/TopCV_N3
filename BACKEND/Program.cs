@@ -5,53 +5,88 @@ using System.Text;
 using BACKEND.Models;
 using Microsoft.EntityFrameworkCore;
 using DotNetEnv;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using BACKEND.Hubs;
+using StackExchange.Redis;
+using BACKEND.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Env.Load();
+
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<EmailService>();
-Env.Load();
-builder.Services.AddDbContext<TopcvBeContext>(options =>
-    options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
-        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))));
+builder.Services.AddSingleton<IConnectionMultiplexer>(
+    ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("RedisConnection")!)
+);
+builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddSingleton<IRedisService, RedisService>();
 
-var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var secret = jwtSettings["Secret"] ?? throw new InvalidOperationException("JWT Secret is missing in configuration.");
-var key = Encoding.UTF8.GetBytes(secret);
+builder.Services.AddDbContext<TopcvBeContext>(options =>
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
+    )
+);
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
+builder.Services.AddAuthorization();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
-        options.Cookie.Name = "topcv_auth";
-        options.Cookie.HttpOnly = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-        options.ExpireTimeSpan = TimeSpan.FromHours(1);
-        // Luôn đặt SameSite=None để cookie được gửi kèm khi gọi AJAX từ React/Vite
-        options.Cookie.SameSite = SameSiteMode.None;
-        options.Events = new CookieAuthenticationEvents
+        var jwt = builder.Configuration.GetSection("JwtSettings");
+        options.TokenValidationParameters = new TokenValidationParameters
         {
-            OnRedirectToLogin = context =>
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwt["Issuer"],
+            ValidAudience = jwt["Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(jwt["Secret"]!)
+            ),
+            ClockSkew = TimeSpan.Zero 
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
             {
-                context.Response.StatusCode = 401;
+                // Ưu tiên đọc token từ cookie nếu có
+                if (context.Request.Cookies.ContainsKey("access"))
+                {
+                    var tokenFromCookie = context.Request.Cookies["access"];
+                    if (!string.IsNullOrEmpty(tokenFromCookie))
+                    {
+                        context.Token = tokenFromCookie;
+                        Console.WriteLine($"[JWT] Token read from cookie: {tokenFromCookie.Substring(0, Math.Min(20, tokenFromCookie.Length))}...");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("[JWT] No 'access' cookie found in request");
+                    // Log all cookies for debugging
+                    foreach (var cookie in context.Request.Cookies)
+                    {
+                        Console.WriteLine($"[JWT] Cookie found: {cookie.Key}");
+                    }
+                }
                 return Task.CompletedTask;
             },
-            OnRedirectToAccessDenied = context =>
+            OnAuthenticationFailed = context =>
             {
-                context.Response.StatusCode = 403;
+                Console.WriteLine($"[JWT] Authentication failed: {context.Exception.Message}");
                 return Task.CompletedTask;
             }
         };
     });
 
-
-
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Bố Truyền nè", Version = "pro max" });
-
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "TopCV Clone", Version = "v1" });
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -61,70 +96,72 @@ builder.Services.AddSwaggerGen(options =>
         In = ParameterLocation.Header,
         Description = "Nhập token theo định dạng: Bearer {token}"
     });
-
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
             new OpenApiSecurityScheme
             {
-                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
             },
             new string[] { }
         }
     });
 });
 
-
-// Cấu hình CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy.WithOrigins(
             "http://localhost:5173",
-            "top-cv-n3-5zs5gnzq4-truiens-projects-27a8e364.vercel.app",
-            "https://top-cv-n3.vercel.app"
-       )
-             .AllowAnyHeader()
-             .AllowAnyMethod()
-             .AllowCredentials();
+            "https://top-cv-n3.vercel.app",
+            "https://top-cv-n3-5zs5gnzq4-truiens-projects-27a8e364.vercel.app"
+        )
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials();
     });
 });
-
 
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
     serverOptions.ListenAnyIP(5046);
-    serverOptions.ListenAnyIP(7026, listenOptions =>
-    {
-        listenOptions.UseHttps();
-    });
+    serverOptions.ListenAnyIP(7026, listenOptions => listenOptions.UseHttps());
 });
+
 builder.Services.AddHostedService<TopMaxPostDateUpdaterService>();
 builder.Services.AddSingleton<PayPalClient>();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddSignalR();
-builder.Services.AddAuthorization();
+
 builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Configuration.AddEnvironmentVariables();
 
 var app = builder.Build();
 
 app.UseStaticFiles();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Trọng Truyền Vip Pro");
-    });
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TopCV Clone API"));
 }
+
 app.UseCors("AllowFrontend");
-app.UseHttpsRedirection();
+
+// Chỉ redirect HTTPS trong production
+if (app.Environment.IsProduction())
+{
+    app.UseHttpsRedirection();
+}
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 app.MapHub<NotificationHub>("/hubs/notifications");
+
 app.Run();
